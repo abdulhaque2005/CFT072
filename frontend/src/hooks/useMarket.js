@@ -12,7 +12,7 @@ export function useMarket() {
     try {
       const result = await getMarketPrediction(data);
       setPrediction(result.data);
-      toast.success('Market prediction ready! 📊');
+      toast.success('Market prediction ready!');
     } catch (err) {
       toast.error(err.message);
     } finally {
@@ -25,7 +25,7 @@ export function useMarket() {
     try {
       const result = await getMandiComparison(data);
       setMandiData(result.data);
-      toast.success('Mandi comparison ready! 🏪');
+      toast.success('Mandi comparison ready!');
     } catch (err) {
       toast.error(err.message);
     } finally {

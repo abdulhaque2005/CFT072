@@ -10,6 +10,9 @@ import WeatherPage from './pages/WeatherPage';
 import MarketInsights from './pages/MarketInsights';
 import GovernmentSchemes from './pages/GovernmentSchemes';
 import FarmingCalendar from './pages/FarmingCalendar';
+import SubsidyTracker from './pages/SubsidyTracker';
+
+import KisaanAIAssistant from './components/KisaanAIAssistant';
 
 function App() {
   return (
@@ -27,8 +30,10 @@ function App() {
             <Route path="/market" element={<MarketInsights />} />
             <Route path="/schemes" element={<GovernmentSchemes />} />
             <Route path="/calendar" element={<FarmingCalendar />} />
+            <Route path="/subsidy-tracker" element={<SubsidyTracker />} />
           </Routes>
         </main>
+        <KisaanAIAssistant />
         <Toaster
           position="bottom-right"
           toastOptions={{

@@ -58,7 +58,7 @@ Keep response under 250 words. Be practical.`;
   try {
     logger.ai('Calling Gemini for crop recommendation...');
     const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
+      model: 'gemini-2.5-pro',
       contents: prompt
     });
     return {

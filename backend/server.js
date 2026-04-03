@@ -1,8 +1,8 @@
+import './config/env.js';
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
-import dotenv from 'dotenv';
 import { logger } from './utils/logger.js';
 import { errorHandler } from './middleware/errorHandler.js';
 
@@ -14,8 +14,7 @@ import marketRoutes from './routes/market.routes.js';
 import mandiRoutes from './routes/mandi.routes.js';
 import schemesRoutes from './routes/schemes.routes.js';
 import aiRoutes from './routes/ai.routes.js';
-
-dotenv.config({ path: '../.env' });
+import transparencyRoutes from './routes/transparency.routes.js';
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -43,6 +42,7 @@ app.use('/api/market', marketRoutes);
 app.use('/api/mandi', mandiRoutes);
 app.use('/api/schemes', schemesRoutes);
 app.use('/api/ai', aiRoutes);
+app.use('/api/transparency', transparencyRoutes);
 
 app.use((req, res) => {
   res.status(404).json({ success: false, message: 'Route not found' });

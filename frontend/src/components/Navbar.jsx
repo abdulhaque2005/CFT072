@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, Sprout, FlaskConical, Wheat, Leaf, CloudSun, BarChart3, Landmark, CalendarDays, Home as HomeIcon } from 'lucide-react';
+import { Menu, X, Sprout, FlaskConical, Wheat, Leaf, CloudSun, BarChart3, Landmark, CalendarDays, Home as HomeIcon, ShieldCheck } from 'lucide-react';
 
 const navLinks = [
   { path: '/', label: 'Home', Icon: HomeIcon },
@@ -10,7 +10,8 @@ const navLinks = [
   { path: '/weather', label: 'Weather', Icon: CloudSun },
   { path: '/market', label: 'Market', Icon: BarChart3 },
   { path: '/schemes', label: 'Schemes', Icon: Landmark },
-  { path: '/calendar', label: 'Calendar', Icon: CalendarDays }
+  { path: '/calendar', label: 'Calendar', Icon: CalendarDays },
+  { path: '/subsidy-tracker', label: 'Transparency', Icon: ShieldCheck }
 ];
 
 export default function Navbar() {
@@ -36,13 +37,13 @@ export default function Navbar() {
               <Link
                 key={path}
                 to={path}
-                className={`px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center gap-1.5
+                className={`px-3 py-2 rounded-lg text-sm font-bold transition-all duration-200 flex items-center gap-2
                   ${location.pathname === path
                     ? 'bg-primary-800 text-white shadow-md shadow-primary-800/20'
                     : 'text-gray-600 hover:bg-primary-50 hover:text-primary-800'
                   }`}
               >
-                <Icon className="w-4 h-4" />
+                <Icon className={`w-5 h-5 ${location.pathname === path ? 'text-white' : 'text-primary-600'}`} />
                 {label}
               </Link>
             ))}
@@ -66,13 +67,15 @@ export default function Navbar() {
                 key={path}
                 to={path}
                 onClick={() => setIsOpen(false)}
-                className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all
+                className={`flex items-center gap-3 px-4 py-3 rounded-xl text-base font-bold transition-all
                   ${location.pathname === path
                     ? 'bg-primary-800 text-white'
                     : 'text-gray-600 hover:bg-primary-50'
                   }`}
               >
-                <Icon className="w-5 h-5" />
+                <div className={`p-2 rounded-lg ${location.pathname === path ? 'bg-white/20' : 'bg-primary-100'} `}>
+                  <Icon className={`w-5 h-5 ${location.pathname === path ? 'text-white' : 'text-primary-700'}`} />
+                </div>
                 {label}
               </Link>
             ))}

@@ -1,101 +1,157 @@
-import { useState } from 'react';
-import CalendarView from '../components/CalendarView';
+import { useState, useEffect } from 'react';
+import { CalendarDays, MapPin, Sprout, Sun, CloudRain, Snowflake, RefreshCw, Wheat } from 'lucide-react';
+import { getCalendar } from '../services/calendarApi';
+import useLocation from '../hooks/useLocation';
 import Loading from '../components/Loading';
-import { getFarmingCalendar } from '../services/schemeApi';
-import toast from 'react-hot-toast';
+import Error from '../components/Error';
+
+const CROP_OPTIONS = ['Wheat', 'Rice', 'Cotton', 'Maize', 'Soybean', 'Gram', 'Mustard', 'Bajra', 'Groundnut', 'Moong'];
+
+function getCurrentSeason() {
+  const month = new Date().getMonth() + 1;
+  if (month >= 6 && month <= 10) return { name: 'Kharif', icon: CloudRain, color: 'text-blue-600', bg: 'bg-blue-50', desc: 'Monsoon season — baarish wali faslein', tips: ['Baarish se pehle seeds ready rakhein', 'Drainage ka proper arrangement karein', 'Soybean/Cotton ki buwai June mein karein', 'Waterlogging se bachein — raised bed use karein'] };
+  if (month >= 11 || month <= 3) return { name: 'Rabi', icon: Snowflake, color: 'text-cyan-600', bg: 'bg-cyan-50', desc: 'Winter season — thandi wali faslein', tips: ['Wheat ki buwai November tak complete karein', 'Frost se bachne ke liye halki irrigation karein', 'Mustard mein aphid ke liye spray karein', 'Gram mein pod borer ka dhyan rakhein'] };
+  return { name: 'Zaid', icon: Sun, color: 'text-amber-600', bg: 'bg-amber-50', desc: 'Summer season — garmi ki faslein', tips: ['Moong/Urad ki buwai March-April mein', 'Paani ka proper management karein', 'Mulching se moisture preserve karein', 'Short duration crops select karein'] };
+}
 
 export default function FarmingCalendar() {
-  const [form, setForm] = useState({ crop: '', season: '', location: '' });
-  const [calendarData, setCalendarData] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [selectedCrop, setSelectedCrop] = useState('Wheat');
+  const { city, state, locationText, loading: locLoading } = useLocation();
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!form.crop) return;
-    setLoading(true);
+  const season = getCurrentSeason();
+  const SeasonIcon = season.icon;
+  const todayStr = new Date().toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+
+  useEffect(() => {
+    if (!locLoading) loadCalendar();
+  }, [locLoading]);
+
+  const loadCalendar = async (crop) => {
     try {
-      const result = await getFarmingCalendar(form);
-      setCalendarData(result.data);
-      toast.success('Farming calendar ready! 📅');
+      setLoading(true);
+      setError('');
+      const res = await getCalendar({ crop: crop || selectedCrop, season: season.name, location: locationText || 'India' });
+      setData(res.data || res);
     } catch (err) {
-      toast.error(err.message);
+      setError(err.message || 'Calendar generation failed');
     } finally {
       setLoading(false);
     }
   };
 
+  const handleCropChange = (crop) => {
+    setSelectedCrop(crop);
+    loadCalendar(crop);
+  };
+
+  if (locLoading || loading) return <Loading text={`📅 ${selectedCrop} ka farming calendar bana rahe hain...`} />;
+  if (error) return <Error message={error} onRetry={() => loadCalendar()} />;
+  if (!data) return null;
+
   return (
-    <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-      <div className="mb-8">
-        <h1 className="section-title flex items-center gap-3">📅 Farming Calendar</h1>
-        <p className="text-gray-500 mt-2">Poora farming schedule — buwai se katai tak, AI plan karega</p>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-        <div className="lg:col-span-1">
-          <CalendarView events={[]} />
+    <div className="min-h-screen bg-[#f8faf8]">
+      <section className="relative overflow-hidden">
+        <div className="absolute inset-0">
+          <img src="https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=1200&h=400&fit=crop" alt="Farm" className="w-full h-full object-cover" />
+          <div className="absolute inset-0 bg-gradient-to-b from-primary-900/85 via-primary-800/70 to-[#f8faf8]"></div>
         </div>
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+          <div className="flex items-center gap-2 mb-3">
+            <MapPin className="w-4 h-4 text-primary-300" />
+            <span className="text-primary-200 text-sm font-medium">{locationText}</span>
+          </div>
+          <h1 className="text-3xl md:text-4xl font-extrabold text-white mb-3 flex items-center gap-3">
+            <CalendarDays className="w-9 h-9" /> Farming Calendar
+          </h1>
+          <p className="text-primary-200 text-lg font-medium mb-6">Poora farming schedule — buwai se katai tak</p>
+          <div className="grid sm:grid-cols-2 gap-4 max-w-lg">
+            <div className={`${season.bg} rounded-2xl p-4 border border-white/50`}>
+              <div className="flex items-center gap-2 mb-1">
+                <SeasonIcon className={`w-5 h-5 ${season.color}`} />
+                <span className={`text-sm font-bold ${season.color}`}>{season.name} Season</span>
+              </div>
+              <p className="text-xs text-gray-600 font-medium">{season.desc}</p>
+            </div>
+            <div className="bg-white/15 backdrop-blur-md rounded-2xl p-4 border border-white/20">
+              <p className="text-white font-bold text-sm">{todayStr}</p>
+              <p className="text-primary-200 text-xs font-medium mt-1">Aaj ki date ke hisaab se schedule</p>
+            </div>
+          </div>
+        </div>
+      </section>
 
-        <div className="lg:col-span-2">
-          <div className="card">
-            <h3 className="font-bold text-gray-800 mb-4">🌾 Crop Calendar Generate Karein</h3>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
-                <label className="label-text">Crop Name</label>
-                <input
-                  type="text"
-                  value={form.crop}
-                  onChange={(e) => setForm({...form, crop: e.target.value})}
-                  placeholder="e.g. Wheat, Rice, Cotton"
-                  className="input-field"
-                  required
-                />
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="label-text">Season</label>
-                  <select
-                    value={form.season}
-                    onChange={(e) => setForm({...form, season: e.target.value})}
-                    className="input-field"
-                  >
-                    <option value="">Auto-detect</option>
-                    <option value="Kharif">Kharif (Monsoon)</option>
-                    <option value="Rabi">Rabi (Winter)</option>
-                    <option value="Zaid">Zaid (Summer)</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="label-text">Location</label>
-                  <input
-                    type="text"
-                    value={form.location}
-                    onChange={(e) => setForm({...form, location: e.target.value})}
-                    placeholder="e.g. Gujarat"
-                    className="input-field"
-                  />
-                </div>
-              </div>
-              <button type="submit" disabled={loading} className="btn-primary w-full justify-center">
-                {loading ? 'Generating...' : '📅 Calendar Generate Karein'}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 mb-8">
+          <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3 flex items-center gap-2">
+            <Wheat className="w-4 h-4" /> Fasal Select Karein — Calendar Update Hoga
+          </p>
+          <div className="flex gap-3 overflow-x-auto pb-2" style={{ scrollbarWidth: 'thin' }}>
+            {CROP_OPTIONS.map(crop => (
+              <button key={crop} onClick={() => handleCropChange(crop)}
+                className={`px-5 py-2.5 rounded-xl text-sm font-bold whitespace-nowrap transition-all flex-shrink-0 ${selectedCrop === crop ? 'bg-primary-800 text-white shadow-lg shadow-primary-800/25' : 'bg-primary-50 text-primary-700 hover:bg-primary-100 border border-primary-100'}`}>
+                {crop}
               </button>
-            </form>
+            ))}
+          </div>
+        </div>
+
+        <div className="grid lg:grid-cols-3 gap-8">
+          <div className="lg:col-span-2">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-extrabold text-gray-900 flex items-center gap-2">
+                <Sprout className="w-6 h-6 text-primary-600" /> {selectedCrop} — Complete Calendar
+              </h2>
+              <button onClick={() => loadCalendar()} className="text-sm text-primary-600 font-bold flex items-center gap-1 hover:text-primary-800">
+                <RefreshCw className="w-4 h-4" /> Refresh
+              </button>
+            </div>
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 md:p-8">
+              <div className="whitespace-pre-wrap text-gray-700 leading-relaxed font-medium text-sm max-h-[600px] overflow-y-auto pr-2" style={{ scrollbarWidth: 'thin' }}>
+                {typeof data.calendar === 'string' ? data.calendar : "Calendar generation mein issue aaya. Retry karein."}
+              </div>
+            </div>
+          </div>
+
+          <div className="space-y-6">
+            <div className="bg-gradient-to-br from-primary-800 to-primary-900 rounded-2xl p-6 text-white">
+              <h3 className="font-extrabold text-lg mb-4">📋 Aaj Kya Karein?</h3>
+              <div className="space-y-3">
+                <div className="bg-white/10 rounded-xl p-4 border border-white/10">
+                  <p className="text-xs text-primary-300 font-bold uppercase mb-1">Season</p>
+                  <p className="text-sm font-medium">{season.name} — {season.desc}</p>
+                </div>
+                <div className="bg-white/10 rounded-xl p-4 border border-white/10">
+                  <p className="text-xs text-primary-300 font-bold uppercase mb-1">Selected Crop</p>
+                  <p className="text-sm font-bold">{selectedCrop}</p>
+                </div>
+                <div className="bg-white/10 rounded-xl p-4 border border-white/10">
+                  <p className="text-xs text-primary-300 font-bold uppercase mb-1">Location</p>
+                  <p className="text-sm font-medium">{locationText}</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+              <h3 className="text-base font-extrabold text-gray-900 mb-4">🌾 {season.name} Season Tips</h3>
+              <div className="space-y-3">
+                {season.tips.map((tip, i) => (
+                  <div key={i} className="flex items-start gap-2 text-sm">
+                    <span className="w-5 h-5 bg-primary-50 rounded-full flex items-center justify-center text-[10px] font-bold text-primary-700 mt-0.5 flex-shrink-0">{i+1}</span>
+                    <p className="text-gray-600 font-medium leading-relaxed">{tip}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="rounded-2xl overflow-hidden shadow-sm border border-gray-100">
+              <img src="https://images.unsplash.com/photo-1574943320219-553eb213f72d?w=600&h=250&fit=crop" alt="Farming activities" className="w-full h-36 object-cover" />
+            </div>
           </div>
         </div>
       </div>
-
-      {loading && <Loading text="Farming calendar bana raha hoon..." />}
-
-      {calendarData && !loading && (
-        <div className="card animate-fade-in">
-          <h3 className="font-bold text-gray-800 mb-3">
-            📋 {calendarData.crop} — {calendarData.season} Calendar
-          </h3>
-          <div className="text-sm text-gray-700 whitespace-pre-wrap leading-relaxed">
-            {calendarData.calendar}
-          </div>
-        </div>
-      )}
     </div>
   );
 }

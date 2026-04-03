@@ -17,7 +17,7 @@ export function useSoil() {
     try {
       const result = await analyzeSoil(soilData);
       setSoilResult(result.data);
-      toast.success('Mitti ka analysis ho gaya! 🌱');
+      toast.success('Mitti ka analysis ho gaya!');
       return result.data;
     } catch (err) {
       setError(err.message);
@@ -32,7 +32,7 @@ export function useSoil() {
     try {
       const result = await getCropRecommendation(soilData);
       setCropResult(result.data);
-      toast.success('Best crops mil gaye! 🌾');
+      toast.success('Best crops mil gaye!');
       return result.data;
     } catch (err) {
       setError(err.message);
@@ -47,7 +47,7 @@ export function useSoil() {
     try {
       const result = await getFertilizerPlan(soilData);
       setFertilizerResult(result.data);
-      toast.success('Fertilizer plan ready! 🧪');
+      toast.success('Fertilizer plan ready!');
       return result.data;
     } catch (err) {
       setError(err.message);

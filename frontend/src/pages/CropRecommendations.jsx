@@ -1,60 +1,79 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { Wheat, CheckCircle2, TrendingUp, DollarSign } from 'lucide-react';
+import { getCrops } from '../services/cropApi';
 import CropCard from '../components/CropCard';
-import SoilForm from '../components/SoilForm';
 import Loading from '../components/Loading';
-import { useSoil } from '../hooks/useSoil';
+import Error from '../components/Error';
 
 export default function CropRecommendations() {
-  const { cropResult, loading, getCrops } = useSoil();
-  const [showForm, setShowForm] = useState(true);
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
-  const handleSubmit = async (data) => {
-    await getCrops(data);
-    setShowForm(false);
+  useEffect(() => {
+    loadCrops();
+  }, []);
+
+  const loadCrops = async () => {
+    try {
+      setLoading(true);
+      const res = await getCrops();
+      setData(res.data);
+    } catch (err) {
+      setError(err.response?.data?.message || err.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
+  if (loading) return <Loading text="Finding the best crops..." />;
+  if (error) return <Error message={error} onRetry={loadCrops} />;
+  if (!data) return null;
+
   return (
-    <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-      <div className="mb-8">
-        <h1 className="section-title flex items-center gap-3">🌾 Crop Recommendations</h1>
-        <p className="text-gray-500 mt-2">AI aapki mitti ke hisaab se best fasal batayega</p>
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+      <div className="mb-10 text-center">
+        <h1 className="section-title flex items-center justify-center gap-3">
+          <Wheat className="w-8 h-8 text-primary-700" /> Fasal Recommendations
+        </h1>
+        <p className="text-gray-500 mt-2 font-medium">Aapki mitti aur mausam ke hisaab se sabse badiya faslain</p>
       </div>
 
-      {showForm && (
-        <div className="card mb-8">
-          <h3 className="font-bold text-gray-800 mb-4">Soil Data Enter Karein</h3>
-          <SoilForm onSubmit={handleSubmit} loading={loading} />
+      <div className="grid md:grid-cols-3 gap-8 mb-12">
+        <div className="md:col-span-2">
+          <h2 className="text-xl font-extrabold text-gray-900 mb-6 flex items-center gap-2">
+            <CheckCircle2 className="w-5 h-5 text-primary-600" /> Highly Recommended
+          </h2>
+          <div className="grid sm:grid-cols-2 gap-6">
+            {data.topCrops?.map((crop, i) => (
+              <CropCard key={i} rank={i + 1} name={crop.name} score={crop.score} reason={crop.reason} />
+            ))}
+          </div>
         </div>
-      )}
 
-      {loading && <Loading text="Best crops dhundh raha hoon..." />}
-
-      {cropResult && !loading && (
         <div>
-          <div className="flex items-center justify-between mb-6">
-            <div>
-              <h3 className="text-xl font-bold text-gray-800">AI Recommendations</h3>
-              <p className="text-sm text-gray-500">Season: {cropResult.season} | Location: {cropResult.location}</p>
-            </div>
-            <button onClick={() => setShowForm(!showForm)} className="btn-secondary text-sm">
-              {showForm ? 'Hide Form' : '🔄 Naya Analysis'}
-            </button>
+          <h2 className="text-xl font-extrabold text-gray-900 mb-6 flex items-center gap-2">
+            <TrendingUp className="w-5 h-5 text-gray-600" /> Rotation Crops
+          </h2>
+          <div className="space-y-4">
+            {data.rotationCrops?.map((crop, i) => (
+              <div key={i} className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm hover:border-primary-200 transition-colors">
+                <h4 className="font-bold text-gray-900 mb-1">{crop.name}</h4>
+                <p className="text-xs text-gray-500 font-medium">{crop.benefit}</p>
+              </div>
+            ))}
           </div>
 
-          <div className="card">
-            <div className="text-sm text-gray-700 whitespace-pre-wrap leading-relaxed">
-              {cropResult.recommendation}
+          {data.marketTrends && (
+            <div className="mt-8 bg-gradient-to-br from-green-50 to-primary-100 p-6 rounded-2xl border border-green-200 shadow-sm">
+              <h3 className="font-extrabold text-primary-900 mb-4 flex items-center gap-2">
+                <DollarSign className="w-5 h-5 text-green-600" /> Market Prediction
+              </h3>
+              <p className="text-sm text-green-800 font-medium leading-relaxed">{data.marketTrends}</p>
             </div>
-          </div>
+          )}
         </div>
-      )}
-
-      {!cropResult && !loading && !showForm && (
-        <div className="text-center py-16">
-          <p className="text-5xl mb-4">🌾</p>
-          <p className="text-gray-500">Soil data daalein toh crop recommendation milegi</p>
-        </div>
-      )}
+      </div>
     </div>
   );
 }

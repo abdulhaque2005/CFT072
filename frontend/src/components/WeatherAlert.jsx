@@ -1,20 +1,45 @@
-import { CloudRain, Wind, Thermometer, Droplets, AlertTriangle } from 'lucide-react';
+import { AlertTriangle, AlertCircle, Info } from 'lucide-react';
 
-export default function WeatherAlert({ advisory, type }) {
-  const typeStyles = {
-    rain: { icon: <CloudRain className="w-5 h-5" />, bg: 'bg-blue-50 border-blue-200', text: 'text-blue-800' },
-    heat: { icon: <Thermometer className="w-5 h-5" />, bg: 'bg-red-50 border-red-200', text: 'text-red-800' },
-    storm: { icon: <Wind className="w-5 h-5" />, bg: 'bg-amber-50 border-amber-200', text: 'text-amber-800' },
-    warning: { icon: <AlertTriangle className="w-5 h-5" />, bg: 'bg-orange-50 border-orange-200', text: 'text-orange-800' },
-    default: { icon: <Droplets className="w-5 h-5" />, bg: 'bg-primary-50 border-primary-200', text: 'text-primary-800' }
+export default function WeatherAlert({ type, title, message }) {
+  const getAlertConfig = () => {
+    switch (type) {
+      case 'danger':
+        return {
+          bg: 'bg-red-50',
+          border: 'border-red-200',
+          text: 'text-red-800',
+          icon: <AlertTriangle className="w-5 h-5 text-red-600 mt-0.5" />,
+          titleColor: 'text-red-900'
+        };
+      case 'warning':
+        return {
+          bg: 'bg-yellow-50',
+          border: 'border-yellow-200',
+          text: 'text-yellow-800',
+          icon: <AlertCircle className="w-5 h-5 text-yellow-600 mt-0.5" />,
+          titleColor: 'text-yellow-900'
+        };
+      case 'info':
+      default:
+        return {
+          bg: 'bg-blue-50',
+          border: 'border-blue-200',
+          text: 'text-blue-800',
+          icon: <Info className="w-5 h-5 text-blue-600 mt-0.5" />,
+          titleColor: 'text-blue-900'
+        };
+    }
   };
 
-  const style = typeStyles[type] || typeStyles.default;
+  const config = getAlertConfig();
 
   return (
-    <div className={`flex items-start gap-3 p-4 rounded-xl border-2 ${style.bg} animate-fade-in`}>
-      <div className={`mt-0.5 ${style.text}`}>{style.icon}</div>
-      <p className={`text-sm font-medium leading-relaxed ${style.text}`}>{advisory}</p>
+    <div className={`${config.bg} border ${config.border} p-5 rounded-2xl flex items-start gap-4 shadow-sm hover:shadow-md transition-shadow`}>
+      <div className="flex-shrink-0">{config.icon}</div>
+      <div>
+        <h4 className={`font-extrabold ${config.titleColor} mb-1.5 text-lg leading-tight`}>{title}</h4>
+        <p className={`${config.text} text-sm font-medium leading-relaxed`}>{message}</p>
+      </div>
     </div>
   );
 }

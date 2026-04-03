@@ -1,65 +1,92 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { Sprout, CalendarClock, Beaker, Ban } from 'lucide-react';
+import { getFertilizerPlan } from '../services/fertilizerApi';
 import FertilizerTable from '../components/FertilizerTable';
-import SoilForm from '../components/SoilForm';
 import Loading from '../components/Loading';
-import { useSoil } from '../hooks/useSoil';
+import Error from '../components/Error';
 
 export default function FertilizerPlan() {
-  const { fertilizerResult, loading, getFertilizer } = useSoil();
-  const [showForm, setShowForm] = useState(true);
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
-  const handleSubmit = async (data) => {
-    await getFertilizer({ ...data, crop: data.crop || 'Wheat' });
-    setShowForm(false);
+  useEffect(() => {
+    loadPlan();
+  }, []);
+
+  const loadPlan = async () => {
+    try {
+      setLoading(true);
+      const res = await getFertilizerPlan();
+      setData(res.data);
+    } catch (err) {
+      setError(err.response?.data?.message || err.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
+  if (loading) return <Loading text="Creating fertilizer plan..." />;
+  if (error) return <Error message={error} onRetry={loadPlan} />;
+  if (!data) return null;
+
   return (
-    <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-      <div className="mb-8">
-        <h1 className="section-title flex items-center gap-3">🌱 Fertilizer Plan</h1>
-        <p className="text-gray-500 mt-2">AI batayega — kaunsa fertilizer, kitna, aur kab daalein</p>
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+      <div className="mb-10 text-center">
+        <h1 className="section-title flex items-center justify-center gap-3">
+          <Sprout className="w-8 h-8 text-primary-700" /> Fertilizer Plan
+        </h1>
+        <p className="text-gray-500 mt-2 font-medium">Kitna, kab, aur kaunsa fertilizer daalna hai</p>
       </div>
 
-      {showForm && (
-        <div className="card mb-8">
-          <h3 className="font-bold text-gray-800 mb-4">Soil Data + Crop Name Daalein</h3>
-          <SoilForm onSubmit={handleSubmit} loading={loading} />
-        </div>
-      )}
+      <div className="mb-12">
+        <h2 className="text-xl font-extrabold text-gray-900 mb-6 flex items-center gap-2">
+          <Beaker className="w-6 h-6 text-primary-600" /> Requirements Checklist
+        </h2>
+        <FertilizerTable quickReference={data.requirements} />
+      </div>
 
-      {loading && <Loading text="Fertilizer plan bana raha hoon..." />}
-
-      {fertilizerResult && !loading && (
-        <div>
-          <div className="flex items-center justify-between mb-6">
-            <h3 className="text-xl font-bold text-gray-800">📋 Your Fertilizer Plan</h3>
-            <button onClick={() => setShowForm(!showForm)} className="btn-secondary text-sm">
-              {showForm ? 'Hide Form' : '🔄 Naya Plan'}
-            </button>
-          </div>
-
-          <FertilizerTable quickReference={fertilizerResult.quickReference} />
-
-          {fertilizerResult.plan && (
-            <div className="card mt-6">
-              <h3 className="font-bold text-gray-800 mb-3">🤖 AI Detailed Plan</h3>
-              <div className="text-sm text-gray-700 whitespace-pre-wrap leading-relaxed">
-                {fertilizerResult.plan}
+      <div className="grid lg:grid-cols-3 gap-8">
+        <div className="lg:col-span-2">
+          <h2 className="text-xl font-extrabold text-gray-900 mb-6 flex items-center gap-2">
+            <CalendarClock className="w-6 h-6 text-primary-600" /> Schedule (Kab daalna hai)
+          </h2>
+          <div className="space-y-6">
+            {data.schedule?.map((stage, i) => (
+              <div key={i} className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 relative pl-8">
+                <div className="absolute left-0 top-6 bottom-0 w-1 bg-primary-100 rounded-r-full"></div>
+                <div className="absolute left-[-5px] top-6 w-3 h-3 bg-primary-500 rounded-full border-2 border-white"></div>
+                
+                <h3 className="font-bold text-lg text-primary-900 mb-2">{stage.stage} ( {stage.timing} )</h3>
+                <div className="grid sm:grid-cols-2 gap-4 mt-4">
+                  {stage.actions.map((act, j) => (
+                    <div key={j} className="bg-gray-50 p-4 rounded-xl border border-gray-100">
+                      <span className="text-xs font-black uppercase text-gray-400 block mb-1">Dose</span>
+                      <strong className="text-gray-900">{act}</strong>
+                    </div>
+                  ))}
+                </div>
               </div>
-            </div>
-          )}
+            ))}
+          </div>
+        </div>
 
-          <div className="card mt-6 bg-amber-50 border-amber-200">
-            <h3 className="font-bold text-amber-800 mb-2">⚠️ Safety Reminders</h3>
-            <ul className="text-sm text-amber-700 space-y-1">
-              <li>• Zyada fertilizer mat daalein — soil damage hoga</li>
-              <li>• Baarish mein fertilizer mat do — wash ho jayega</li>
-              <li>• Split doses mein daalein (2-3 parts)</li>
-              <li>• Organic khad bhi zaroor mix karein</li>
+        <div>
+          <h2 className="text-xl font-extrabold text-gray-900 mb-6 flex items-center gap-2">
+            <Ban className="w-6 h-6 text-red-500" /> Zaroori Warnings
+          </h2>
+          <div className="bg-red-50 rounded-2xl p-6 border border-red-100">
+            <ul className="space-y-4">
+              {data.warnings?.map((w, i) => (
+                <li key={i} className="flex gap-3 text-red-800 text-sm font-medium leading-relaxed">
+                  <span className="flex-shrink-0 mt-0.5"><Ban className="w-4 h-4" /></span>
+                  {w}
+                </li>
+              ))}
             </ul>
           </div>
         </div>
-      )}
+      </div>
     </div>
   );
 }

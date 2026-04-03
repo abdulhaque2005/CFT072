@@ -80,7 +80,7 @@ Keep response under 300 words.`;
   try {
     logger.ai('Calling Gemini for soil analysis...');
     const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
+      model: 'gemini-2.5-pro',
       contents: prompt
     });
     aiAnalysis = response.text;

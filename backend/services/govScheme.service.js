@@ -5,12 +5,14 @@ import { GOVERNMENT_SCHEMES } from '../utils/constants.js';
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
 export async function findSchemes(location, crop, farmerType) {
-  const schemesList = GOVERNMENT_SCHEMES.map(s => `- ${s.name}: ${s.benefit} (${s.eligibility})`).join('\n');
+  const schemesList = GOVERNMENT_SCHEMES.map(s => 
+    `- ${s.name}: ${s.amount} | ${s.benefit} | Eligibility: ${s.eligibility} | Category: ${s.category}`
+  ).join('\n');
 
-  const prompt = `You are a government scheme advisor for Indian farmers. Give advice in Hinglish.
+  const prompt = `You are a government scheme advisor for Indian farmers. Respond in Hinglish.
 
 FARMER DETAILS:
-- Location: ${location}
+- Location: ${location || 'India'}
 - Crop: ${crop || 'General'}
 - Farmer Type: ${farmerType || 'Small farmer'}
 
@@ -18,41 +20,46 @@ AVAILABLE SCHEMES:
 ${schemesList}
 
 TASK:
-1. Check which schemes the farmer is eligible for
-2. Explain each scheme's benefit in simple words
-3. Give step-by-step apply instructions
-4. Mention any documents needed
+1. Rank the top 5 most relevant schemes for this farmer
+2. For each, explain WHY this scheme is good for them specifically
+3. Give 2-3 step apply instructions
+4. Mention if any deadline is coming soon
 
-OUTPUT FORMAT for each scheme:
-📋 **[Scheme Name]**
-💰 Benefit: [What farmer gets]
-✅ Eligibility: [Who can apply]
-📝 How to Apply:
-   Step 1: ...
-   Step 2: ...
-🔗 Website: [URL]
+OUTPUT FORMAT (respond ONLY in this JSON-like text format):
+For each scheme, one paragraph with:
+- Scheme name
+- Why it's relevant
+- How to apply (2-3 steps)
 
-Suggest top 3-4 most relevant schemes.
-Keep response under 350 words.`;
+Keep response under 400 words. Warm and helpful Hinglish.`;
 
   try {
     logger.ai('Calling Gemini for scheme recommendation...');
     const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
+      model: 'gemini-2.0-flash',
       contents: prompt
     });
     return {
-      location,
+      location: location || 'India',
       crop: crop || 'General',
-      availableSchemes: GOVERNMENT_SCHEMES,
-      recommendation: response.text
+      schemes: GOVERNMENT_SCHEMES,
+      recommendation: response.text,
+      totalSchemes: GOVERNMENT_SCHEMES.length,
+      totalBenefitValue: '₹6,000 - ₹5,00,000+'
     };
   } catch (error) {
     logger.error(`Gemini scheme error: ${error.message}`);
-    let fallback = `## Government Schemes for You\n\n`;
-    GOVERNMENT_SCHEMES.slice(0, 4).forEach(s => {
-      fallback += `📋 **${s.name}**\n💰 ${s.benefit}\n✅ ${s.eligibility}\n🔗 ${s.url}\n\n`;
+    let fallback = `## Aapke liye Best Sarkari Yojanayein\n\n`;
+    GOVERNMENT_SCHEMES.slice(0, 5).forEach(s => {
+      fallback += `📋 **${s.name}**\n💰 Amount: ${s.amount}\n✅ ${s.eligibility}\n🔗 ${s.url}\n\n`;
     });
-    return { location, crop: crop || 'General', availableSchemes: GOVERNMENT_SCHEMES, recommendation: fallback };
+    return { 
+      location: location || 'India', 
+      crop: crop || 'General', 
+      schemes: GOVERNMENT_SCHEMES, 
+      recommendation: fallback,
+      totalSchemes: GOVERNMENT_SCHEMES.length,
+      totalBenefitValue: '₹6,000 - ₹5,00,000+'
+    };
   }
 }

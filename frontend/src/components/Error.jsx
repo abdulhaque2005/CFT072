@@ -2,17 +2,17 @@ import { AlertTriangle, RefreshCcw } from 'lucide-react';
 
 export default function Error({ message, onRetry }) {
   return (
-    <div className="flex flex-col items-center justify-center py-12 animate-fade-in">
-      <div className="w-16 h-16 bg-red-100 rounded-2xl flex items-center justify-center mb-4">
-        <AlertTriangle className="w-8 h-8 text-red-500" />
+    <div className="bg-white flex flex-col items-center justify-center py-16 px-6 rounded-2xl border border-red-100 shadow-sm animate-fade-in text-center max-w-lg mx-auto">
+      <div className="w-20 h-20 bg-red-50 rounded-[2rem] flex items-center justify-center mb-6 shadow-inner">
+        <AlertTriangle className="w-10 h-10 text-red-500" />
       </div>
-      <h3 className="text-lg font-bold text-gray-800 mb-1">Kuch galat ho gaya!</h3>
-      <p className="text-sm text-gray-500 mb-4 text-center max-w-md">
+      <h3 className="text-2xl font-extrabold text-gray-900 mb-2">Kuch galat ho gaya!</h3>
+      <p className="text-base font-medium text-gray-500 mb-8 max-w-md leading-relaxed">
         {message || 'Server se connection nahi ho pa raha. Please thodi der baad try karein.'}
       </p>
       {onRetry && (
-        <button onClick={onRetry} className="btn-secondary flex items-center gap-2">
-          <RefreshCcw className="w-4 h-4" /> Phir se try karein
+        <button onClick={onRetry} className="bg-gray-900 text-white px-6 py-3 rounded-xl font-bold flex items-center gap-2 hover:bg-gray-800 transition-colors shadow-lg shadow-gray-900/20 active:scale-95">
+          <RefreshCcw className="w-5 h-5" /> Phir se try karein
         </button>
       )}
     </div>

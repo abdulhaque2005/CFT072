@@ -1,73 +1,86 @@
-import { Upload, FileImage, X } from 'lucide-react';
-import { useState, useRef } from 'react';
+import { useState } from 'react';
+import { UploadCloud, CheckCircle2, AlertTriangle, FileText } from 'lucide-react';
 
-export default function UploadBox({ onFileSelect }) {
+export default function UploadBox({ onUpload, onFileSelect, loading }) {
+  const [dragActive, setDragActive] = useState(false);
   const [file, setFile] = useState(null);
-  const [preview, setPreview] = useState(null);
-  const inputRef = useRef(null);
 
-  const handleFile = (f) => {
-    if (!f) return;
-    setFile(f);
-    if (f.type.startsWith('image/')) {
-      const reader = new FileReader();
-      reader.onload = (e) => setPreview(e.target.result);
-      reader.readAsDataURL(f);
-    } else {
-      setPreview(null);
-    }
-    onFileSelect?.(f);
+  const handleDrag = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.type === "dragenter" || e.type === "dragover") setDragActive(true);
+    else if (e.type === "dragleave") setDragActive(false);
   };
 
   const handleDrop = (e) => {
     e.preventDefault();
-    const f = e.dataTransfer.files[0];
-    handleFile(f);
+    e.stopPropagation();
+    setDragActive(false);
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      handleFile(e.dataTransfer.files[0]);
+    }
   };
 
-  const clearFile = () => {
-    setFile(null);
-    setPreview(null);
-    if (inputRef.current) inputRef.current.value = '';
+  const handleChange = (e) => {
+    e.preventDefault();
+    if (e.target.files && e.target.files[0]) {
+      handleFile(e.target.files[0]);
+    }
+  };
+
+  const handleFile = (f) => {
+    setFile(f);
+    if (onUpload) onUpload(f);
+    if (onFileSelect) onFileSelect(f);
   };
 
   return (
-    <div
-      className="relative border-2 border-dashed border-primary-300 rounded-2xl p-8 text-center transition-all hover:border-primary-500 hover:bg-primary-50/30 cursor-pointer"
-      onDrop={handleDrop}
-      onDragOver={(e) => e.preventDefault()}
-      onClick={() => inputRef.current?.click()}
-    >
-      <input
-        ref={inputRef}
-        type="file"
-        accept="image/*,.pdf"
-        className="hidden"
-        onChange={(e) => handleFile(e.target.files[0])}
-      />
+    <div className="w-full">
+      <div 
+        className={`relative border-2 border-dashed rounded-3xl p-10 text-center transition-all ${
+          dragActive ? 'border-primary-500 bg-primary-50/50 scale-[1.02]' : 'border-gray-300 hover:border-primary-400 hover:bg-gray-50'
+        } ${loading ? 'opacity-50 pointer-events-none' : ''}`}
+        onDragEnter={handleDrag}
+        onDragLeave={handleDrag}
+        onDragOver={handleDrag}
+        onDrop={handleDrop}
+      >
+        <input
+          type="file"
+          accept="image/*,.pdf"
+          onChange={handleChange}
+          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+        />
+        
+        {file ? (
+          <div className="flex flex-col items-center gap-3">
+            <div className="w-16 h-16 bg-green-50 rounded-full flex items-center justify-center mb-2">
+              <CheckCircle2 className="w-8 h-8 text-green-500" />
+            </div>
+            <p className="text-gray-900 font-extrabold text-lg">{file.name}</p>
+            <p className="text-sm text-gray-500 font-medium">Auto-analyzing your report via OCR...</p>
+          </div>
+        ) : (
+          <div className="flex flex-col items-center gap-4">
+            <div className="w-20 h-20 bg-primary-50 rounded-full flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
+              <UploadCloud className="w-10 h-10 text-primary-600" />
+            </div>
+            <div>
+              <p className="text-xl font-extrabold text-gray-900 mb-2">Apni Report Upload Karein</p>
+              <p className="text-sm text-gray-500 font-medium">Click karein ya file ko yahan drag karein</p>
+            </div>
+            <div className="flex gap-2 text-xs font-bold uppercase tracking-wider text-gray-400 mt-2">
+              <span className="bg-gray-100 px-3 py-1.5 rounded-md flex items-center gap-1"><FileText className="w-3 h-3" /> PDF</span>
+              <span className="bg-gray-100 px-3 py-1.5 rounded-md flex items-center gap-1"><UploadCloud className="w-3 h-3" /> IMAGE</span>
+            </div>
+          </div>
+        )}
+      </div>
 
-      {file ? (
-        <div className="space-y-3">
-          {preview && <img src={preview} alt="Soil report preview" className="max-h-40 mx-auto rounded-xl shadow-md" />}
-          <div className="flex items-center justify-center gap-2 text-primary-800 font-medium">
-            <FileImage className="w-5 h-5" />
-            <span className="truncate max-w-[200px]">{file.name}</span>
-            <button onClick={(e) => { e.stopPropagation(); clearFile(); }} className="p-1 hover:bg-red-100 rounded-full">
-              <X className="w-4 h-4 text-red-500" />
-            </button>
-          </div>
-        </div>
-      ) : (
-        <div className="space-y-3">
-          <div className="w-16 h-16 mx-auto bg-primary-100 rounded-2xl flex items-center justify-center">
-            <Upload className="w-8 h-8 text-primary-600" />
-          </div>
-          <div>
-            <p className="text-gray-700 font-semibold">Soil Report Upload Karein</p>
-            <p className="text-sm text-gray-500">PDF ya Image (JPG, PNG) — Max 10MB</p>
-          </div>
-        </div>
-      )}
+      <div className="mt-4 flex items-start gap-2 bg-yellow-50 text-yellow-800 p-4 rounded-xl border border-yellow-100 shadow-sm">
+        <AlertTriangle className="w-5 h-5 flex-shrink-0 mt-0.5" />
+        <p className="text-sm font-semibold">Abhi OCR testing mode mein hai. Best results ke liye clear photo ya PDF upload karein.</p>
+      </div>
     </div>
   );
 }

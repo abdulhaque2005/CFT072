@@ -4,7 +4,8 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
-export default function CalendarView({ events }) {
+export default function CalendarView({ events, tasksByMonth }) {
+  const allEvents = events || tasksByMonth || [];
   const [currentDate, setCurrentDate] = useState(new Date());
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth();
@@ -16,8 +17,8 @@ export default function CalendarView({ events }) {
   const nextMonth = () => setCurrentDate(new Date(year, month + 1, 1));
 
   const getEventsForDay = (day) => {
-    if (!events) return [];
-    return events.filter(e => {
+    if (!allEvents) return [];
+    return allEvents.filter(e => {
       const d = new Date(e.date);
       return d.getDate() === day && d.getMonth() === month && d.getFullYear() === year;
     });
