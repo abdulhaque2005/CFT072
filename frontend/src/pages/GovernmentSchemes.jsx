@@ -46,7 +46,9 @@ export default function GovernmentSchemes() {
       setLoading(true);
       setError('');
       const res = await findSchemes({ location: locationText || 'India', crop: '', farmerType: 'Small Farmer' });
-      setData(res.data || res);
+      // interceptor strips response.data → res = { success, data, message }
+      const payload = res.data || res;
+      setData(payload);
     } catch (err) {
       setError(err.message || 'Schemes fetch failed');
     } finally {
@@ -59,12 +61,12 @@ export default function GovernmentSchemes() {
   if (!data) return null;
 
   const schemes = data.schemes || [];
-  const categories = ['All', ...new Set(schemes.map(s => s.category))];
+  const categories = ['All', ...new Set(schemes.map(s => s.category).filter(Boolean))];
   
   const filteredSchemes = schemes.filter(s => {
     const matchSearch = searchTerm === '' || 
-      s.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      s.benefit.toLowerCase().includes(searchTerm.toLowerCase());
+      (s.name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (s.benefit || '').toLowerCase().includes(searchTerm.toLowerCase());
     const matchCategory = selectedCategory === 'All' || s.category === selectedCategory;
     return matchSearch && matchCategory;
   });
@@ -155,12 +157,14 @@ export default function GovernmentSchemes() {
             const img = SCHEME_IMAGES[i % SCHEME_IMAGES.length];
             return (
               <div key={i} className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group flex flex-col">
-                {/* Card Image */}
-                <div className="relative h-36 overflow-hidden">
-                  <img src={img} alt={scheme.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
-                  <div className="absolute bottom-3 left-4 right-4">
-                    <span className={`inline-block px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${config.bg} ${config.text} ${config.border} border`}>
+                {/* Card Header styling with Gradient */}
+                <div className={`relative h-24 ${config.bg} flex items-center justify-center border-b border-gray-100 overflow-hidden`}>
+                  <div className="absolute inset-0 opacity-20 flex items-center justify-center">
+                    <span className="text-6xl">{config.icon}</span>
+                  </div>
+                  <div className={`absolute bottom-0 w-full h-1/2 bg-gradient-to-t from-white to-transparent`}></div>
+                  <div className="absolute top-3 left-4">
+                    <span className={`inline-block px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${config.bg} ${config.text} ${config.border} border bg-white/80 backdrop-blur-sm shadow-sm`}>
                       {config.icon} {scheme.category}
                     </span>
                   </div>

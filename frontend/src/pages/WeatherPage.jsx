@@ -40,7 +40,9 @@ export default function WeatherPage() {
       setLoading(true);
       setError('');
       const res = await getWeatherByCoords(lat, lon, locationText);
-      setData(res.data || res);
+      // interceptor strips response.data → res = { success, data, message }
+      const payload = res.data || res;
+      setData(payload);
     } catch (err) {
       setError(err.message || 'Weather data fetch failed');
     } finally {

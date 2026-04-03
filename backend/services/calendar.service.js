@@ -32,7 +32,7 @@ Keep response under 350 words.`;
   try {
     logger.ai('Calling Gemini for farming calendar...');
     const response = await ai.models.generateContent({
-      model: 'gemini-2.5-pro',
+      model: 'gemini-2.0-flash',
       contents: prompt
     });
     return {

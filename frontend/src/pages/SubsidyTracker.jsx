@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Search, ShieldAlert, AlertTriangle, Scale, Target, Send, ShieldCheck, HeartHandshake } from 'lucide-react';
-import axios from 'axios';
+import api from '../services/api';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LabelList, Legend } from 'recharts';
 
 export default function SubsidyTracker() {
@@ -11,8 +11,10 @@ export default function SubsidyTracker() {
   const fetchTracker = async () => {
     setLoading(true);
     try {
-      const res = await axios.post('http://localhost:5000/api/transparency/track', { location: district, farmerType: 'Small Farmer' });
-      setData(res.data.data);
+      const res = await api.post('/transparency/track', { location: district, farmerType: 'Small Farmer' });
+      // interceptor strips response.data → res = { success, data, message }
+      const payload = res.data || res;
+      setData(payload);
     } catch (err) {
       console.error(err);
     } finally {
@@ -32,13 +34,12 @@ export default function SubsidyTracker() {
   };
 
   const getChartData = () => {
-    if (!data) return [];
+    if (!data || !data.trackingData) return [];
     return data.trackingData.map(item => {
-      // Parse numbers from strings like "₹10,000" or "45 Kg" for visualization
-      const released = parseInt(item.governmentReleased.replace(/[^0-9]/g, '')) || 100;
-      const received = parseInt(item.averageReceived.replace(/[^0-9]/g, '')) || (100 - item.leakagePercent);
+      const released = parseInt((item.governmentReleased || '').replace(/[^0-9]/g, '')) || 100;
+      const received = parseInt((item.averageReceived || '').replace(/[^0-9]/g, '')) || (100 - (item.leakagePercent || 0));
       return {
-        name: item.schemeName.substring(0, 15) + '...',
+        name: (item.schemeName || '').substring(0, 15) + '...',
         Released: released,
         Received: received,
         Lost: released - received
@@ -71,7 +72,7 @@ export default function SubsidyTracker() {
         </button>
       </div>
 
-      {data && (
+      {data && data.trackingData && (
         <>
           <div className="grid lg:grid-cols-2 gap-8 mb-8">
             <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
@@ -136,7 +137,7 @@ export default function SubsidyTracker() {
                 <div className="mb-6">
                   <p className="text-xs font-bold text-gray-400 uppercase mb-3">Common Issues Block</p>
                   <ul className="space-y-2">
-                    {scheme.commonIssues.map((issue, i) => (
+                    {(scheme.commonIssues || []).map((issue, i) => (
                       <li key={i} className="flex items-start gap-2 text-sm text-gray-700 font-medium">
                         <AlertTriangle className="w-4 h-4 text-amber-500 mt-0.5 flex-shrink-0" /> {issue}
                       </li>

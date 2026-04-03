@@ -41,19 +41,19 @@ ${results.soil ? `SOIL ANALYSIS:
 ${results.weather ? `WEATHER: ${results.weather.current ? `${results.weather.current.temp}°C, ${results.weather.current.description}` : 'Data unavailable'}` : ''}
 
 YOUR BEHAVIOR:
-- Talk like a human friend in Hinglish
-- Give practical advice farmer can act on TODAY
-- Be encouraging
+- Respond entirely in ENGLISH.
+- Give practical advice the farmer can act on TODAY.
+- Keep it structured and easy to read.
 
 OUTPUT FORMAT:
-1. 🌱 Mitti ki Haalat — 2-3 lines
-2. 🌾 Best Fasal — top recommendation
+1. 🌱 Soil Condition — 2-3 lines
+2. 🌾 Best Crop — top recommendation
 3. 🧪 Fertilizer Plan — key points
-4. 🌧️ Mausam Advisory — today's action
-5. 💰 Market/Scheme Tip
-6. ✅ Final Sujhav — 1 clear action
+4. 🌧️ Weather Advisory — today's action
+5. 💰 Market & Govt Scheme Tip
+6. ✅ Final Suggestion — 1 clear action
 
-Keep under 400 words. Be warm and helpful.`;
+Keep under 300 words.`;
 
   try {
     logger.ai('Calling Gemini MASTER MODE...');
@@ -73,7 +73,7 @@ Keep under 400 words. Be warm and helpful.`;
 }
 
 export async function recoveryAdvisor(problem, soilData) {
-  const prompt = `You are a crop recovery expert for Indian farmers. Respond in Hinglish.
+  const prompt = `You are a crop recovery expert for Indian farmers. Respond in English.
 
 PROBLEM: ${problem}
 ${soilData ? `SOIL: N=${soilData.nitrogen}, P=${soilData.phosphorus}, K=${soilData.potassium}, pH=${soilData.ph}` : ''}
@@ -97,7 +97,7 @@ Keep under 200 words. Be encouraging.`;
     logger.error(`Gemini recovery error: ${error.message}`);
     return {
       problem,
-      recovery: `## Recovery Plan\n\n🌿 Short duration crops try karein (Moong, Urad — 60 din)\n💧 Soil moisture maintain karein\n📋 PM Fasal Bima Yojana mein claim karein\n💪 Himmat rakhein — recovery possible hai!`
+      recovery: `## Recovery Plan\n\n🌿 Try short duration crops (Green Gram, Black Gram — 60 days)\n💧 Maintain soil moisture\n📋 File a claim in PM Fasal Bima Yojana\n💪 Stay strong — recovery is possible!`
     };
   }
 }
@@ -108,11 +108,12 @@ export async function processVoiceQuery(transcript) {
 USER SPEECH: "${transcript}"
 
 RULES:
-1. Detect language, respond in Hinglish (Latin script)
-2. EXTREMELY SHORT — under 15 seconds to read aloud (2-3 sentences max)
-3. Give exact solution right away
+1. Detect the exact language used by the user. If they spoke Hindi, reply in Hindi. If English, reply in English. If Gujarati, reply in Gujarati.
+2. Reply in the NATIVE SCRIPT of that language (e.g. Devanagari for Hindi, not Latin).
+3. Keep it EXTREMELY SHORT — under 15 seconds to read aloud (2-3 sentences max).
+4. Give the exact solution right away.
 
-OUTPUT ONLY THE RESPONSE TEXT.`;
+OUTPUT ONLY THE RESPONSE TEXT. NO INTRO. NO QUOTES.`;
 
   try {
     logger.ai('Calling Gemini for Voice AI...');

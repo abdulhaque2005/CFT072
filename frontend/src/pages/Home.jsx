@@ -27,41 +27,63 @@ export default function Home() {
     <div className="overflow-hidden bg-[#f8faf8]">
       {/* Premium Hero Section with Background Video */}
       <section className="relative min-h-[85vh] flex items-center justify-center">
-        {/* Background Image of Farmer */}
-        <div className="absolute inset-0 overflow-hidden w-full h-full bg-black">
-          <img
-            src="https://images.unsplash.com/photo-1599839619711-2eb2ce0ab0eb?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80"
-            alt="Lush Indian Farming"
-            className="absolute top-1/2 left-1/2 min-w-full min-h-full w-auto h-auto object-cover -translate-x-1/2 -translate-y-1/2 opacity-80"
+        {/* Background Farming Video */}
+        <div className="absolute inset-0 overflow-hidden w-full h-full bg-[#0a1a0c]">
+          {/* Fallback image shown instantly while video loads */}
+          <img 
+            src="https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=1920&q=80" 
+            alt="Farming" 
+            className="absolute inset-0 w-full h-full object-cover opacity-60"
           />
-          <div className="absolute inset-0 bg-gradient-to-br from-primary-950/80 via-primary-900/40 to-transparent mix-blend-multiply"></div>
+          <video
+            autoPlay
+            loop
+            muted
+            playsInline
+            poster="https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=1920&q=80"
+            className="absolute inset-0 w-full h-full object-cover opacity-70"
+            onLoadedData={(e) => { e.target.style.opacity = '0.7'; e.target.previousElementSibling.style.display = 'none'; }}
+          >
+            <source src="https://cdn.pixabay.com/video/2020/05/25/40060-424930080_large.mp4" type="video/mp4" />
+          </video>
+          <div className="absolute inset-0 bg-gradient-to-br from-primary-950/80 via-primary-900/50 to-transparent"></div>
         </div>
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 relative z-10 w-full mt-10">
-          <div className="max-w-3xl">
-            {/* Location Badge */}
-            <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-md px-4 py-2 rounded-full text-white text-sm font-medium mb-4 border border-white/20 shadow-lg">
-              <MapPin className="w-4 h-4 text-green-300" />
-              {locLoading ? 'Detecting Location...' : `Farming in ${city}, ${state}`}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 relative z-10 w-full mt-12 md:mt-20">
+          <div className="max-w-4xl">
+            {/* Ultra Premium Live Location Badge */}
+            <div className={`inline-flex items-center gap-3 bg-black/30 backdrop-blur-xl px-5 py-2.5 rounded-full text-white text-sm md:text-base font-bold mb-8 border shadow-[0_4px_30px_rgba(0,0,0,0.3)] transition-all duration-700 ease-in-out ${locLoading ? 'border-primary-400/50 animate-pulse' : 'border-white/30 hover:border-white/50 hover:bg-black/40'}`}>
+              <div className="relative flex h-3 w-3">
+                {locLoading && <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary-400 opacity-75"></span>}
+                <span className={`relative inline-flex rounded-full h-3 w-3 ${locLoading ? 'bg-primary-500' : 'bg-green-400 shadow-[0_0_10px_rgba(74,222,128,0.8)]'}`}></span>
+              </div>
+              <MapPin className={`w-4 h-4 md:w-5 md:h-5 ${locLoading ? 'text-primary-300' : 'text-green-300 animate-bounce'}`} />
+              {locLoading ? (
+                <span className="tracking-wide text-primary-100">Live Farming Location Detect ho rahi hai...</span>
+              ) : (
+                <span className="tracking-wide">Smart Farming in <span className="text-green-300 drop-shadow-md">{city}, {state}</span></span>
+              )}
             </div>
 
-            <div className="inline-flex items-center gap-2 bg-gradient-to-r from-yellow-500/20 to-yellow-600/20 backdrop-blur-md px-4 py-2 rounded-full text-yellow-300 text-sm font-extrabold mb-6 border border-yellow-500/30">
-              <Sparkles className="w-4 h-4" /> Powered by Gemini 2.0 Flash
-            </div>
-
-            <h1 className="text-4xl sm:text-5xl lg:text-7xl font-extrabold text-white leading-tight mb-6 drop-shadow-md">
+            {/* Jaw-dropping Headline */}
+            <h1 className="text-5xl sm:text-6xl lg:text-[5.5rem] font-black text-white leading-[1.05] mb-8 tracking-tight drop-shadow-2xl">
               Complex Soil Data ko
-              <span className="block text-primary-300">Simple Farming</span>
+              <span className="block mt-2 bg-gradient-to-r from-green-300 via-primary-300 to-emerald-300 text-transparent bg-clip-text drop-shadow-lg filter pb-2">
+                Simple Farming
+              </span>
             </h1>
 
-            <p className="text-lg text-gray-200 mb-8 max-w-xl leading-relaxed drop-shadow font-medium">
-              Aapki {city} ki mitti aur mausam ke hisaab se, AI turant batayega best crop, fertilizer plan, 5-din ka forecast aur profitable govt schemes.
+            {/* Elegant Subheadline */}
+            <p className="text-xl md:text-2xl text-primary-50 mb-12 max-w-3xl leading-relaxed drop-shadow-xl font-medium border-l-4 border-green-500 pl-6 py-2 bg-gradient-to-r from-black/40 to-transparent backdrop-blur-sm rounded-r-2xl">
+              Aapki {city} ki mitti aur mausam ke hisaab se, AI turant batayega best crop, fertilizer plan, aur profitable govt schemes.
             </p>
 
-            <div className="flex flex-wrap gap-4">
-              <Link to="/soil-input" className="bg-white text-primary-900 px-8 py-4 rounded-xl font-bold text-base hover:bg-gray-100 transition-all shadow-[0_0_40px_rgba(255,255,255,0.3)] hover:shadow-white/40 active:scale-95 flex items-center gap-2">
-                <FlaskConical className="w-5 h-5" /> Start Free Analysis
-                <ArrowRight className="w-5 h-5 ml-1" />
+            {/* Premium CTA Buttons */}
+            <div className="flex flex-wrap gap-5">
+              <Link to="/soil-input" className="group bg-gradient-to-r from-green-500 to-primary-600 text-white px-8 py-4.5 rounded-2xl font-black text-lg hover:shadow-[0_0_40px_rgba(34,197,94,0.5)] transition-all duration-300 hover:-translate-y-1 active:scale-95 flex items-center gap-3 border border-green-400/50">
+                <FlaskConical className="w-6 h-6 group-hover:scale-110 transition-transform" /> 
+                <span className="tracking-wide">Start Free Analysis</span>
+                <ArrowRight className="w-6 h-6 ml-2 group-hover:translate-x-2 transition-transform" />
               </Link>
             </div>
           </div>

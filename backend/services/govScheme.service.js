@@ -49,15 +49,11 @@ Keep response under 400 words. Warm and helpful Hinglish.`;
     };
   } catch (error) {
     logger.error(`Gemini scheme error: ${error.message}`);
-    let fallback = `## Aapke liye Best Sarkari Yojanayein\n\n`;
-    GOVERNMENT_SCHEMES.slice(0, 5).forEach(s => {
-      fallback += `📋 **${s.name}**\n💰 Amount: ${s.amount}\n✅ ${s.eligibility}\n🔗 ${s.url}\n\n`;
-    });
     return { 
       location: location || 'India', 
       crop: crop || 'General', 
       schemes: GOVERNMENT_SCHEMES, 
-      recommendation: fallback,
+      recommendation: `Kshama karein, abhi direct AI recommendation available nahi hai. Lekin neeche di gayi sabhi yojanayein aapke liye labhdayak hain. Kripya list check karein.`,
       totalSchemes: GOVERNMENT_SCHEMES.length,
       totalBenefitValue: '₹6,000 - ₹5,00,000+'
     };

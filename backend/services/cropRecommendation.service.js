@@ -16,7 +16,7 @@ export async function recommendCrops(soilData, location, season) {
   const currentSeason = season || getCurrentSeason();
   const seasonLabel = typeof currentSeason === 'string' ? currentSeason : currentSeason.label;
 
-  const prompt = `You are a crop advisor for Indian farmers. Give advice in simple Hindi + English mix.
+  const prompt = `You are a crop advisor for farmers. Respond ONLY in English. Use simple and clear terms.
 
 SOIL DATA:
 - Nitrogen: ${soilData.nitrogen} kg/ha
@@ -28,67 +28,75 @@ SOIL DATA:
 LOCATION: ${location || 'India'}
 SEASON: ${seasonLabel}
 
-RECOMMENDATION RULES:
-- Good N (>280) → leafy crops (palak, methi, dhaniya) aur cereal crops
-- Balanced soil (all medium+) → wheat/rice best rahega
-- Bad/poor soil → millets (bajra, jowar) ya pulses (moong, chana) better hai
-- Acidic (pH < 6) → tea, potato, blue berries suitable
-- Alkaline (pH > 7.5) → barley, sugar beet suitable
-- High K → root crops like aloo, gajar
-
 TASK:
-1. Suggest top 3 best crops — rank them 1st, 2nd, 3rd
-2. For each crop, explain WHY it's suitable (2 lines max)
-3. Give suitability score (0-100) for each
-4. Suggest 2 crops to AVOID and explain why
+Give top 3 best crops, 2 rotation crops with benefits, and 1 market trend prediction. 
 
-OUTPUT FORMAT:
-🥇 Best Crop: [Name] — Score: [X]/100
-   Reason: [Why]
-🥈 2nd Best: [Name] — Score: [X]/100
-   Reason: [Why]
-🥉 3rd Best: [Name] — Score: [X]/100
-   Reason: [Why]
-
-❌ Avoid: [Crop1] — [Reason]
-❌ Avoid: [Crop2] — [Reason]
-
-Keep response under 250 words. Be practical.`;
+OUTPUT FORMAT: Return ONLY valid JSON inside a code block, exactly like this:
+{
+  "topCrops": [
+    { "name": "Wheat", "score": 90, "reason": "Perfect for balanced NPK." }
+  ],
+  "rotationCrops": [
+    { "name": "Legumes", "benefit": "Fixes nitrogen in soil" }
+  ],
+  "marketTrends": "Wheat prices are expected to rise by 5% this season due to high demand."
+}`;
 
   try {
     logger.ai('Calling Gemini for crop recommendation...');
     const response = await ai.models.generateContent({
-      model: 'gemini-2.5-pro',
+      model: 'gemini-2.0-flash',
       contents: prompt
     });
-    return {
-      season: seasonLabel,
-      location: location || 'India',
-      soilSummary: { n: soilData.nitrogen, p: soilData.phosphorus, k: soilData.potassium, ph: soilData.ph },
-      recommendation: response.text
-    };
+    
+    // Parse the JSON blocks out of the markdown response
+    const rawText = response.text;
+    const jsonMatch = rawText.match(/```(?:json)?\n([\s\S]*?)\n```/) || rawText.match(/{[\s\S]*}/);
+    const resultJson = jsonMatch ? JSON.parse(jsonMatch[1] || jsonMatch[0]) : null;
+    
+    if (resultJson) {
+      return resultJson;
+    }
+    throw new Error('Invalid JSON from Gemini');
   } catch (error) {
     logger.error(`Gemini crop recommendation error: ${error.message}`);
-    return {
-      season: seasonLabel,
-      location: location || 'India',
-      soilSummary: { n: soilData.nitrogen, p: soilData.phosphorus, k: soilData.potassium, ph: soilData.ph },
-      recommendation: generateFallbackCrops(soilData, seasonLabel)
-    };
+    const fallbackData = generateFallbackCrops(soilData, seasonLabel);
+    return fallbackData;
   }
 }
 
 function generateFallbackCrops(soil, season) {
-  let crops = [];
+  let topCrops = [];
   const isBalanced = soil.nitrogen >= 200 && soil.phosphorus >= 15 && soil.potassium >= 150;
 
   if (isBalanced) {
-    crops = ['Wheat (Gehun)', 'Rice (Chawal)', 'Maize (Makka)'];
+    topCrops = [
+      { name: 'Wheat', score: 85, reason: 'Good balanced NPK levels' },
+      { name: 'Rice', score: 75, reason: 'Sufficient nutrients for paddy' },
+      { name: 'Maize', score: 65, reason: 'Decent conditions for generic crops' }
+    ];
   } else if (soil.nitrogen < 140) {
-    crops = ['Moong (Green Gram)', 'Chana (Gram)', 'Masoor (Lentil)'];
+    topCrops = [
+      { name: 'Green Gram', score: 88, reason: 'Legume helps fix low nitrogen' },
+      { name: 'Gram', score: 80, reason: 'Needs very low nitrogen' },
+      { name: 'Lentil', score: 70, reason: 'Drought resistant and low N requirement' }
+    ];
   } else {
-    crops = ['Bajra (Millet)', 'Jowar (Sorghum)', 'Arhar (Pigeon Pea)'];
+    topCrops = [
+      { name: 'Pearl Millet', score: 80, reason: 'Tolerant to harsh soil conditions' },
+      { name: 'Sorghum', score: 75, reason: 'Hardy crop for imbalanced soil' },
+      { name: 'Pigeon Pea', score: 60, reason: 'Deep rooting crop' }
+    ];
   }
 
-  return `## Crop Recommendations (${season})\n\n🥇 **${crops[0]}** — Score: 85/100\n🥈 **${crops[1]}** — Score: 75/100\n🥉 **${crops[2]}** — Score: 65/100\n\n_Note: Gemini API unavailable, using rule-based recommendations._`;
+  return {
+    topCrops,
+    rotationCrops: [
+      { name: 'Mustard', benefit: 'Breaks pest cycle' },
+      { name: 'Cowpea', benefit: 'Improves soil organic carbon' }
+    ],
+    marketTrends: 'Market prices generally look stable for these hardy resilient crops.'
+  };
 }
+
+

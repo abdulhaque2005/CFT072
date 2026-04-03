@@ -17,10 +17,25 @@ export default function FertilizerPlan() {
   const loadPlan = async () => {
     try {
       setLoading(true);
-      const res = await getFertilizerPlan();
-      setData(res.data);
+      setError('');
+      const saved = localStorage.getItem('agrisaar_soil');
+      const soilData = saved ? JSON.parse(saved) : {
+        nitrogen: 200, phosphorus: 25, potassium: 180, ph: 6.5, organicCarbon: 0.6
+      };
+      const res = await getFertilizerPlan({
+        nitrogen: Number(soilData.nitrogen),
+        phosphorus: Number(soilData.phosphorus),
+        potassium: Number(soilData.potassium),
+        ph: Number(soilData.ph),
+        organicCarbon: Number(soilData.organicCarbon) || 0.5,
+        crop: soilData.crop || 'Wheat'
+      });
+      // interceptor strips response.data → res = { success, data, message }
+      const result = res.data || res;
+      setData(result);
     } catch (err) {
-      setError(err.response?.data?.message || err.message);
+      console.error('Fertilizer load error:', err);
+      setError(err.message);
     } finally {
       setLoading(false);
     }
@@ -59,7 +74,7 @@ export default function FertilizerPlan() {
                 
                 <h3 className="font-bold text-lg text-primary-900 mb-2">{stage.stage} ( {stage.timing} )</h3>
                 <div className="grid sm:grid-cols-2 gap-4 mt-4">
-                  {stage.actions.map((act, j) => (
+                  {stage.actions?.map((act, j) => (
                     <div key={j} className="bg-gray-50 p-4 rounded-xl border border-gray-100">
                       <span className="text-xs font-black uppercase text-gray-400 block mb-1">Dose</span>
                       <strong className="text-gray-900">{act}</strong>

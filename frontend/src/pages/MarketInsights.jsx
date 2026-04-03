@@ -1,5 +1,6 @@
+import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
 import { useState, useEffect } from 'react';
-import { BarChart3, Store, MapPin, RefreshCw, TrendingUp, TrendingDown, Minus, Search, Loader2, Sparkles } from 'lucide-react';
+import { BarChart3, Store, MapPin, RefreshCw, TrendingUp, TrendingDown, Minus, Search, Loader2, Sparkles, PhoneCall, ShieldCheck } from 'lucide-react';
 import { getMarketPredictions, getMandiPrices } from '../services/marketApi';
 import { getNearbyInfo } from '../services/schemeApi';
 import useLocation from '../hooks/useLocation';
@@ -31,9 +32,19 @@ export default function MarketInsights() {
         getNearbyInfo({ lat, lon, location: locationText })
       ]);
 
-      if (marketRes.status === 'fulfilled') setMarketData(marketRes.value?.data || marketRes.value);
-      if (mandiRes.status === 'fulfilled') setMandiData(mandiRes.value?.data || mandiRes.value);
-      if (nearbyRes.status === 'fulfilled') setNearbyInfo(nearbyRes.value?.data || nearbyRes.value);
+      // interceptor strips response.data → each value = { success, data, message }
+      if (marketRes.status === 'fulfilled') {
+        const raw = marketRes.value;
+        setMarketData(raw?.data || raw);
+      }
+      if (mandiRes.status === 'fulfilled') {
+        const raw = mandiRes.value;
+        setMandiData(raw?.data || raw);
+      }
+      if (nearbyRes.status === 'fulfilled') {
+        const raw = nearbyRes.value;
+        setNearbyInfo(raw?.data || raw);
+      }
     } catch (err) {
       setError(err.message);
     } finally {
@@ -47,6 +58,18 @@ export default function MarketInsights() {
 
   const searchCrop = () => {
     loadData();
+  };
+
+  const CustomTooltip = ({ active, payload, label }) => {
+    if (active && payload && payload.length) {
+      return (
+        <div className="bg-white p-3 border border-gray-100 shadow-xl rounded-xl">
+          <p className="text-gray-500 text-xs font-bold uppercase mb-1">{label}</p>
+          <p className="text-primary-700 font-extrabold text-lg">₹{payload[0].value}</p>
+        </div>
+      );
+    }
+    return null;
   };
 
   if (locLoading || loading) return <Loading text="📍 Aapke paas ki mandiyaan dhundh rahe hain..." />;
@@ -73,7 +96,7 @@ export default function MarketInsights() {
       </section>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Crop Selector - Horizontal Scroll */}
+        {/* Crop Selector */}
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 mb-8">
           <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">Apni fasal select karein:</p>
           <div className="flex gap-3 overflow-x-auto pb-2" style={{ scrollbarWidth: 'thin' }}>
@@ -99,15 +122,38 @@ export default function MarketInsights() {
         <div className="grid lg:grid-cols-5 gap-8">
           {/* Main Content */}
           <div className="lg:col-span-3 space-y-8">
-            {/* AI Market Prediction */}
-            {marketData?.prediction && (
+            {/* AI Market Prediction Graph & Details */}
+            {marketData && (
               <div>
                 <h2 className="text-xl font-extrabold text-gray-900 mb-4 flex items-center gap-2">
                   <TrendingUp className="w-6 h-6 text-primary-600" /> AI Price Prediction — {selectedCrop}
                 </h2>
-                <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-                  <div className="whitespace-pre-wrap text-gray-700 leading-relaxed font-medium text-sm">
-                    {marketData.prediction}
+                <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100">
+                  {marketData.trendData && marketData.trendData.length > 0 && (
+                    <div className="h-[250px] w-full mb-8 mt-2">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <LineChart data={marketData.trendData}>
+                          <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" />
+                          <XAxis dataKey="day" axisLine={false} tickLine={false} tick={{fill: '#6B7280', fontSize: 12}} dy={10} />
+                          <YAxis axisLine={false} tickLine={false} tick={{fill: '#6B7280', fontSize: 12}} dx={-10} domain={['auto', 'auto']} />
+                          <Tooltip content={<CustomTooltip />} />
+                          <Line type="monotone" dataKey="price" stroke="#059669" strokeWidth={4} dot={{r: 6, fill: '#059669', strokeWidth: 2, stroke: '#fff'}} activeDot={{r: 8, strokeWidth: 0}} />
+                        </LineChart>
+                      </ResponsiveContainer>
+                    </div>
+                  )}
+
+                  <div className="grid sm:grid-cols-2 gap-4">
+                    <div className="bg-primary-50 rounded-2xl p-5 border border-primary-100">
+                      <p className="text-xs font-bold text-primary-700 uppercase tracking-wider mb-2">Trend Analysis</p>
+                      <p className="text-gray-800 font-medium leading-relaxed">{marketData.analysis || marketData.prediction || 'Analysis loading...'}</p>
+                    </div>
+                    {marketData.recommendation && (
+                      <div className="bg-yellow-50 rounded-2xl p-5 border border-yellow-200">
+                        <p className="text-xs font-bold text-yellow-800 uppercase tracking-wider mb-2 flex items-center gap-1"><Sparkles className="w-3 h-3" /> Recommendation</p>
+                        <p className="text-gray-900 font-extrabold leading-relaxed text-lg">{marketData.recommendation}</p>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
@@ -119,7 +165,7 @@ export default function MarketInsights() {
                 <h2 className="text-xl font-extrabold text-gray-900 mb-4 flex items-center gap-2">
                   <Store className="w-6 h-6 text-primary-600" /> Nearby Mandi Comparison
                 </h2>
-                <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+                <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100">
                   <div className="whitespace-pre-wrap text-gray-700 leading-relaxed font-medium text-sm">
                     {mandiData.comparison}
                   </div>
@@ -130,38 +176,36 @@ export default function MarketInsights() {
 
           {/* Sidebar */}
           <div className="lg:col-span-2 space-y-6">
-            {/* Nearby Farming Info */}
-            {nearbyInfo?.info && (
-              <div>
-                <h3 className="text-lg font-extrabold text-gray-900 mb-3 flex items-center gap-2">
-                  <Sparkles className="w-5 h-5 text-yellow-500" /> Nearby Advisory ({city})
-                </h3>
-                <div className="bg-gradient-to-br from-primary-800 to-primary-900 rounded-2xl p-6 text-white">
-                  <div className="whitespace-pre-wrap text-sm leading-relaxed font-medium max-h-80 overflow-y-auto pr-1" style={{ scrollbarWidth: 'thin' }}>
-                    {nearbyInfo.info}
-                  </div>
-                  <div className="mt-4 pt-4 border-t border-white/15">
-                    <p className="text-[10px] text-primary-300 font-bold uppercase">Season: {nearbyInfo.season}</p>
-                  </div>
-                </div>
-              </div>
-            )}
+            
+            {/* Government Helpline Banner */}
+            <div className="bg-gradient-to-br from-white to-green-50 rounded-3xl p-6 shadow-lg border border-green-200 relative overflow-hidden group hover:shadow-xl transition-all">
+              <div className="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-green-200 rounded-full blur-2xl opacity-50 group-hover:bg-green-300 transition-colors"></div>
+              <h3 className="text-lg font-black text-gray-900 mb-2 flex items-center gap-2 relative z-10">
+                <ShieldCheck className="w-6 h-6 text-green-600" /> Kisaan Call Center
+              </h3>
+              <p className="text-sm text-gray-600 font-medium mb-6 relative z-10">
+                Agri expert se direct baat karne ke liye free me sarkar ke toll-free number par call karein.
+              </p>
+              <a href="tel:18001801551" className="bg-green-600 text-white w-full rounded-2xl py-4 font-black flex items-center justify-center gap-3 hover:bg-green-700 hover:shadow-lg transition-all drop-shadow-sm active:scale-95 text-lg relative z-10">
+                <PhoneCall className="w-6 h-6 animate-pulse" /> 1800-180-1551
+              </a>
+            </div>
 
             {/* Quick Tips */}
-            <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
-              <h3 className="text-base font-extrabold text-gray-900 mb-4">💡 Quick Market Tips</h3>
-              <div className="space-y-3">
+            <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100">
+              <h3 className="text-base font-extrabold text-gray-900 mb-5">💡 Quick Market Tips</h3>
+              <div className="space-y-4">
                 {[
                   { tip: 'e-NAM portal pe online price compare karein', url: 'https://enam.gov.in' },
                   { tip: 'MSP se neeche mat bechein — sarkar guarantee deti hai', url: null },
                   { tip: 'Storage available hai toh 2-3 hafte wait karo, price badhega', url: null },
                   { tip: 'Group mein bech kar better rate milta hai — FPO join karein', url: null }
                 ].map((item, i) => (
-                  <div key={i} className="flex items-start gap-2 text-sm">
-                    <span className="w-5 h-5 bg-primary-50 rounded-full flex items-center justify-center text-[10px] font-bold text-primary-700 mt-0.5 flex-shrink-0">{i+1}</span>
-                    <p className="text-gray-600 font-medium leading-relaxed">
+                  <div key={i} className="flex items-start gap-3 text-sm">
+                    <span className="w-6 h-6 bg-primary-50 rounded-full flex items-center justify-center text-xs font-bold text-primary-700 flex-shrink-0 mt-0.5">{i+1}</span>
+                    <p className="text-gray-600 font-medium leading-relaxed mt-0.5">
                       {item.tip}
-                      {item.url && <a href={item.url} target="_blank" rel="noopener noreferrer" className="text-primary-600 ml-1 font-bold">→</a>}
+                      {item.url && <a href={item.url} target="_blank" rel="noopener noreferrer" className="text-primary-600 ml-1 font-bold underline decoration-primary-200 underline-offset-2">→ Visit</a>}
                     </p>
                   </div>
                 ))}
@@ -169,17 +213,20 @@ export default function MarketInsights() {
             </div>
 
             {/* Real Image */}
-            <div className="rounded-2xl overflow-hidden shadow-sm border border-gray-100">
-              <img 
-                src="https://images.unsplash.com/photo-1595855759920-86582396756a?w=600&h=250&fit=crop" 
-                alt="Indian crop market" 
-                className="w-full h-36 object-cover"
-              />
+            <div className="rounded-3xl overflow-hidden shadow-sm border border-gray-100 group">
+              <div className="overflow-hidden">
+                <img 
+                  src="https://images.unsplash.com/photo-1595855759920-86582396756a?w=600&h=250&fit=crop" 
+                  alt="Indian crop market" 
+                  className="w-full h-36 object-cover group-hover:scale-105 transition-transform duration-500"
+                />
+              </div>
               <div className="bg-white p-4">
-                <p className="text-xs font-bold text-primary-700">🏪 Mandi rates change daily</p>
-                <p className="text-[11px] text-gray-400 mt-1">Har roz subah 8 baje check karein for best prices</p>
+                <p className="text-sm font-extrabold text-primary-800">🏪 Mandi rates change daily</p>
+                <p className="text-xs text-gray-500 mt-1 font-medium">Har roz subah 8 baje check karein for best prices</p>
               </div>
             </div>
+
           </div>
         </div>
       </div>

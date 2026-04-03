@@ -17,10 +17,25 @@ export default function CropRecommendations() {
   const loadCrops = async () => {
     try {
       setLoading(true);
-      const res = await getCrops();
-      setData(res.data);
+      setError('');
+      const saved = localStorage.getItem('agrisaar_soil');
+      const soilData = saved ? JSON.parse(saved) : {
+        nitrogen: 200, phosphorus: 25, potassium: 180, ph: 6.5, organicCarbon: 0.6
+      };
+      const res = await getCrops({
+        nitrogen: Number(soilData.nitrogen),
+        phosphorus: Number(soilData.phosphorus),
+        potassium: Number(soilData.potassium),
+        ph: Number(soilData.ph),
+        organicCarbon: Number(soilData.organicCarbon) || 0.5,
+        location: soilData.location || 'India'
+      });
+      // interceptor strips response.data → res = { success, data, message }
+      const result = res.data || res;
+      setData(result);
     } catch (err) {
-      setError(err.response?.data?.message || err.message);
+      console.error('Crop load error:', err);
+      setError(err.message);
     } finally {
       setLoading(false);
     }

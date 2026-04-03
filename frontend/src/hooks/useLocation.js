@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import axios from 'axios';
 
 const STORAGE_KEY = 'agrisaar_location';
 const NOMINATIM_URL = 'https://nominatim.openstreetmap.org/reverse';
@@ -37,67 +38,61 @@ export default function useLocation() {
       const district = addr.state_district || addr.county || city;
       const country = addr.country || 'India';
 
-      return {
-        lat,
-        lon,
-        city,
-        state,
-        district,
-        country,
-        locationText: `${city}, ${state}`
-      };
+      return { lat, lon, city, state, district, country, locationText: `${city}, ${state}` };
     } catch (err) {
-      console.warn('Reverse geocode failed:', err);
-      return {
-        lat,
-        lon,
-        city: 'Unknown',
-        state: 'Unknown',
-        district: 'Unknown',
-        country: 'India',
-        locationText: `${lat.toFixed(2)}°N, ${lon.toFixed(2)}°E`
-      };
+      return { lat, lon, city: 'Unknown', state: 'Unknown', district: 'Unknown', country: 'India', locationText: `${lat.toFixed(2)}°N, ${lon.toFixed(2)}°E` };
     }
+  }, []);
+
+  const getIpLocation = useCallback(async () => {
+    try {
+      const res = await axios.get('https://ipapi.co/json/');
+      if (res.data && res.data.latitude && res.data.longitude) {
+        const { latitude, longitude, city, region, country_name } = res.data;
+        const finalLoc = { lat: latitude, lon: longitude, city: city || 'Unknown', state: region || 'Unknown', district: city || 'Unknown', country: country_name || 'India', locationText: `${city}, ${region}` };
+        setLocation({ ...finalLoc, loading: false, error: null });
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(finalLoc));
+        return true;
+      }
+    } catch (err) {
+      console.warn('IP Location fallback failed');
+    }
+    return false;
   }, []);
 
   const detectLocation = useCallback(async () => {
     setLocation(prev => ({ ...prev, loading: true, error: null }));
 
-    if (!navigator.geolocation) {
-      const loc = { ...DEFAULT_LOCATION, loading: false, error: 'Geolocation not supported' };
-      setLocation(loc);
-      return;
+    // Try HTML5 Geolocation First
+    if ('geolocation' in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+          const { latitude: lat, longitude: lon } = position.coords;
+          const geocoded = await reverseGeocode(lat, lon);
+          setLocation({ ...geocoded, loading: false, error: null });
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(geocoded));
+        },
+        async (error) => {
+          console.warn('Geolocation denied or failed. Trying IP based location...');
+          const ipSuccess = await getIpLocation();
+          if (!ipSuccess) {
+            setLocation({ ...DEFAULT_LOCATION, loading: false, error: 'Using default location' });
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(DEFAULT_LOCATION));
+          }
+        },
+        { enableHighAccuracy: false, timeout: 5000, maximumAge: 300000 }
+      );
+    } else {
+      const ipSuccess = await getIpLocation();
+      if (!ipSuccess) {
+        setLocation({ ...DEFAULT_LOCATION, loading: false, error: 'Using default location' });
+      }
     }
-
-    try {
-      const position = await new Promise((resolve, reject) => {
-        navigator.geolocation.getCurrentPosition(resolve, reject, {
-          enableHighAccuracy: false,
-          timeout: 10000,
-          maximumAge: 300000
-        });
-      });
-
-      const { latitude: lat, longitude: lon } = position.coords;
-      const geocoded = await reverseGeocode(lat, lon);
-      const loc = { ...geocoded, loading: false, error: null };
-      
-      setLocation(loc);
-      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(geocoded)); } catch {}
-    } catch (err) {
-      console.warn('Location detection failed:', err.message);
-      const loc = { ...DEFAULT_LOCATION, loading: false, error: 'Location permission denied — using default' };
-      setLocation(loc);
-      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(DEFAULT_LOCATION)); } catch {}
-    }
-  }, [reverseGeocode]);
+  }, [reverseGeocode, getIpLocation]);
 
   useEffect(() => {
     detectLocation();
   }, [detectLocation]);
 
-  return {
-    ...location,
-    refresh: detectLocation
-  };
+  return { ...location, refresh: detectLocation };
 }

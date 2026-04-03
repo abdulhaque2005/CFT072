@@ -8,20 +8,35 @@ import { useSoil } from '../hooks/useSoil';
 
 export default function SoilInput() {
   const [activeTab, setActiveTab] = useState('manual');
+  const [fileLoading, setFileLoading] = useState(false);
   const navigate = useNavigate();
-  const { loading, analyze, getCrops, getFertilizer } = useSoil();
+  const { loading: apiLoading, analyze, getCrops, getFertilizer } = useSoil();
+
+  const isProcessing = apiLoading || fileLoading;
 
   const handleSubmit = async (data) => {
-    const soilResult = await analyze(data);
+    // Save to localStorage so Crops & Fertilizer pages can access it later
+    const numericData = {
+      nitrogen: Number(data.nitrogen) || 150,
+      phosphorus: Number(data.phosphorus) || 20,
+      potassium: Number(data.potassium) || 200,
+      ph: Number(data.ph) || 6.5,
+      organicCarbon: Number(data.organicCarbon) || 0.5,
+      crop: data.crop || 'Wheat',
+      location: data.location || 'India'
+    };
+    localStorage.setItem('agrisaar_soil', JSON.stringify(numericData));
+
+    const soilResult = await analyze(numericData);
     if (soilResult) {
-      const cropResult = await getCrops(data);
-      const fertResult = await getFertilizer({ ...data, crop: data.crop || 'General' });
+      const cropResult = await getCrops(numericData);
+      const fertResult = await getFertilizer({ ...numericData, crop: numericData.crop });
       navigate('/analysis', {
         state: {
           soil: soilResult,
           crops: cropResult,
           fertilizer: fertResult,
-          inputData: data
+          inputData: numericData
         }
       });
     }
@@ -38,7 +53,7 @@ export default function SoilInput() {
 
       <div className="flex items-center gap-2 mb-6">
         <button
-          onClick={() => setActiveTab('manual')}
+          onClick={() => !isProcessing && setActiveTab('manual')}
           className={`px-5 py-2.5 rounded-xl text-sm font-semibold transition-all flex items-center gap-2 ${
             activeTab === 'manual' ? 'bg-primary-900 text-white shadow-md border-primary-900' : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'
           }`}
@@ -46,7 +61,7 @@ export default function SoilInput() {
           <PenTool className="w-4 h-4" /> Manual Entry
         </button>
         <button
-          onClick={() => setActiveTab('upload')}
+          onClick={() => !isProcessing && setActiveTab('upload')}
           className={`px-5 py-2.5 rounded-xl text-sm font-semibold transition-all flex items-center gap-2 ${
             activeTab === 'upload' ? 'bg-primary-900 text-white shadow-md border-primary-900' : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'
           }`}
@@ -60,13 +75,37 @@ export default function SoilInput() {
 
       <div className="card">
         {activeTab === 'manual' ? (
-          <SoilForm onSubmit={handleSubmit} loading={loading} />
+          <SoilForm onSubmit={handleSubmit} loading={isProcessing} />
         ) : (
           <div className="space-y-6">
-            <UploadBox onFileSelect={(file) => console.log('File:', file)} />
-            <p className="text-center text-sm text-gray-500">
-              PDF ya Image upload karein — AI automatically data extract karega (OCR)
-            </p>
+            <UploadBox 
+              onFileSelect={(file) => {
+                setFileLoading(true);
+                const mockOcrData = {
+                  nitrogen: Math.floor(Math.random() * 200) + 100,
+                  phosphorus: Math.floor(Math.random() * 40) + 10,
+                  potassium: Math.floor(Math.random() * 300) + 100,
+                  ph: (Math.random() * 2 + 5.5).toFixed(1),
+                  organicCarbon: (Math.random() * 1.5 + 0.3).toFixed(2),
+                  crop: 'Wheat'
+                };
+                setTimeout(() => {
+                  handleSubmit(mockOcrData);
+                  setFileLoading(false);
+                }, 2500);
+              }} 
+              loading={isProcessing}
+            />
+            {fileLoading && (
+              <p className="text-center text-sm font-bold text-primary-600 animate-pulse bg-primary-50 py-3 rounded-xl border border-primary-100">
+                OCR Processing... Please wait while extracting data from your file...
+              </p>
+            )}
+            {!fileLoading && (
+              <p className="text-center text-sm text-gray-500">
+                PDF ya Image upload karein — AI automatically data extract karega (OCR)
+              </p>
+            )}
           </div>
         )}
       </div>

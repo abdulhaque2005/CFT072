@@ -5,64 +5,58 @@ import { FERTILIZER_MAP } from '../utils/constants.js';
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
 export async function getFertilizerPlan(soilData, crop) {
-  const prompt = `You are a fertilizer expert for Indian farming. Give advice in simple Hindi + English mix.
+  // Use a default empty object if soilData is missing
+  const safeSoil = soilData || { nitrogen: 0, phosphorus: 0, potassium: 0, ph: 7 };
+
+  const prompt = `You are a fertilizer expert. Respond ONLY in English. Use simple terms.
 
 SOIL DATA:
-- Nitrogen: ${soilData.nitrogen} kg/ha
-- Phosphorus: ${soilData.phosphorus} kg/ha
-- Potassium: ${soilData.potassium} kg/ha
-- pH: ${soilData.ph}
-- Organic Carbon: ${soilData.organicCarbon || 'N/A'}%
+- Nitrogen: ${safeSoil.nitrogen} kg/ha
+- Phosphorus: ${safeSoil.phosphorus} kg/ha
+- Potassium: ${safeSoil.potassium} kg/ha
+- pH: ${safeSoil.ph}
+- Organic Carbon: ${safeSoil.organicCarbon || 'N/A'}%
 
-CROP: ${crop}
-
-FERTILIZER RULES:
-- Low N (<140 kg/ha) → Urea (46% N) — 25-30 kg per acre
-- Low P (<10 kg/ha) → DAP (46% P₂O₅) — 25 kg per acre
-- Low K (<110 kg/ha) → MOP/Potash (60% K₂O) — 15-20 kg per acre
-- Low Zinc → Zinc Sulphate — 5 kg per acre
-- Acidic soil → Add lime
-- Alkaline soil → Add gypsum
-
-IMPORTANT SAFETY RULES:
-- Zyada fertilizer mat daalein — soil damage hota hai
-- Split doses mein daalein (2-3 parts)
-- Baarish se pehle fertilizer mat do — wash ho jayega
-- Organic manure bhi mix karein
+CROP: ${crop || 'General Crop'}
 
 TASK:
-1. Identify which nutrients are deficient
-2. Suggest specific fertilizer for each deficiency
-3. Give exact quantity per acre
-4. Give timing (when to apply — basal, 25 DAS, 45 DAS etc.)
-5. Warn about overuse
+Give a structured fertilizer plan. 
 
-OUTPUT FORMAT in a table-like structure:
-| Fertilizer | Quantity/Acre | Timing | Purpose |
-Then give 2-3 important warnings.
-
-Keep response under 300 words.`;
+OUTPUT FORMAT: Return ONLY valid JSON inside a code block, exactly like this:
+{
+  "schedule": [
+    { "stage": "Basal Dose", "timing": "At sowing", "actions": ["Urea 25kg/acre", "DAP 25kg/acre"] },
+    { "stage": "Top Dressing", "timing": "25 Days after sowing", "actions": ["Urea 25kg/acre"] }
+  ],
+  "warnings": [
+    "Do not apply excessive urea as it burns the soil.",
+    "Always apply organic manure along with chemical fertilizers."
+  ]
+}`;
 
   try {
     logger.ai('Calling Gemini for fertilizer plan...');
     const response = await ai.models.generateContent({
-      model: 'gemini-2.5-pro',
+      model: 'gemini-2.0-flash',
       contents: prompt
     });
-    return {
-      crop,
-      soilSummary: { n: soilData.nitrogen, p: soilData.phosphorus, k: soilData.potassium, ph: soilData.ph },
-      plan: response.text,
-      quickReference: buildQuickReference(soilData)
-    };
+    
+    // Parse the JSON blocks out of the markdown response
+    const rawText = response.text;
+    const jsonMatch = rawText.match(/```(?:json)?\n([\s\S]*?)\n```/) || rawText.match(/{[\s\S]*}/);
+    const resultJson = jsonMatch ? JSON.parse(jsonMatch[1] || jsonMatch[0]) : null;
+    
+    if (resultJson) {
+      return {
+        requirements: buildQuickReference(safeSoil),
+        schedule: resultJson.schedule,
+        warnings: resultJson.warnings
+      };
+    }
+    throw new Error('Invalid JSON from Gemini');
   } catch (error) {
     logger.error(`Gemini fertilizer error: ${error.message}`);
-    return {
-      crop,
-      soilSummary: { n: soilData.nitrogen, p: soilData.phosphorus, k: soilData.potassium, ph: soilData.ph },
-      plan: generateFallbackPlan(soilData, crop),
-      quickReference: buildQuickReference(soilData)
-    };
+    return generateFallbackPlan(safeSoil, crop);
   }
 }
 
@@ -75,11 +69,21 @@ function buildQuickReference(soil) {
 }
 
 function generateFallbackPlan(soil, crop) {
-  let plan = `## Fertilizer Plan for ${crop}\n\n`;
-  if (soil.nitrogen < 140) plan += `🧪 **Urea**: 25 kg/acre — 2 split doses mein daalein (sowing + 25 din baad)\n`;
-  if (soil.phosphorus < 10) plan += `🧪 **DAP**: 25 kg/acre — sowing ke time daalein (basal dose)\n`;
-  if (soil.potassium < 110) plan += `🧪 **MOP**: 15 kg/acre — sowing ke time daalein\n`;
-  plan += `\n⚠️ **Warning:** Zyada urea mat daalein — soil ki health kharab hogi.\n`;
-  plan += `⚠️ **Tip:** Organic khad (FYM) bhi zaroor use karein — 2 ton/acre`;
-  return plan;
+  const schedule = [];
+  if (soil.nitrogen < 140) schedule.push({ stage: "Basal & Top", timing: "Sowing & 25 DAS", actions: ["Urea 25kg/acre"] });
+  if (soil.phosphorus < 10) schedule.push({ stage: "Basal Dose", timing: "At sowing", actions: ["DAP 25kg/acre"] });
+  if (soil.potassium < 110) schedule.push({ stage: "Basal Dose", timing: "At sowing", actions: ["MOP 15kg/acre"] });
+  
+  if (schedule.length === 0) {
+    schedule.push({ stage: "Maintenance", timing: "During growth", actions: ["Standard NPK mix"] });
+  }
+
+  return {
+    requirements: buildQuickReference(soil),
+    schedule,
+    warnings: [
+      "Do not over-apply urea, it damages soil health.",
+      "Always mix organic manure (FYM) around 2 ton/acre."
+    ]
+  };
 }

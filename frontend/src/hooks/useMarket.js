@@ -11,7 +11,8 @@ export function useMarket() {
     setLoading(true);
     try {
       const result = await getMarketPrediction(data);
-      setPrediction(result.data);
+      // interceptor already strips response.data, so result = { success, data, message }
+      setPrediction(result.data || result);
       toast.success('Market prediction ready!');
     } catch (err) {
       toast.error(err.message);
@@ -24,7 +25,7 @@ export function useMarket() {
     setLoading(true);
     try {
       const result = await getMandiComparison(data);
-      setMandiData(result.data);
+      setMandiData(result.data || result);
       toast.success('Mandi comparison ready!');
     } catch (err) {
       toast.error(err.message);

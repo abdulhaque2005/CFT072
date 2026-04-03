@@ -27,25 +27,32 @@ export default function AnalysisDashboard() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-4">
-        <div>
-          <h1 className="text-3xl font-extrabold text-gray-900 flex items-center gap-3">
-            <Cpu className="w-8 h-8 text-primary-700" /> AI Analysis Report
-          </h1>
-          <p className="text-gray-500 mt-2 font-medium">Aapki mitti ke data ka complete AI checkup</p>
+      {/* Hero Section */}
+      <section className="relative overflow-hidden mb-10 rounded-3xl mx-px mt-2 shadow-sm border border-gray-100">
+        <div className="absolute inset-0">
+          <img src="https://images.unsplash.com/photo-1464226184884-fa280b87c399?w=1200&h=400&fit=crop" alt="Soil Analysis" className="w-full h-full object-cover" />
+          <div className="absolute inset-0 bg-gradient-to-r from-primary-900/90 via-primary-800/80 to-transparent"></div>
         </div>
-        <button className="bg-white border border-gray-200 text-gray-700 px-5 py-2.5 rounded-xl font-bold text-sm hover:bg-gray-50 flex items-center gap-2 shadow-sm transition-all focus:ring-4 focus:ring-gray-100">
-          <Download className="w-4 h-4" /> Download PDF
-        </button>
-      </div>
+        <div className="relative z-10 p-8 md:p-12 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+          <div>
+            <h1 className="text-3xl md:text-4xl font-extrabold text-white flex items-center gap-3 mb-3">
+              <Cpu className="w-9 h-9 text-primary-200" /> AI Soil Analysis Report
+            </h1>
+            <p className="text-primary-100 text-lg font-medium">Aapki mitti ke data ka complete AI checkup</p>
+          </div>
+          <button className="bg-white/20 backdrop-blur-md border border-white/30 text-white px-6 py-3 rounded-xl font-bold text-sm hover:bg-white/30 flex items-center gap-2 shadow-sm transition-all focus:ring-4 focus:ring-white/10">
+            <Download className="w-5 h-5" /> Download PDF Report
+          </button>
+        </div>
+      </section>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-1 space-y-8">
           <div className="bg-white p-1 rounded-2xl shadow-sm border border-gray-100">
             <SoilHealthCard
-              score={aiAnalysis?.score}
+              score={aiAnalysis?.healthScore || aiAnalysis?.score}
               soilType={aiAnalysis?.soilType}
-              nutrients={aiAnalysis?.nutrientsStatus}
+              nutrients={aiAnalysis?.nutrients || aiAnalysis?.nutrientsStatus}
             />
           </div>
           
@@ -56,6 +63,15 @@ export default function AnalysisDashboard() {
               potassium: { value: originalData?.potassium || 0 },
               ph: { value: originalData?.ph || 0 }
             }} />
+          </div>
+
+          <div className="bg-gradient-to-br from-green-50 to-primary-100 p-6 rounded-2xl border border-green-200 mt-6 shadow-sm">
+            <h3 className="font-extrabold text-primary-900 mb-4 flex items-center gap-2">
+              <Sprout className="w-5 h-5 text-green-600" /> AI Insights & Takeaways
+            </h3>
+            <div className="whitespace-pre-wrap text-sm text-green-900 leading-relaxed font-medium" style={{ scrollbarWidth: 'thin' }}>
+              {aiAnalysis?.analysis || 'Your AI Analysis is ready. Refer to the scores above for a detailed breakdown.'}
+            </div>
           </div>
         </div>
 

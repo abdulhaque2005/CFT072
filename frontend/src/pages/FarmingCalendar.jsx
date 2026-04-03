@@ -34,7 +34,9 @@ export default function FarmingCalendar() {
       setLoading(true);
       setError('');
       const res = await getCalendar({ crop: crop || selectedCrop, season: season.name, location: locationText || 'India' });
-      setData(res.data || res);
+      // interceptor strips response.data → res = { success, data, message }
+      const payload = res.data || res;
+      setData(payload);
     } catch (err) {
       setError(err.message || 'Calendar generation failed');
     } finally {
@@ -55,7 +57,7 @@ export default function FarmingCalendar() {
     <div className="min-h-screen bg-[#f8faf8]">
       <section className="relative overflow-hidden">
         <div className="absolute inset-0">
-          <img src="https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=1200&h=400&fit=crop" alt="Farm" className="w-full h-full object-cover" />
+          <img src="https://images.unsplash.com/photo-1592982537447-6f23fcf93eb9?auto=format&fit=crop&w=1200&h=400&q=80" alt="Farm Calendar" className="w-full h-full object-cover" />
           <div className="absolute inset-0 bg-gradient-to-b from-primary-900/85 via-primary-800/70 to-[#f8faf8]"></div>
         </div>
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">

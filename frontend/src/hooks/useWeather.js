@@ -13,7 +13,8 @@ export function useWeather(location) {
     setError(null);
     try {
       const result = await getWeatherAdvisory(target);
-      setWeather(result.data);
+      // interceptor strips response.data → result = { success, data, message }
+      setWeather(result.data || result);
     } catch (err) {
       setError(err.message);
     } finally {

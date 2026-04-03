@@ -16,9 +16,11 @@ export function useSoil() {
     setError(null);
     try {
       const result = await analyzeSoil(soilData);
-      setSoilResult(result.data);
+      // interceptor strips response.data → result = { success, data, message }
+      const payload = result.data || result;
+      setSoilResult(payload);
       toast.success('Mitti ka analysis ho gaya!');
-      return result.data;
+      return payload;
     } catch (err) {
       setError(err.message);
       toast.error(err.message);
@@ -31,9 +33,10 @@ export function useSoil() {
     setLoading(true);
     try {
       const result = await getCropRecommendation(soilData);
-      setCropResult(result.data);
+      const payload = result.data || result;
+      setCropResult(payload);
       toast.success('Best crops mil gaye!');
-      return result.data;
+      return payload;
     } catch (err) {
       setError(err.message);
       toast.error(err.message);
@@ -46,9 +49,10 @@ export function useSoil() {
     setLoading(true);
     try {
       const result = await getFertilizerPlan(soilData);
-      setFertilizerResult(result.data);
+      const payload = result.data || result;
+      setFertilizerResult(payload);
       toast.success('Fertilizer plan ready!');
-      return result.data;
+      return payload;
     } catch (err) {
       setError(err.message);
       toast.error(err.message);

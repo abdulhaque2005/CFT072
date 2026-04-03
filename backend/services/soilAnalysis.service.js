@@ -46,7 +46,7 @@ export async function analyzeSoil(soilData) {
   const pLevel = getNutrientLevel(soilData.phosphorus, SOIL_THRESHOLDS.phosphorus);
   const kLevel = getNutrientLevel(soilData.potassium, SOIL_THRESHOLDS.potassium);
 
-  const prompt = `You are a soil expert. Analyze this soil data and give practical advice in simple Hindi + English mix (Hinglish).
+  const prompt = `You are a soil expert. Analyze this soil data and give highly practical advice. Respond ONLY in English. Use a structured, pointwise format like a premium search engine result.
 
 SOIL DATA:
 - Nitrogen (N): ${soilData.nitrogen} kg/ha → Level: ${nLevel}
@@ -56,31 +56,19 @@ SOIL DATA:
 - Organic Carbon: ${soilData.organicCarbon || 'Not provided'}%
 - Location: ${soilData.location || 'Not specified'}
 
-ANALYSIS RULES:
-- Low N → growth issue, fasal ki growth slow hogi
-- Low P → root development weak, jadon mein problem
-- Low K → plant strength kam, fasal kamzor hogi
-- pH < 6 → acidic mitti
-- pH > 7.5 → alkaline mitti
-- pH 6-7.5 → balanced, acha hai
-
 TASK:
-1. Check if soil is healthy or not
-2. Identify which nutrients are low/high
-3. Classify the soil type
-4. Give soil health score explanation (Score: ${healthScore}/100)
-5. Give 2-3 practical suggestions to improve soil
+Give a structured analysis in exact point-wise format:
+1. Provide a 2-line summary of the soil health.
+2. List 3 critical bullet points about nutrient deficiencies/excesses and their impact.
+3. List 3 highly actionable bullet points on how to improve this specific soil.
 
-OUTPUT STYLE: Simple, Hinglish, like talking to a farmer friend.
-Example: "Aapki mitti thodi weak hai. Nitrogen kam hai, isliye fasal growth slow ho sakti hai."
-
-Keep response under 300 words.`;
+OUTPUT STYLE: Structured, clean, pointwise, strictly in English. Keep it under 250 words total. Do not output markdown headers (no ##).`;
 
   let aiAnalysis = '';
   try {
     logger.ai('Calling Gemini for soil analysis...');
     const response = await ai.models.generateContent({
-      model: 'gemini-2.5-pro',
+      model: 'gemini-2.0-flash',
       contents: prompt
     });
     aiAnalysis = response.text;

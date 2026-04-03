@@ -74,7 +74,6 @@ export default function KisaanAIAssistant() {
       // Remove emojis before speaking
       const cleanText = text.replace(/[\u1000-\uFFFF]/g, '');
       const utterance = new SpeechSynthesisUtterance(cleanText);
-      utterance.lang = 'hi-IN';
       utterance.rate = 0.95;
       
       utterance.onstart = () => setSpeaking(true);

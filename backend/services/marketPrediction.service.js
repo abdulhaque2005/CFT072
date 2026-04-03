@@ -4,46 +4,42 @@ import { logger } from '../utils/logger.js';
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
 export async function predictMarketPrice(crop, location, currentPrice, pastTrend) {
-  const prompt = `You are a market advisor for Indian farmers. Give advice in Hinglish.
-
+  const prompt = `You are an expert agricultural market analyst.
 CROP: ${crop}
-LOCATION: ${location}
-CURRENT PRICE: ₹${currentPrice || 'Unknown'} per quintal
-PAST TREND: ${pastTrend || 'Not available'}
+LOCATION: ${location || 'India'}
 
-MARKET PREDICTION RULES:
-- Increasing trend + low supply → price will go UP, wait karein
-- Decreasing trend + high supply → price will go DOWN, jaldi sell karein
-- Stable trend → hold, thoda wait karein
-- Festival season → demand badhti hai, prices UP
-- Harvest season (glut) → supply zyada, prices DOWN
-- Government MSP se compare karein
-
-TASK:
-1. Predict if price will go UP or DOWN in next 7-15 days
-2. Give clear recommendation: SELL NOW or WAIT
-3. Explain reasoning
-4. Mention MSP (Minimum Support Price) if applicable
-
-OUTPUT FORMAT:
-📊 Price Prediction: [UP/DOWN/STABLE]
-💡 Recommendation: [SELL NOW / WAIT X DAYS]
-📝 Reason: [Short explanation]
-
-Keep response under 150 words.`;
+TASK: Predict the market price trend for the next 7 days. Give highly realistic simulated data if real data is unavailable.
+OUTPUT FORMAT: Return ONLY valid JSON inside a code block exactly like this:
+{
+  "currentPrice": 2450,
+  "trendData": [
+    { "day": "Day 1", "price": 2450 },
+    { "day": "Day 2", "price": 2480 },
+    { "day": "Day 3", "price": 2510 },
+    { "day": "Day 4", "price": 2490 },
+    { "day": "Day 5", "price": 2550 },
+    { "day": "Day 6", "price": 2600 },
+    { "day": "Day 7", "price": 2650 }
+  ],
+  "analysis": "Prices are currently stable but expected to rise by weekend due to festival demand.",
+  "recommendation": "Hold for 5 days. Sell when price hits 2600."
+}`;
 
   try {
     logger.ai('Calling Gemini for market prediction...');
     const response = await ai.models.generateContent({
-      model: 'gemini-2.5-pro',
+      model: 'gemini-2.0-flash',
       contents: prompt
     });
-    return {
-      crop,
-      location,
-      currentPrice: currentPrice || null,
-      prediction: response.text
-    };
+    
+    const rawText = response.text;
+    const jsonMatch = rawText.match(/```(?:json)?\n([\s\S]*?)\n```/) || rawText.match(/{[\s\S]*}/);
+    const resultJson = jsonMatch ? JSON.parse(jsonMatch[1] || jsonMatch[0]) : null;
+
+    if (resultJson) {
+      return { crop, location, ...resultJson };
+    }
+    throw new Error('Invalid JSON from Gemini');
   } catch (error) {
     logger.error(`Gemini market error: ${error.message}`);
     return {

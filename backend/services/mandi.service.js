@@ -8,32 +8,24 @@ export async function compareMandis(crop, location, mandiPrices) {
     ? mandiPrices.map(m => `${m.name}: ₹${m.price}/quintal`).join('\n')
     : 'No mandi data provided';
 
-  const prompt = `You are a real-time mandi (market) comparison advisor for Indian farmers. Give advice ONLY in pure simple Hindi.
+  const prompt = `You are a live mandi (market) comparison advisor. Provide structured advice in English.
 
 CROP: ${crop}
-FARMER LOCATION: ${location}
-NEARBY MANDI PRICES PROVIDED BY SYSTEM:
+LOCATION: ${location}
+MANDI DATA:
 ${mandiList}
 
 TASK:
-1. If "NEARBY MANDI PRICES" are empty or "No mandi data", YOU MUST act as a live data fetcher. Search your knowledge base and simulate/predict the REAL current average market prices for ${crop} in 2-3 prominent Mandis nearest to ${location}.
-2. Compare the mandi prices (either provided or simulated by you).
-3. Find the BEST mandi (highest price).
-4. Consider transport cost and distance from ${location}.
-5. Give clear recommendation — kahan sell karein (sell locally vs travel far).
+1. If no data, simulate realistic current prices for 2 nearest Mandis to ${location}.
+2. Compare prices.
+3. Recommend where to sell considering transport cost.
 
-OUTPUT STRICTLY IN THIS EXACT FORMAT:
-📍 Best Mandi: [Near by Location Name] — ₹[Predict Price]/quintal
-📍 2nd Option: [Near by Location Name] — ₹[Predict Price]/quintal
-💡 Recommendation: [Where to sell and why based on location cost]
-🚛 Transport Tip: [Consider distance from ${location}]
-
-Keep response short, under 100 words, IN HINDI but written in Hinglish script (e.g. "Aapko paas wali mandi mein...") or pure Hindi script. Make it feel like it fetched LIVE data from nearby ${location}.`;
+OUTPUT STYLE: Pointwise, clear English. Keep under 100 words.`;
 
   try {
     logger.ai('Calling Gemini for mandi comparison...');
     const response = await ai.models.generateContent({
-      model: 'gemini-2.5-pro',
+      model: 'gemini-2.0-flash',
       contents: prompt
     });
     return {

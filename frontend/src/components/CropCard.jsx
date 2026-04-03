@@ -1,17 +1,19 @@
 import { TrendingUp, Award, Droplets } from 'lucide-react';
 
 const CROP_IMAGES = {
-  wheat: 'https://images.pexels.com/photos/158827/field-corn-air-uh-158827.jpeg?auto=compress&cs=tinysrgb&w=600',
-  rice: 'https://images.pexels.com/photos/1687063/pexels-photo-1687063.jpeg?auto=compress&cs=tinysrgb&w=600',
-  maize: 'https://images.pexels.com/photos/1112048/pexels-photo-1112048.jpeg?auto=compress&cs=tinysrgb&w=600',
-  cotton: 'https://images.pexels.com/photos/2568600/pexels-photo-2568600.jpeg?auto=compress&cs=tinysrgb&w=600',
-  sugarcane: 'https://images.pexels.com/photos/3305597/pexels-photo-3305597.jpeg?auto=compress&cs=tinysrgb&w=600',
-  gram: 'https://images.pexels.com/photos/30045/pexels-photo-30045.jpg?auto=compress&cs=tinysrgb&w=600',
-  mustard: 'https://images.pexels.com/photos/3800049/pexels-photo-3800049.jpeg?auto=compress&cs=tinysrgb&w=600',
-  soybean: 'https://images.pexels.com/photos/1120352/pexels-photo-1120352.jpeg?auto=compress&cs=tinysrgb&w=600',
-  bajra: 'https://images.pexels.com/photos/1359336/pexels-photo-1359336.jpeg?auto=compress&cs=tinysrgb&w=600',
-  jowar: 'https://images.pexels.com/photos/1321742/pexels-photo-1321742.jpeg?auto=compress&cs=tinysrgb&w=600',
-  default: 'https://images.pexels.com/photos/2165688/pexels-photo-2165688.jpeg?auto=compress&cs=tinysrgb&w=600'
+  wheat: 'https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?auto=format&fit=crop&w=800&q=80',
+  rice: 'https://images.unsplash.com/photo-1550989460-0adf9ea622e2?auto=format&fit=crop&w=800&q=80',
+  maize: 'https://images.unsplash.com/photo-1625246333195-78d9c38ad449?auto=format&fit=crop&w=800&q=80',
+  cotton: 'https://images.unsplash.com/photo-1590483864197-0ec997a39833?auto=format&fit=crop&w=800&q=80',
+  sugarcane: 'https://images.unsplash.com/photo-1596752718105-d326ccbc126f?auto=format&fit=crop&w=800&q=80',
+  gram: 'https://images.unsplash.com/photo-1599557451369-0260afad9d19?auto=format&fit=crop&w=800&q=80',
+  mustard: 'https://images.unsplash.com/photo-1616422329764-9dfcffc2bc4a?auto=format&fit=crop&w=800&q=80',
+  soybean: 'https://images.unsplash.com/photo-1598284699564-9eb51e8adbc5?auto=format&fit=crop&w=800&q=80',
+  bajra: 'https://images.unsplash.com/photo-1535405814088-7eecd04e4ecb?auto=format&fit=crop&w=800&q=80',
+  jowar: 'https://images.unsplash.com/photo-1582239634952-b8d960f2bb97?auto=format&fit=crop&w=800&q=80',
+  potato: 'https://images.unsplash.com/photo-1518977676601-b53f82aba655?auto=format&fit=crop&w=800&q=80',
+  tomato: 'https://images.unsplash.com/photo-1592924357228-91a4daadcfea?auto=format&fit=crop&w=800&q=80',
+  default: 'https://images.unsplash.com/photo-1599839619711-2eb2ce0ab0eb?auto=format&fit=crop&w=800&q=80'
 };
 
 const getCropImage = (name) => {
