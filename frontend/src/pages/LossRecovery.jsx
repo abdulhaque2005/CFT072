@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { LifeBuoy, AlertTriangle, CloudRain, Bug, Sun, Sprout, ArrowRight, XCircle } from 'lucide-react';
-import { api } from '../services/api';
+import api from '../services/api';
 import useLocation from '../hooks/useLocation';
 import Loading from '../components/Loading';
 
