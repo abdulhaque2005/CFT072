@@ -56,7 +56,7 @@ export default function GovernmentSchemes() {
     }
   };
 
-  if (locLoading || loading) return <Loading text="📍 Aapke liye best sarkari yojanayein dhundh rahe hain..." />;
+  if (locLoading || loading) return <Loading text="Finding the best government schemes for you..." />;
   if (error) return <Error message={error} onRetry={loadSchemes} />;
   if (!data) return null;
 
@@ -84,9 +84,9 @@ export default function GovernmentSchemes() {
             <span className="text-primary-200 font-medium text-sm">{locationText || 'India'}</span>
           </div>
           <h1 className="text-3xl md:text-4xl font-extrabold text-white mb-3 flex items-center gap-3">
-            <Landmark className="w-9 h-9" /> Sarkari Yojanayein
+            <Landmark className="w-9 h-9" /> Government Schemes
           </h1>
-          <p className="text-primary-200 text-lg font-medium mb-6">Aapke liye {schemes.length}+ sarkari faayde available hain</p>
+          <p className="text-primary-200 text-lg font-medium mb-6">{schemes.length}+ government benefits available for you</p>
           
           <div className="grid sm:grid-cols-3 gap-4">
             <div className="bg-white/10 backdrop-blur-md rounded-2xl p-5 border border-white/15">
@@ -114,7 +114,7 @@ export default function GovernmentSchemes() {
               type="text"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Scheme search karein... (e.g. PM Kisan, KCC)"
+              placeholder="Search schemes... (e.g. PM Kisan, KCC)"
               className="w-full bg-transparent outline-none text-sm font-medium text-gray-800 placeholder:text-gray-400"
             />
           </div>
@@ -229,8 +229,8 @@ export default function GovernmentSchemes() {
         {filteredSchemes.length === 0 && (
           <div className="text-center py-16">
             <Landmark className="w-16 h-16 text-gray-200 mx-auto mb-4" />
-            <p className="text-gray-400 font-bold text-lg">Koi scheme nahi mili "{searchTerm}"</p>
-            <p className="text-gray-300 text-sm mt-1">Search term change karke try karein</p>
+            <p className="text-gray-400 font-bold text-lg">No schemes found for "{searchTerm}"</p>
+            <p className="text-gray-300 text-sm mt-1">Try changing your search term</p>
           </div>
         )}
       </div>

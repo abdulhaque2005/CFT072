@@ -6,7 +6,7 @@ export default function FertilizerTable({ quickReference }) {
       <div className="bg-white rounded-2xl p-10 text-center border border-gray-100 shadow-sm">
         <CheckCircle2 className="w-16 h-16 text-green-500 mx-auto mb-4" />
         <h3 className="text-xl font-bold text-gray-900 mb-2">Soil is perfectly balanced!</h3>
-        <p className="text-gray-500 font-medium tracking-wide">Sab nutrients balanced hain — extra fertilizer ki zaroorat nahi.</p>
+        <p className="text-gray-500 font-medium tracking-wide">All nutrients are balanced — no extra fertilizer needed.</p>
       </div>
     );
   }

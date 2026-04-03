@@ -50,7 +50,7 @@ export default function WeatherPage() {
     }
   };
 
-  if (locLoading || loading) return <Loading text="📍 Aapki location detect kar rahe hain aur mausam dhundh rahe hain..." />;
+  if (locLoading || loading) return <Loading text="Detecting your location and fetching weather data..." />;
   if (error) return <Error message={error} onRetry={loadWeather} />;
   if (!data) return null;
 
@@ -182,27 +182,27 @@ export default function WeatherPage() {
                 <div className="bg-white/10 rounded-xl p-4 border border-white/10">
                   <p className="text-primary-200 text-xs font-bold uppercase mb-1">Temperature Impact</p>
                   <p className="text-sm font-medium">
-                    {current?.temp > 40 ? '⚠️ Heat wave — irrigation zaroor karein, mulching lagayein' :
-                     current?.temp > 35 ? '☀️ Garmi zyada — subah jaldi paani dein' :
-                     current?.temp < 10 ? '❄️ Thandi hai — frost protection zaroor karein' :
-                     current?.temp < 20 ? '🌡️ Thanda mausam — Rabi crops ke liye achha' :
-                     '✅ Temperature farming ke liye perfect hai'}
+                    {current?.temp > 40 ? '⚠️ Heat wave alert — ensure irrigation and use mulching' :
+                     current?.temp > 35 ? '☀️ High temperature — irrigate early morning' :
+                     current?.temp < 10 ? '❄️ Cold temperatures — use frost protection for crops' :
+                     current?.temp < 20 ? '🌡️ Cool weather — ideal for Rabi crops' :
+                     '✅ Temperature is perfect for farming'}
                   </p>
                 </div>
                 <div className="bg-white/10 rounded-xl p-4 border border-white/10">
                   <p className="text-primary-200 text-xs font-bold uppercase mb-1">Humidity Impact</p>
                   <p className="text-sm font-medium">
-                    {current?.humidity > 85 ? '⚠️ Humidity bahut zyada — fungal disease ka risk, spray karein' :
-                     current?.humidity > 70 ? '💧 Humidity achhi — irrigation kam karein' :
-                     current?.humidity < 30 ? '🏜️ Dry air — extra paani ki zaroorat' :
-                     '✅ Humidity level theek hai'}
+                    {current?.humidity > 85 ? '⚠️ Very high humidity — risk of fungal disease, apply preventive spray' :
+                     current?.humidity > 70 ? '💧 Good humidity — reduce irrigation frequency' :
+                     current?.humidity < 30 ? '🏜️ Dry air — increase irrigation' :
+                     '✅ Humidity level is normal'}
                   </p>
                 </div>
                 <div className="bg-white/10 rounded-xl p-4 border border-white/10">
                   <p className="text-primary-200 text-xs font-bold uppercase mb-1">Best Action</p>
                   <p className="text-sm font-bold">
-                    {current?.temp > 35 ? '💧 Subah 5-7 baje irrigation karein' :
-                     '🌾 Normal farming routine chalayein'}
+                    {current?.temp > 35 ? '💧 Best time for irrigation: 5-7 AM' :
+                     '🌾 Continue normal farming routine'}
                   </p>
                 </div>
               </div>

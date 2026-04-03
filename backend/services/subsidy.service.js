@@ -26,7 +26,7 @@ JSON Schema to follow:
        "commonIssues": []
     }
   ],
-  "recommendation": "Advice on how to bypass agents and apply directly in Hinglish"
+  "recommendation": "Advice on how to bypass agents and apply directly in English"
 }`;
 
   try {

@@ -9,9 +9,9 @@ const CROP_OPTIONS = ['Wheat', 'Rice', 'Cotton', 'Maize', 'Soybean', 'Gram', 'Mu
 
 function getCurrentSeason() {
   const month = new Date().getMonth() + 1;
-  if (month >= 6 && month <= 10) return { name: 'Kharif', icon: CloudRain, color: 'text-blue-600', bg: 'bg-blue-50', desc: 'Monsoon season — baarish wali faslein', tips: ['Baarish se pehle seeds ready rakhein', 'Drainage ka proper arrangement karein', 'Soybean/Cotton ki buwai June mein karein', 'Waterlogging se bachein — raised bed use karein'] };
-  if (month >= 11 || month <= 3) return { name: 'Rabi', icon: Snowflake, color: 'text-cyan-600', bg: 'bg-cyan-50', desc: 'Winter season — thandi wali faslein', tips: ['Wheat ki buwai November tak complete karein', 'Frost se bachne ke liye halki irrigation karein', 'Mustard mein aphid ke liye spray karein', 'Gram mein pod borer ka dhyan rakhein'] };
-  return { name: 'Zaid', icon: Sun, color: 'text-amber-600', bg: 'bg-amber-50', desc: 'Summer season — garmi ki faslein', tips: ['Moong/Urad ki buwai March-April mein', 'Paani ka proper management karein', 'Mulching se moisture preserve karein', 'Short duration crops select karein'] };
+  if (month >= 6 && month <= 10) return { name: 'Kharif', icon: CloudRain, color: 'text-blue-600', bg: 'bg-blue-50', desc: 'Monsoon season crops', tips: ['Prepare seeds before the monsoon starts', 'Ensure proper drainage arrangements', 'Sow Soybean/Cotton in June', 'Avoid waterlogging — use raised beds'] };
+  if (month >= 11 || month <= 3) return { name: 'Rabi', icon: Snowflake, color: 'text-cyan-600', bg: 'bg-cyan-50', desc: 'Winter season crops', tips: ['Complete wheat sowing by November', 'Use light irrigation to prevent frost damage', 'Spray for aphids in mustard crops', 'Watch for pod borer in gram'] };
+  return { name: 'Zaid', icon: Sun, color: 'text-amber-600', bg: 'bg-amber-50', desc: 'Summer season crops', tips: ['Sow Moong/Urad in March-April', 'Manage water usage properly', 'Use mulching to preserve soil moisture', 'Select short-duration crops'] };
 }
 
 export default function FarmingCalendar() {
@@ -49,7 +49,7 @@ export default function FarmingCalendar() {
     loadCalendar(crop);
   };
 
-  if (locLoading || loading) return <Loading text={`📅 ${selectedCrop} ka farming calendar bana rahe hain...`} />;
+  if (locLoading || loading) return <Loading text={`Building ${selectedCrop} farming calendar...`} />;
   if (error) return <Error message={error} onRetry={() => loadCalendar()} />;
   if (!data) return null;
 
@@ -68,7 +68,7 @@ export default function FarmingCalendar() {
           <h1 className="text-3xl md:text-4xl font-extrabold text-white mb-3 flex items-center gap-3">
             <CalendarDays className="w-9 h-9" /> Farming Calendar
           </h1>
-          <p className="text-primary-200 text-lg font-medium mb-6">Poora farming schedule — buwai se katai tak</p>
+          <p className="text-primary-200 text-lg font-medium mb-6">Complete farming schedule — sowing to harvest</p>
           <div className="grid sm:grid-cols-2 gap-4 max-w-lg">
             <div className={`${season.bg} rounded-2xl p-4 border border-white/50`}>
               <div className="flex items-center gap-2 mb-1">
@@ -79,7 +79,7 @@ export default function FarmingCalendar() {
             </div>
             <div className="bg-white/15 backdrop-blur-md rounded-2xl p-4 border border-white/20">
               <p className="text-white font-bold text-sm">{todayStr}</p>
-              <p className="text-primary-200 text-xs font-medium mt-1">Aaj ki date ke hisaab se schedule</p>
+              <p className="text-primary-200 text-xs font-medium mt-1">Schedule based on today's date</p>
             </div>
           </div>
         </div>
@@ -88,7 +88,7 @@ export default function FarmingCalendar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 mb-8">
           <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3 flex items-center gap-2">
-            <Wheat className="w-4 h-4" /> Fasal Select Karein — Calendar Update Hoga
+            <Wheat className="w-4 h-4" /> Select a Crop — Calendar Will Update
           </p>
           <div className="flex gap-3 overflow-x-auto pb-2" style={{ scrollbarWidth: 'thin' }}>
             {CROP_OPTIONS.map(crop => (
@@ -112,14 +112,14 @@ export default function FarmingCalendar() {
             </div>
             <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 md:p-8">
               <div className="whitespace-pre-wrap text-gray-700 leading-relaxed font-medium text-sm max-h-[600px] overflow-y-auto pr-2" style={{ scrollbarWidth: 'thin' }}>
-                {typeof data.calendar === 'string' ? data.calendar : "Calendar generation mein issue aaya. Retry karein."}
+                {typeof data.calendar === 'string' ? data.calendar : "Calendar generation failed. Please retry."}
               </div>
             </div>
           </div>
 
           <div className="space-y-6">
             <div className="bg-gradient-to-br from-primary-800 to-primary-900 rounded-2xl p-6 text-white">
-              <h3 className="font-extrabold text-lg mb-4">📋 Aaj Kya Karein?</h3>
+              <h3 className="font-extrabold text-lg mb-4">Today's Action Plan</h3>
               <div className="space-y-3">
                 <div className="bg-white/10 rounded-xl p-4 border border-white/10">
                   <p className="text-xs text-primary-300 font-bold uppercase mb-1">Season</p>

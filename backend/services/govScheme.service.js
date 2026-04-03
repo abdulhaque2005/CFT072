@@ -9,7 +9,7 @@ export async function findSchemes(location, crop, farmerType) {
     `- ${s.name}: ${s.amount} | ${s.benefit} | Eligibility: ${s.eligibility} | Category: ${s.category}`
   ).join('\n');
 
-  const prompt = `You are a government scheme advisor for Indian farmers. Respond in Hinglish.
+  const prompt = `You are a government scheme advisor for Indian farmers. Respond in English.
 
 FARMER DETAILS:
 - Location: ${location || 'India'}
@@ -31,7 +31,7 @@ For each scheme, one paragraph with:
 - Why it's relevant
 - How to apply (2-3 steps)
 
-Keep response under 400 words. Warm and helpful Hinglish.`;
+Keep response under 400 words. Warm and helpful English.`;
 
   try {
     logger.ai('Calling Gemini for scheme recommendation...');

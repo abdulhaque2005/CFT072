@@ -53,7 +53,7 @@ export default function SubsidyTracker() {
         <h1 className="section-title flex items-center justify-center gap-3">
           <Scale className="w-8 h-8 text-primary-700" /> Kisaan Haq Tracker
         </h1>
-        <p className="text-gray-500 mt-2 font-medium">Sarkari Yojanayein aur Subsidy ka asli hisaab</p>
+        <p className="text-gray-500 mt-2 font-medium">Track government schemes and subsidy delivery status</p>
       </div>
 
       <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center justify-between mb-8">
@@ -102,7 +102,7 @@ export default function SubsidyTracker() {
                 </p>
                 <div className="mt-8 flex items-center gap-3 bg-white/10 p-4 rounded-xl border border-white/20">
                   <ShieldCheck className="w-8 h-8 text-green-400 flex-shrink-0" />
-                  <p className="text-sm font-bold text-white">Hum ensure karte hain ki aapke dhabe hue haq ki complain aala afsaron tak pahuche.</p>
+                  <p className="text-sm font-bold text-white">We ensure your grievance reaches the concerned authorities for resolution.</p>
                 </div>
               </div>
             </div>
@@ -125,11 +125,11 @@ export default function SubsidyTracker() {
 
                 <div className="grid grid-cols-2 gap-4 mb-6">
                   <div className="bg-gray-50 rounded-xl p-4 border border-gray-100">
-                    <p className="text-xs font-bold text-gray-400 uppercase mb-1">Sarkar ne Bheja</p>
+                    <p className="text-xs font-bold text-gray-400 uppercase mb-1">Govt. Released</p>
                     <p className="font-extrabold text-gray-800 text-lg">{scheme.governmentReleased}</p>
                   </div>
                   <div className="bg-gray-50 rounded-xl p-4 border border-gray-100">
-                    <p className="text-xs font-bold text-gray-400 uppercase mb-1">Kisaan ko Mila</p>
+                    <p className="text-xs font-bold text-gray-400 uppercase mb-1">Farmer Received</p>
                     <p className="font-extrabold text-gray-800 text-lg">{scheme.averageReceived}</p>
                   </div>
                 </div>
@@ -147,7 +147,7 @@ export default function SubsidyTracker() {
 
                 <div className="border-t border-gray-100 pt-5 flex justify-end">
                   <button onClick={() => submitGrievance(scheme.schemeName)} className="flex items-center gap-2 bg-red-50 text-red-600 px-5 py-2.5 rounded-xl font-bold text-sm hover:bg-red-100 transition-colors">
-                    <ShieldAlert className="w-4 h-4" /> Complain Register Karein
+                    <ShieldAlert className="w-4 h-4" /> File a Complaint
                   </button>
                 </div>
               </div>

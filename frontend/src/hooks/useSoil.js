@@ -19,7 +19,7 @@ export function useSoil() {
       // interceptor strips response.data → result = { success, data, message }
       const payload = result.data || result;
       setSoilResult(payload);
-      toast.success('Mitti ka analysis ho gaya!');
+      toast.success('Soil analysis complete!');
       return payload;
     } catch (err) {
       setError(err.message);

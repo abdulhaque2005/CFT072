@@ -66,8 +66,8 @@ export default function UploadBox({ onUpload, onFileSelect, loading }) {
               <UploadCloud className="w-10 h-10 text-primary-600" />
             </div>
             <div>
-              <p className="text-xl font-extrabold text-gray-900 mb-2">Apni Report Upload Karein</p>
-              <p className="text-sm text-gray-500 font-medium">Click karein ya file ko yahan drag karein</p>
+              <p className="text-xl font-extrabold text-gray-900 mb-2">Upload Your Soil Report</p>
+              <p className="text-sm text-gray-500 font-medium">Click to browse or drag & drop your file here</p>
             </div>
             <div className="flex gap-2 text-xs font-bold uppercase tracking-wider text-gray-400 mt-2">
               <span className="bg-gray-100 px-3 py-1.5 rounded-md flex items-center gap-1"><FileText className="w-3 h-3" /> PDF</span>
@@ -79,7 +79,7 @@ export default function UploadBox({ onUpload, onFileSelect, loading }) {
 
       <div className="mt-4 flex items-start gap-2 bg-yellow-50 text-yellow-800 p-4 rounded-xl border border-yellow-100 shadow-sm">
         <AlertTriangle className="w-5 h-5 flex-shrink-0 mt-0.5" />
-        <p className="text-sm font-semibold">Abhi OCR testing mode mein hai. Best results ke liye clear photo ya PDF upload karein.</p>
+        <p className="text-sm font-semibold">OCR is currently in testing mode. For best results, upload a clear photo or PDF of your soil report.</p>
       </div>
     </div>
   );

@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Mic, MicOff, Loader2, X, MessageSquare, Volume2, Send, MapPin } from 'lucide-react';
-import axios from 'axios';
+import api from '../services/api';
 import useLocation from '../hooks/useLocation';
 
 export default function KisaanAIAssistant() {
@@ -55,13 +55,15 @@ export default function KisaanAIAssistant() {
         ? `[Location: ${locationText}] ${query}` 
         : query;
 
-      const res = await axios.post('http://localhost:5000/api/ai/voice', { transcript: contextQuery });
-      const reply = res.data.data.advice || res.data.data;
+      const res = await api.post('/ai/voice', { transcript: contextQuery });
+      // interceptor strips response.data → res = { success, data, message }
+      const payload = res.data || res;
+      const reply = payload.advice || (typeof payload === 'string' ? payload : JSON.stringify(payload));
       
       addMessage('ai', reply);
       speak(reply);
     } catch (err) {
-      const fallback = "Main abhi samajh nahi paa raha, thodi der mein try karein.";
+      const fallback = "I couldn't understand that. Please try again in a moment.";
       addMessage('ai', fallback);
     } finally {
       setLoading(false);
@@ -71,10 +73,19 @@ export default function KisaanAIAssistant() {
   const speak = (text) => {
     if ('speechSynthesis' in window) {
       window.speechSynthesis.cancel();
-      // Remove emojis before speaking
-      const cleanText = text.replace(/[\u1000-\uFFFF]/g, '');
+      // Remove emojis, markdown symbols before speaking
+      const cleanText = text.replace(/[\u{1F300}-\u{1FAD6}\u{2600}-\u{27BF}#*_\[\]()]/gu, '').replace(/\n+/g, '. ');
       const utterance = new SpeechSynthesisUtterance(cleanText);
       utterance.rate = 0.95;
+      
+      // Detect if text contains Devanagari (Hindi) script
+      const hasHindi = /[\u0900-\u097F]/.test(cleanText);
+      utterance.lang = hasHindi ? 'hi-IN' : 'en-IN';
+      
+      // Try to get the best matching voice
+      const voices = window.speechSynthesis.getVoices();
+      const preferredVoice = voices.find(v => v.lang === utterance.lang) || voices.find(v => v.lang.startsWith(hasHindi ? 'hi' : 'en'));
+      if (preferredVoice) utterance.voice = preferredVoice;
       
       utterance.onstart = () => setSpeaking(true);
       utterance.onend = () => setSpeaking(false);
@@ -141,8 +152,8 @@ export default function KisaanAIAssistant() {
                 <div className="w-16 h-16 bg-primary-100 rounded-full flex items-center justify-center mb-3 text-primary-700">
                   <SproutIcon className="w-8 h-8" />
                 </div>
-                <p className="text-sm font-bold text-gray-700">Poochiye apna sawaal...</p>
-                <p className="text-xs text-gray-500 mt-1">Mausam, fasal, ya mandi ke baare mein</p>
+                <p className="text-sm font-bold text-gray-700">Ask your question...</p>
+                <p className="text-xs text-gray-500 mt-1">About weather, crops, or market prices</p>
               </div>
             ) : (
               conversation.map((msg, i) => (
@@ -163,7 +174,7 @@ export default function KisaanAIAssistant() {
             {loading && (
               <div className="mr-auto bg-white border border-gray-100 rounded-2xl rounded-tl-sm p-4 shadow-sm flex items-center gap-3">
                 <Loader2 className="w-4 h-4 text-primary-600 animate-spin" />
-                <span className="text-xs font-bold text-primary-700">Soch raha hoon...</span>
+                <span className="text-xs font-bold text-primary-700">Thinking...</span>
               </div>
             )}
             <div ref={chatEndRef} />
@@ -173,10 +184,10 @@ export default function KisaanAIAssistant() {
           {speaking && (
             <div className="bg-primary-50 border-y border-primary-100 px-4 py-2 flex items-center justify-between">
                <div className="flex items-center gap-2 text-xs font-bold text-primary-700">
-                 <Volume2 className="w-4 h-4 animate-pulse" /> AI Bol Raha Hai...
+                 <Volume2 className="w-4 h-4 animate-pulse" /> AI is speaking...
                </div>
                <button onClick={stopSpeaking} className="text-[10px] bg-red-100 text-red-600 px-2 py-1 rounded-full font-bold hover:bg-red-200">
-                 Chup Karein
+                 Stop
                </button>
             </div>
           )}
@@ -189,7 +200,7 @@ export default function KisaanAIAssistant() {
                 value={inputText}
                 onChange={(e) => setInputText(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleUserMessage(inputText)}
-                placeholder="Likhein ya bolein..."
+                placeholder="Type or speak..."
                 className="flex-1 bg-transparent border-none outline-none text-sm font-medium text-gray-700 placeholder:text-gray-400"
               />
               

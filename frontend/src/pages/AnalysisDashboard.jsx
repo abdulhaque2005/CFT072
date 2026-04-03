@@ -14,10 +14,10 @@ export default function AnalysisDashboard() {
     return (
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-20 text-center">
         <AlertTriangle className="w-16 h-16 text-yellow-500 mx-auto mb-4" />
-        <h2 className="text-2xl font-bold text-gray-900 mb-4">Koi Data Nahi Mila</h2>
-        <p className="text-gray-500 mb-8 max-w-md mx-auto">Pahle apni mitti ka data upload karein ya manually enter karein analysis dekhne ke liye.</p>
+        <h2 className="text-2xl font-bold text-gray-900 mb-4">No Data Found</h2>
+        <p className="text-gray-500 mb-8 max-w-md mx-auto">Please enter your soil data or upload a report first to view the analysis.</p>
         <button onClick={() => navigate('/soil-input')} className="bg-primary-900 text-white px-8 py-3 rounded-xl font-bold">
-          Data Enter Karein
+          Enter Soil Data
         </button>
       </div>
     );
@@ -38,7 +38,7 @@ export default function AnalysisDashboard() {
             <h1 className="text-3xl md:text-4xl font-extrabold text-white flex items-center gap-3 mb-3">
               <Cpu className="w-9 h-9 text-primary-200" /> AI Soil Analysis Report
             </h1>
-            <p className="text-primary-100 text-lg font-medium">Aapki mitti ke data ka complete AI checkup</p>
+            <p className="text-primary-100 text-lg font-medium">Complete AI-powered soil health checkup</p>
           </div>
           <button className="bg-white/20 backdrop-blur-md border border-white/30 text-white px-6 py-3 rounded-xl font-bold text-sm hover:bg-white/30 flex items-center gap-2 shadow-sm transition-all focus:ring-4 focus:ring-white/10">
             <Download className="w-5 h-5" /> Download PDF Report

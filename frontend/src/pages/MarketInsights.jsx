@@ -72,7 +72,7 @@ export default function MarketInsights() {
     return null;
   };
 
-  if (locLoading || loading) return <Loading text="📍 Aapke paas ki mandiyaan dhundh rahe hain..." />;
+  if (locLoading || loading) return <Loading text="Finding nearby markets and prices..." />;
   if (error) return <Error message={error} onRetry={loadData} />;
 
   return (
@@ -98,7 +98,7 @@ export default function MarketInsights() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Crop Selector */}
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 mb-8">
-          <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">Apni fasal select karein:</p>
+          <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">Select your crop:</p>
           <div className="flex gap-3 overflow-x-auto pb-2" style={{ scrollbarWidth: 'thin' }}>
             {CROP_OPTIONS.map(crop => (
               <button
@@ -115,7 +115,7 @@ export default function MarketInsights() {
             ))}
           </div>
           <button onClick={searchCrop} className="mt-4 bg-primary-800 text-white px-6 py-2.5 rounded-xl font-bold text-sm hover:bg-primary-900 transition-colors flex items-center gap-2">
-            <Search className="w-4 h-4" /> {selectedCrop} ka Rate Check Karein
+            <Search className="w-4 h-4" /> Check {selectedCrop} Prices
           </button>
         </div>
 
@@ -184,7 +184,7 @@ export default function MarketInsights() {
                 <ShieldCheck className="w-6 h-6 text-green-600" /> Kisaan Call Center
               </h3>
               <p className="text-sm text-gray-600 font-medium mb-6 relative z-10">
-                Agri expert se direct baat karne ke liye free me sarkar ke toll-free number par call karein.
+                Talk directly with an agriculture expert for free via the government toll-free number.
               </p>
               <a href="tel:18001801551" className="bg-green-600 text-white w-full rounded-2xl py-4 font-black flex items-center justify-center gap-3 hover:bg-green-700 hover:shadow-lg transition-all drop-shadow-sm active:scale-95 text-lg relative z-10">
                 <PhoneCall className="w-6 h-6 animate-pulse" /> 1800-180-1551
@@ -196,10 +196,10 @@ export default function MarketInsights() {
               <h3 className="text-base font-extrabold text-gray-900 mb-5">💡 Quick Market Tips</h3>
               <div className="space-y-4">
                 {[
-                  { tip: 'e-NAM portal pe online price compare karein', url: 'https://enam.gov.in' },
+                  { tip: 'Compare prices online on the e-NAM portal', url: 'https://enam.gov.in' },
                   { tip: 'MSP se neeche mat bechein — sarkar guarantee deti hai', url: null },
                   { tip: 'Storage available hai toh 2-3 hafte wait karo, price badhega', url: null },
-                  { tip: 'Group mein bech kar better rate milta hai — FPO join karein', url: null }
+                  { tip: 'Sell in groups for better rates — join an FPO', url: null }
                 ].map((item, i) => (
                   <div key={i} className="flex items-start gap-3 text-sm">
                     <span className="w-6 h-6 bg-primary-50 rounded-full flex items-center justify-center text-xs font-bold text-primary-700 flex-shrink-0 mt-0.5">{i+1}</span>
@@ -223,7 +223,7 @@ export default function MarketInsights() {
               </div>
               <div className="bg-white p-4">
                 <p className="text-sm font-extrabold text-primary-800">🏪 Mandi rates change daily</p>
-                <p className="text-xs text-gray-500 mt-1 font-medium">Har roz subah 8 baje check karein for best prices</p>
+                <p className="text-xs text-gray-500 mt-1 font-medium">Check every morning at 8 AM for best prices</p>
               </div>
             </div>
 

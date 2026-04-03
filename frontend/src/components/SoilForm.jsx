@@ -81,7 +81,7 @@ export default function SoilForm({ onSubmit, loading }) {
         {loading ? (
           <><Loader2 className="w-6 h-6 animate-spin" /> Analyzing Report...</>
         ) : (
-          <><Sparkles className="w-5 h-5 text-yellow-400" /> Analyze Mitti — AI Analysis Shuru Karein</>
+          <><Sparkles className="w-5 h-5 text-yellow-400" /> Analyze Soil — Start AI Analysis</>
         )}
       </button>
     </form>

@@ -4,7 +4,7 @@ import { logger } from '../utils/logger.js';
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
 export async function generateFarmingCalendar(crop, season, location) {
-  const prompt = `You are a farming planner for Indian farmers. Give a complete farming calendar in Hinglish.
+  const prompt = `You are a farming planner for Indian farmers. Give a complete farming calendar in English.
 
 CROP: ${crop}
 SEASON: ${season || 'Current season'}

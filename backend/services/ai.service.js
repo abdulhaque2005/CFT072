@@ -108,8 +108,8 @@ export async function processVoiceQuery(transcript) {
 USER SPEECH: "${transcript}"
 
 RULES:
-1. Detect the exact language used by the user. If they spoke Hindi, reply in Hindi. If English, reply in English. If Gujarati, reply in Gujarati.
-2. Reply in the NATIVE SCRIPT of that language (e.g. Devanagari for Hindi, not Latin).
+1. Detect the language the user used. Reply in the SAME language. If Hindi, reply in Hindi. If English, reply in English. If Gujarati, reply in Gujarati.
+2. Reply in the NATIVE SCRIPT of that language (e.g. Devanagari for Hindi, not Latin/Roman).
 3. Keep it EXTREMELY SHORT — under 15 seconds to read aloud (2-3 sentences max).
 4. Give the exact solution right away.
 
@@ -132,7 +132,7 @@ export async function getNearbyFarmingInfo(lat, lon, location) {
   const currentMonth = new Date().toLocaleString('en-IN', { month: 'long' });
   const currentSeason = getSeasonName();
 
-  const prompt = `You are a local agriculture information system for Indian farmers. Respond in Hinglish.
+  const prompt = `You are a local agriculture information system for Indian farmers. Respond in English.
 
 FARMER LOCATION: ${location || `${lat}, ${lon}`}
 CURRENT MONTH: ${currentMonth}

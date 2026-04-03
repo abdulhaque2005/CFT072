@@ -4,7 +4,7 @@ import { logger } from '../utils/logger.js';
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
 export async function checkFertilizerSafety(soilData, weatherSummary, crop) {
-  const prompt = `You are a fertilizer safety expert. Give warnings in Hinglish.
+  const prompt = `You are a fertilizer safety expert. Give warnings in English.
 
 SOIL DATA:
 - Nitrogen: ${soilData.nitrogen} kg/ha

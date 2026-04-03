@@ -143,7 +143,7 @@ export async function getWeatherByCoords(lat, lon, locationName) {
     ? forecastDays.map(d => `${d.dayName}: ${d.tempMin}-${d.tempMax}°C, ${d.description}`).join('\n')
     : 'Forecast not available';
 
-  const prompt = `You are a weather-based farming advisor for Indian farmers. Give advice in Hinglish.
+  const prompt = `You are a weather-based farming advisor for Indian farmers. Give advice in English.
 
 LOCATION: ${loc}
 CURRENT WEATHER: ${weatherSummary}
@@ -155,7 +155,7 @@ TASK:
 2. Agle 5 din mein kya dhyan rakhna hai
 3. Irrigation schedule suggest karo
 
-OUTPUT STYLE: Simple, practical Hinglish. Keep under 300 words.`;
+OUTPUT STYLE: Simple, practical English. Keep under 300 words.`;
 
   try {
     const response = await ai.models.generateContent({

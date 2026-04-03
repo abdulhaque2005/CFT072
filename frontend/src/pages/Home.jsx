@@ -4,13 +4,13 @@ import { useState, useEffect } from 'react';
 import useLocation from '../hooks/useLocation';
 
 const features = [
-  { icon: <FlaskConical className="w-8 h-8" />, title: 'Soil Analysis', desc: 'Mitti ki poori report — N, P, K, pH score', path: '/soil-input' },
-  { icon: <Wheat className="w-8 h-8" />, title: 'Crop Recommendation', desc: 'Best fasal suggest karega AI', path: '/crops' },
-  { icon: <Sprout className="w-8 h-8" />, title: 'Fertilizer Plan', desc: 'Kitna, kab, kaunsa fertilizer daalein', path: '/fertilizer' },
-  { icon: <CloudSun className="w-8 h-8" />, title: 'Weather Advisory', desc: 'Mausam ke hisaab se farming advice', path: '/weather' },
-  { icon: <BarChart3 className="w-8 h-8" />, title: 'Market Insights', desc: 'Mandi price prediction aur sell advice', path: '/market' },
-  { icon: <Landmark className="w-8 h-8" />, title: 'Govt Schemes', desc: 'Sarkari yojanayein aur kaise apply karein', path: '/schemes' },
-  { icon: <CalendarDays className="w-8 h-8" />, title: 'Farming Calendar', desc: 'Poora farming schedule — buwai se katai tak', path: '/calendar' }
+  { icon: <FlaskConical className="w-8 h-8" />, title: 'Soil Analysis', desc: 'Complete soil health report — N, P, K, pH score', path: '/soil-input' },
+  { icon: <Wheat className="w-8 h-8" />, title: 'Crop Recommendation', desc: 'AI-powered best crop suggestions for your soil', path: '/crops' },
+  { icon: <Sprout className="w-8 h-8" />, title: 'Fertilizer Plan', desc: 'Precise dosage, timing, and fertilizer type', path: '/fertilizer' },
+  { icon: <CloudSun className="w-8 h-8" />, title: 'Weather Advisory', desc: 'Weather-based farming advice and alerts', path: '/weather' },
+  { icon: <BarChart3 className="w-8 h-8" />, title: 'Market Insights', desc: 'Mandi price prediction and sell advice', path: '/market' },
+  { icon: <Landmark className="w-8 h-8" />, title: 'Govt Schemes', desc: 'Government schemes and how to apply', path: '/schemes' },
+  { icon: <CalendarDays className="w-8 h-8" />, title: 'Farming Calendar', desc: 'Complete farming schedule — sowing to harvest', path: '/calendar' }
 ];
 
 const stats = [
@@ -59,7 +59,7 @@ export default function Home() {
               </div>
               <MapPin className={`w-4 h-4 md:w-5 md:h-5 ${locLoading ? 'text-primary-300' : 'text-green-300 animate-bounce'}`} />
               {locLoading ? (
-                <span className="tracking-wide text-primary-100">Live Farming Location Detect ho rahi hai...</span>
+                <span className="tracking-wide text-primary-100">Detecting your farming location...</span>
               ) : (
                 <span className="tracking-wide">Smart Farming in <span className="text-green-300 drop-shadow-md">{city}, {state}</span></span>
               )}
@@ -75,7 +75,7 @@ export default function Home() {
 
             {/* Elegant Subheadline */}
             <p className="text-xl md:text-2xl text-primary-50 mb-12 max-w-3xl leading-relaxed drop-shadow-xl font-medium border-l-4 border-green-500 pl-6 py-2 bg-gradient-to-r from-black/40 to-transparent backdrop-blur-sm rounded-r-2xl">
-              Aapki {city} ki mitti aur mausam ke hisaab se, AI turant batayega best crop, fertilizer plan, aur profitable govt schemes.
+              Based on {city}'s soil and weather data, AI instantly recommends the best crops, fertilizer plans, and profitable govt schemes.
             </p>
 
             {/* Premium CTA Buttons */}
@@ -112,9 +112,9 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900 flex items-center justify-center gap-3">
-              <Tractor className="w-8 h-8 text-primary-600" /> Hamari Subidhayein
+              <Tractor className="w-8 h-8 text-primary-600" /> Our Features
             </h2>
-            <p className="text-gray-500 mt-3 max-w-xl mx-auto font-medium text-lg">AI-powered tools jo {city} mein farming ko easy banayein</p>
+            <p className="text-gray-500 mt-3 max-w-xl mx-auto font-medium text-lg">AI-powered tools to make farming easier in {city}</p>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
@@ -130,7 +130,7 @@ export default function Home() {
                 <h3 className="text-xl font-extrabold text-gray-900 mb-2 group-hover:text-primary-800 transition-colors">{f.title}</h3>
                 <p className="text-sm text-gray-500 leading-relaxed flex-grow font-medium">{f.desc}</p>
                 <div className="mt-5 flex items-center gap-1.5 text-sm font-extrabold text-primary-600 opacity-0 group-hover:opacity-100 transition-all translate-x-2 group-hover:translate-x-0 duration-300">
-                  Tool Kholein <ArrowRight className="w-4 h-4 ml-1" />
+                  Open Tool <ArrowRight className="w-4 h-4 ml-1" />
                 </div>
               </Link>
             ))}
@@ -147,12 +147,12 @@ export default function Home() {
             </div>
             
             <div className="relative z-10 max-w-2xl mx-auto">
-              <h2 className="text-3xl md:text-5xl font-black text-white mb-6 leading-tight">Mitti Test Karo, <br/>Fasal Badhao <Sparkles className="inline w-8 h-8 text-yellow-400 mb-2" /></h2>
+              <h2 className="text-3xl md:text-5xl font-black text-white mb-6 leading-tight">Test Your Soil, <br/>Grow Better Crops <Sparkles className="inline w-8 h-8 text-yellow-400 mb-2" /></h2>
               <p className="text-primary-100/90 mb-10 text-lg font-medium">
-                Bas apni mitti ka basic data daalein aur AI complete farming plan de dega. Purely free.
+                Just enter your soil data and AI will generate a complete farming plan. Completely free.
               </p>
               <Link to="/soil-input" className="inline-flex items-center gap-3 bg-white text-primary-950 px-10 py-5 rounded-2xl font-black text-lg hover:shadow-[0_0_30px_rgba(255,255,255,0.3)] hover:bg-gray-50 transition-all active:scale-95">
-                <FlaskConical className="w-6 h-6" /> Start Soil Analysis Nu
+                <FlaskConical className="w-6 h-6" /> Start Soil Analysis
               </Link>
             </div>
           </div>

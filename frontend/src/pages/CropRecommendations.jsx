@@ -49,9 +49,9 @@ export default function CropRecommendations() {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
       <div className="mb-10 text-center">
         <h1 className="section-title flex items-center justify-center gap-3">
-          <Wheat className="w-8 h-8 text-primary-700" /> Fasal Recommendations
+          <Wheat className="w-8 h-8 text-primary-700" /> Crop Recommendations
         </h1>
-        <p className="text-gray-500 mt-2 font-medium">Aapki mitti aur mausam ke hisaab se sabse badiya faslain</p>
+        <p className="text-gray-500 mt-2 font-medium">Best crops recommended based on your soil and weather conditions</p>
       </div>
 
       <div className="grid md:grid-cols-3 gap-8 mb-12">

@@ -40,12 +40,12 @@ export default function VoiceButton({ onResult }) {
           ? 'bg-red-500 text-white animate-pulse shadow-lg shadow-red-500/30'
           : 'bg-primary-100 text-primary-800 hover:bg-primary-200 hover:shadow-md'
         }`}
-      title="Hindi mein bolo"
+      title="Speak to search"
     >
       {listening ? (
-        <><Loader2 className="w-5 h-5 animate-spin" /> Sun raha hoon...</>
+        <><Loader2 className="w-5 h-5 animate-spin" /> Listening...</>
       ) : (
-        <><Mic className="w-5 h-5" /> Hindi mein bolo</>
+        <><Mic className="w-5 h-5" /> Voice Input</>
       )}
     </button>
   );
