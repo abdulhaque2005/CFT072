@@ -70,3 +70,42 @@
     @apply bg-white/80 backdrop-blur-md rounded-2xl border border-white/50 shadow-xl;
   }
 }
+
+/* Hide default Google Translate UI */
+#google_translate_element {
+  display: none !important;
+}
+.goog-te-banner-frame {
+  display: none !important;
+}
+.skiptranslate.goog-te-gadget {
+  display: none !important;
+}
+.goog-tooltip {
+  display: none !important;
+}
+.goog-tooltip:hover {
+  display: none !important;
+}
+.goog-text-highlight {
+  background-color: transparent !important;
+  border: none !important; 
+  box-shadow: none !important;
+}
+#goog-gt-tt {
+  display: none !important;
+  visibility: hidden !important;
+}
+.goog-te-spinner-pos {
+  display: none !important;
+}
+body {
+  top: 0px !important;
+  position: static !important;
+}
+iframe.goog-te-banner-frame {
+  display: none !important;
+}
+iframe[name="goog_te_banner"] {
+  display: none !important;
+}
