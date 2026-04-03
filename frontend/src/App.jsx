@@ -11,7 +11,10 @@ import MarketInsights from './pages/MarketInsights';
 import GovernmentSchemes from './pages/GovernmentSchemes';
 import FarmingCalendar from './pages/FarmingCalendar';
 import SubsidyTracker from './pages/SubsidyTracker';
-
+import LossRecovery from './pages/LossRecovery';
+import BioFertilizer from './pages/BioFertilizer';
+import ProfitTrees from './pages/ProfitTrees';
+import DirectMarket from './pages/DirectMarket';
 import KisaanAIAssistant from './components/KisaanAIAssistant';
 
 function App() {
@@ -31,6 +34,10 @@ function App() {
             <Route path="/schemes" element={<GovernmentSchemes />} />
             <Route path="/calendar" element={<FarmingCalendar />} />
             <Route path="/subsidy-tracker" element={<SubsidyTracker />} />
+            <Route path="/recovery" element={<LossRecovery />} />
+            <Route path="/bio-inputs" element={<BioFertilizer />} />
+            <Route path="/agroforestry" element={<ProfitTrees />} />
+            <Route path="/b2b" element={<DirectMarket />} />
           </Routes>
         </main>
         <KisaanAIAssistant />

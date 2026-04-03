@@ -1,16 +1,17 @@
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, Sprout, FlaskConical, Wheat, Leaf, CloudSun, BarChart3, Landmark, CalendarDays, Home as HomeIcon, ShieldCheck } from 'lucide-react';
+import { Menu, X, Sprout, FlaskConical, Wheat, Leaf, CloudSun, BarChart3, Landmark, CalendarDays, Home as HomeIcon, ShieldCheck, LifeBuoy, Trees, Store, Droplet } from 'lucide-react';
 
 const navLinks = [
   { path: '/', label: 'Home', Icon: HomeIcon },
-  { path: '/soil-input', label: 'Soil Analysis', Icon: FlaskConical },
+  { path: '/soil-input', label: 'Soil', Icon: FlaskConical },
   { path: '/crops', label: 'Crops', Icon: Wheat },
-  { path: '/fertilizer', label: 'Fertilizer', Icon: Leaf },
-  { path: '/weather', label: 'Weather', Icon: CloudSun },
-  { path: '/market', label: 'Market', Icon: BarChart3 },
+  { path: '/recovery', label: 'Loss Recovery', Icon: LifeBuoy },
+  { path: '/bio-inputs', label: 'Bio-Fertilizer', Icon: Droplet },
+  { path: '/agroforestry', label: 'Profit Trees', Icon: Trees },
+  { path: '/b2b', label: 'Direct Market', Icon: Store },
+  { path: '/market', label: 'Mandi Rates', Icon: BarChart3 },
   { path: '/schemes', label: 'Schemes', Icon: Landmark },
-  { path: '/calendar', label: 'Calendar', Icon: CalendarDays },
   { path: '/subsidy-tracker', label: 'Transparency', Icon: ShieldCheck }
 ];
 

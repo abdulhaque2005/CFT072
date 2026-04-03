@@ -185,6 +185,65 @@ Keep response under 250 words. Be specific to the location.`;
   }
 }
 
+export async function getAgroforestryAdvice(location) {
+  const prompt = `You are an agroforestry (tree farming) expert for Indian farmers. Respond in English.
+
+FARMER LOCATION: ${location || 'India'}
+
+TASK: Identify the top 3 high-profit trees/plants for this region (e.g., Teak, Sandalwood, Bamboo, Malabar Neem).
+For each, provide:
+1. Estimated profit per acre after 5-10 years.
+2. Ease of maintenance.
+3. Market demand.
+4. Soil/Water requirement.
+
+Keep response under 250 words. Focus on maximum profit for small farmers.`;
+
+  try {
+    logger.ai('Calling Gemini for agroforestry advice...');
+    const response = await ai.models.generateContent({
+      model: 'gemini-2.0-flash',
+      contents: prompt
+    });
+    return { location, advice: response.text };
+  } catch (error) {
+    logger.error(`Gemini agroforestry error: ${error.message}`);
+    return {
+      location,
+      advice: `🌲 Recommended Trees: Teak, Bamboo, and Lemon.\n💰 High Profit: Teak/Sandalwood (Long term)\n💧 Maintenance: Medium\n\n_Detailed AI report unavailable._`
+    };
+  }
+}
+
+export async function getBioInputIntelligence(crop) {
+  const prompt = `You are an organic farming (ZBNF/Organic) expert for Indian farmers. Respond in English.
+
+CROP: ${crop || 'General/Multi-crop'}
+
+TASK: Provide intelligence on Bio-fertilizers and Bio-pesticides specifically for this crop.
+Include:
+1. One specific bio-organic recipe (e.g., Jeevamrut, Neemastra).
+2. Benefits over chemical alternatives.
+3. Application method.
+
+Keep response under 200 words. Be practical and low-cost.`;
+
+  try {
+    logger.ai('Calling Gemini for bio-input intelligence...');
+    const response = await ai.models.generateContent({
+      model: 'gemini-2.0-flash',
+      contents: prompt
+    });
+    return { crop, intelligence: response.text };
+  } catch (error) {
+    logger.error(`Gemini bio-input error: ${error.message}`);
+    return {
+      crop,
+      intelligence: `🌿 Bio-Input: Jeevamrut (Cow dung + Urine + Jaggery).\n✅ Benefits: Low cost, soil health, better yield.\n🧪 Action: Apply every 15 days near roots.\n\n_Detailed AI report unavailable._`
+    };
+  }
+}
+
 function getSeasonName() {
   const month = new Date().getMonth() + 1;
   if (month >= 6 && month <= 10) return 'Kharif (Monsoon)';

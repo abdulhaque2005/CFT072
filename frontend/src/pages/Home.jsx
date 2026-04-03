@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import {
   Sprout, FlaskConical, Wheat, CloudSun, BarChart3, Landmark,
   CalendarDays, ArrowRight, Sparkles, Tractor, MapPin, Zap,
-  Star, TrendingUp, ShieldCheck, Leaf
+  Star, TrendingUp, ShieldCheck, Leaf, LifeBuoy, Droplet, Trees, Store
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import useLocation from '../hooks/useLocation';
@@ -12,10 +12,14 @@ import MarketTicker from '../components/MarketTicker';
 const features = [
   { icon: <FlaskConical className="w-7 h-7" />, title: 'Soil Analysis', desc: 'Mitti ki poori report — N, P, K, pH score', path: '/soil-input', color: 'from-amber-500 to-orange-600', bg: 'from-amber-50 to-orange-50' },
   { icon: <Wheat className="w-7 h-7" />, title: 'Crop Recommendation', desc: 'Best fasal suggest karega AI', path: '/crops', color: 'from-green-500 to-emerald-600', bg: 'from-green-50 to-emerald-50' },
+  { icon: <LifeBuoy className="w-7 h-7" />, title: 'Loss Recovery', desc: 'Fasal kharab hui? AI se emergency solution', path: '/recovery', color: 'from-red-500 to-rose-600', bg: 'from-red-50 to-rose-50' },
   { icon: <Sprout className="w-7 h-7" />, title: 'Fertilizer Plan', desc: 'Kitna, kab, kaunsa fertilizer daalein', path: '/fertilizer', color: 'from-lime-500 to-green-600', bg: 'from-lime-50 to-green-50' },
+  { icon: <Droplet className="w-7 h-7" />, title: 'Bio-Fertilizers', desc: 'Organic farming aur low cost khad', path: '/bio-inputs', color: 'from-emerald-500 to-teal-600', bg: 'from-emerald-50 to-teal-50' },
+  { icon: <Trees className="w-7 h-7" />, title: 'Agroforestry', desc: 'Pedh lagao, karodo kamao (Long-term)', path: '/agroforestry', color: 'from-green-600 to-green-800', bg: 'from-green-50/50 to-green-100' },
+  { icon: <Store className="w-7 h-7" />, title: 'Direct Market', desc: 'Middlemen hatao, seedhe company ko becho', path: '/b2b', color: 'from-blue-500 to-indigo-600', bg: 'from-blue-50 to-indigo-50' },
   { icon: <CloudSun className="w-7 h-7" />, title: 'Weather Advisory', desc: 'Mausam ke hisaab se farming advice', path: '/weather', color: 'from-sky-500 to-blue-600', bg: 'from-sky-50 to-blue-50' },
   { icon: <BarChart3 className="w-7 h-7" />, title: 'Market Insights', desc: 'Mandi price prediction aur sell advice', path: '/market', color: 'from-violet-500 to-purple-600', bg: 'from-violet-50 to-purple-50' },
-  { icon: <Landmark className="w-7 h-7" />, title: 'Govt Schemes', desc: 'Sarkari yojanayein aur kaise apply karein', path: '/schemes', color: 'from-rose-500 to-pink-600', bg: 'from-rose-50 to-pink-50' },
+  { icon: <Landmark className="w-7 h-7" />, title: 'Govt Schemes', desc: 'Sarkari yojanayein aur kaise apply karein', path: '/schemes', color: 'from-pink-500 to-rose-600', bg: 'from-pink-50 to-rose-50' },
   { icon: <CalendarDays className="w-7 h-7" />, title: 'Farming Calendar', desc: 'Poora schedule — buwai se katai tak', path: '/calendar', color: 'from-teal-500 to-cyan-600', bg: 'from-teal-50 to-cyan-50' },
 ];
 
@@ -166,11 +170,13 @@ export default function Home() {
       <section className="py-10 bg-[#f4f7f4]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-center text-xl font-extrabold text-gray-700 mb-6">⚡ Quick Actions — Seedha Shuru Karo</h2>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
             {[
               { icon: '🧪', label: 'Soil Test', sub: 'Mitti analyze karo', path: '/soil-input', color: 'from-amber-400 to-orange-500' },
               { icon: '🌾', label: 'Best Fasal', sub: 'AI se crop choose karo', path: '/crops', color: 'from-green-400 to-emerald-500' },
-              { icon: '🌦️', label: 'Mausam', sub: 'Weather advisory lo', path: '/weather', color: 'from-sky-400 to-blue-500' },
+              { icon: '💊', label: 'Recovery', sub: 'Nuksan se bacho', path: '/recovery', color: 'from-red-400 to-rose-500' },
+              { icon: '🌲', label: 'Profit Trees', sub: 'Long-term income', path: '/agroforestry', color: 'from-green-600 to-emerald-800' },
+              { icon: '🤝', label: 'Direct Sell', sub: 'B2B markets', path: '/b2b', color: 'from-blue-400 to-indigo-500' },
               { icon: '💰', label: 'Mandi Rate', sub: 'Price check karo', path: '/market', color: 'from-violet-400 to-purple-500' },
             ].map((a, i) => (
               <Link key={i} to={a.path} className="group flex flex-col items-center text-center gap-3 bg-white rounded-3xl p-6 border border-gray-100 hover:shadow-xl hover:border-green-200 transition-all hover:-translate-y-1">

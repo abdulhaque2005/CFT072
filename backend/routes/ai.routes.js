@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { getMasterAdvice, getRecoveryAdvice, getCalendar } from '../controllers/ai.controller.js';
+import { getMasterAdvice, getRecoveryAdvice, getCalendar, getAgroforestry, getBioInput } from '../controllers/ai.controller.js';
 import { processVoiceQuery } from '../services/ai.service.js';
 import { getNearbyFarmingInfo } from '../services/ai.service.js';
 import { successResponse, errorResponse } from '../utils/responseFormatter.js';
@@ -10,7 +10,8 @@ const router = Router();
 router.post('/master', getMasterAdvice);
 router.post('/recovery', getRecoveryAdvice);
 router.post('/calendar', getCalendar);
-
+router.post('/agroforestry', getAgroforestry);
+router.post('/bio-inputs', getBioInput);
 router.post('/voice', async (req, res) => {
   try {
     const { transcript } = req.body;

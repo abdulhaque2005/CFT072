@@ -1,4 +1,4 @@
-import { masterAdvisor, recoveryAdvisor } from '../services/ai.service.js';
+import { masterAdvisor, recoveryAdvisor, getAgroforestryAdvice as generateAgroforestry, getBioInputIntelligence as generateBioInput } from '../services/ai.service.js';
 import { generateFarmingCalendar } from '../services/calendar.service.js';
 import { successResponse } from '../utils/responseFormatter.js';
 
@@ -26,6 +26,26 @@ export async function getCalendar(req, res, next) {
     const { crop, season, location } = req.body;
     const result = await generateFarmingCalendar(crop, season, location);
     return successResponse(res, result, 'Farming calendar generated');
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function getAgroforestry(req, res, next) {
+  try {
+    const { location } = req.body;
+    const result = await generateAgroforestry(location);
+    return successResponse(res, result, 'Agroforestry advice generated');
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function getBioInput(req, res, next) {
+  try {
+    const { crop } = req.body;
+    const result = await generateBioInput(crop);
+    return successResponse(res, result, 'Bio-input intelligence generated');
   } catch (error) {
     next(error);
   }
