@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { PenTool, UploadCloud, Info, FlaskConical, Leaf, Beaker, Flame, ThermometerSun, ArrowRight, CheckCircle2, XCircle, HelpCircle } from 'lucide-react';
 import SoilForm from '../components/SoilForm';
 import UploadBox from '../components/UploadBox';
-import VoiceButton from '../components/VoiceButton';
+import VoiceInput from '../components/VoiceInput';
 import { useSoil } from '../hooks/useSoil';
 
 const NUTRIENT_INFO = [
@@ -171,22 +171,20 @@ export default function SoilInput() {
           <div className="flex items-center gap-2 mb-6">
             <button
               onClick={() => !isProcessing && setActiveTab('manual')}
-              className={`px-5 py-2.5 rounded-xl text-sm font-semibold transition-all flex items-center gap-2 ${
-                activeTab === 'manual' ? 'bg-primary-900 text-white shadow-md border-primary-900' : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'
-              }`}
+              className={`px-5 py-2.5 rounded-xl text-sm font-semibold transition-all flex items-center gap-2 ${activeTab === 'manual' ? 'bg-primary-900 text-white shadow-md border-primary-900' : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'
+                }`}
             >
               <PenTool className="w-4 h-4" /> Manual Entry
             </button>
             <button
               onClick={() => !isProcessing && setActiveTab('upload')}
-              className={`px-5 py-2.5 rounded-xl text-sm font-semibold transition-all flex items-center gap-2 ${
-                activeTab === 'upload' ? 'bg-primary-900 text-white shadow-md border-primary-900' : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'
-              }`}
+              className={`px-5 py-2.5 rounded-xl text-sm font-semibold transition-all flex items-center gap-2 ${activeTab === 'upload' ? 'bg-primary-900 text-white shadow-md border-primary-900' : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'
+                }`}
             >
               <UploadCloud className="w-4 h-4" /> Upload Report
             </button>
             <div className="ml-auto">
-              <VoiceButton onResult={(text) => console.log('Voice:', text)} />
+              <VoiceInput onTranscript={(text) => console.log('Voice:', text)} className="w-[140px] px-4 rounded-xl font-bold flex gap-2 !w-auto" placeholder="Speak to fill data" />
             </div>
           </div>
 
@@ -195,7 +193,7 @@ export default function SoilInput() {
               <SoilForm onSubmit={handleSubmit} loading={isProcessing} />
             ) : (
               <div className="space-y-6">
-                <UploadBox 
+                <UploadBox
                   onFileSelect={(file) => {
                     setFileLoading(true);
                     const mockOcrData = {
@@ -210,7 +208,7 @@ export default function SoilInput() {
                       handleSubmit(mockOcrData);
                       setFileLoading(false);
                     }, 2500);
-                  }} 
+                  }}
                   loading={isProcessing}
                 />
                 {fileLoading && (
@@ -247,7 +245,7 @@ export default function SoilInput() {
             <HelpCircle className="w-5 h-5 text-primary-600" /> Nutrient Guide — What Each Value Means
           </h3>
           <p className="text-xs text-gray-400 font-medium mb-4">Click on any nutrient to learn about its role, benefits, and ideal range</p>
-          
+
           {NUTRIENT_INFO.map((nutrient) => {
             const isExpanded = expandedNutrient === nutrient.key;
             const colorMap = {
@@ -258,12 +256,12 @@ export default function SoilInput() {
               amber: { bg: 'bg-amber-50', border: 'border-amber-200', text: 'text-amber-700', ring: 'ring-amber-200' },
             };
             const c = colorMap[nutrient.color];
-            
+
             return (
               <div key={nutrient.key} className={`rounded-2xl border overflow-hidden transition-all duration-300 ${isExpanded ? `${c.border} shadow-lg ring-2 ${c.ring}` : 'border-gray-100 shadow-sm hover:shadow-md'}`}>
                 {/* Clickable Header */}
-                <button 
-                  onClick={() => toggleNutrient(nutrient.key)} 
+                <button
+                  onClick={() => toggleNutrient(nutrient.key)}
                   className={`w-full flex items-center gap-3 p-4 text-left transition-colors ${isExpanded ? c.bg : 'bg-white hover:bg-gray-50'}`}
                 >
                   <div className={`w-10 h-10 rounded-xl ${c.bg} flex items-center justify-center flex-shrink-0`}>
@@ -283,7 +281,7 @@ export default function SoilInput() {
                     <div className="h-32 w-full overflow-hidden">
                       <img src={nutrient.image} alt={nutrient.name} className="w-full h-full object-cover" />
                     </div>
-                    
+
                     <div className="p-4 space-y-4 bg-white">
                       {/* Benefits */}
                       <div>

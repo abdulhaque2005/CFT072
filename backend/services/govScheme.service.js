@@ -1,8 +1,9 @@
-import { GoogleGenAI } from '@google/genai';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 import { logger } from '../utils/logger.js';
 import { GOVERNMENT_SCHEMES } from '../utils/constants.js';
 
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
 
 export async function findSchemes(location, crop, farmerType) {
   const schemesList = GOVERNMENT_SCHEMES.map(s => 
@@ -35,15 +36,13 @@ Keep response under 400 words. Warm and helpful English.`;
 
   try {
     logger.ai('Calling Gemini for scheme recommendation...');
-    const response = await ai.models.generateContent({
-      model: 'gemini-2.0-flash',
-      contents: prompt
-    });
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
     return {
       location: location || 'India',
       crop: crop || 'General',
       schemes: GOVERNMENT_SCHEMES,
-      recommendation: response.text,
+      recommendation: response.text(),
       totalSchemes: GOVERNMENT_SCHEMES.length,
       totalBenefitValue: '₹6,000 - ₹5,00,000+'
     };

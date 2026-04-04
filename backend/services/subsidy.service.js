@@ -1,7 +1,8 @@
-import { GoogleGenAI } from '@google/genai';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 import { logger } from '../utils/logger.js';
 
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
 
 export async function fetchSubsidyTracker(location, farmerType) {
   const prompt = `You are a transparency and anti-corruption analyzer for Indian farmers. Output strictly in valid JSON format only, without markdown fences or extra text.
@@ -30,14 +31,15 @@ JSON Schema to follow:
 }`;
 
   try {
-    logger.ai('Calling Gemini Pro for transparency tracking data...');
-    const response = await ai.models.generateContent({
-      model: 'gemini-2.5-pro',
-      contents: prompt
-    });
-
-    const cleanJson = response.text.replace(/```json/gi, '').replace(/```/g, '').trim();
-    return JSON.parse(cleanJson);
+    logger.ai('Calling Gemini for subsidy search...');
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    return {
+      location: location || 'India',
+      crop: farmerType || 'General',
+      info: JSON.parse(response.text().replace(/```json/gi, '').replace(/```/g, '').trim()),
+      timestamp: new Date().toISOString()
+    };
   } catch (error) {
     logger.error(`Gemini transparency error: ${error.message}`);
     // Fallback data

@@ -4,6 +4,9 @@ import SoilHealthCard from '../components/SoilHealthCard';
 import CropCard from '../components/CropCard';
 import FertilizerTable from '../components/FertilizerTable';
 import SoilChart from '../components/SoilChart';
+import SoilRadarChart from '../components/SoilRadarChart';
+import SpeakButton from '../components/SpeakButton';
+import ExportReport from '../components/ExportReport';
 
 export default function AnalysisDashboard() {
   const location = useLocation();
@@ -40,9 +43,7 @@ export default function AnalysisDashboard() {
             </h1>
             <p className="text-primary-100 text-lg font-medium">Complete AI-powered soil health checkup</p>
           </div>
-          <button className="bg-white/20 backdrop-blur-md border border-white/30 text-white px-6 py-3 rounded-xl font-bold text-sm hover:bg-white/30 flex items-center gap-2 shadow-sm transition-all focus:ring-4 focus:ring-white/10">
-            <Download className="w-5 h-5" /> Download PDF Report
-          </button>
+          <ExportReport title="Soil Analysis Result" data={{ soil: aiAnalysis, crops: cropData }} />
         </div>
       </section>
 
@@ -55,7 +56,7 @@ export default function AnalysisDashboard() {
               nutrients={aiAnalysis?.nutrients || aiAnalysis?.nutrientsStatus}
             />
           </div>
-          
+
           <div className="mt-4">
             <SoilChart nutrients={{
               nitrogen: { value: originalData?.nitrogen || 0 },
@@ -65,9 +66,22 @@ export default function AnalysisDashboard() {
             }} />
           </div>
 
+          <div className="mt-4">
+            <SoilRadarChart nutrients={{
+              nitrogen: { value: originalData?.nitrogen || 0 },
+              phosphorus: { value: originalData?.phosphorus || 0 },
+              potassium: { value: originalData?.potassium || 0 },
+              ph: { value: originalData?.ph || 0 },
+              organicCarbon: { value: originalData?.organicCarbon || 0 }
+            }} />
+          </div>
+
           <div className="bg-gradient-to-br from-green-50 to-primary-100 p-6 rounded-2xl border border-green-200 mt-6 shadow-sm">
-            <h3 className="font-extrabold text-primary-900 mb-4 flex items-center gap-2">
-              <Sprout className="w-5 h-5 text-green-600" /> AI Insights & Takeaways
+            <h3 className="font-extrabold text-primary-900 mb-4 flex items-center justify-between">
+              <span className="flex items-center gap-2">
+                <Sprout className="w-5 h-5 text-green-600" /> AI Insights & Takeaways
+              </span>
+              <SpeakButton text={aiAnalysis?.analysis || ''} label="Listen" />
             </h3>
             <div className="whitespace-pre-wrap text-sm text-green-900 leading-relaxed font-medium" style={{ scrollbarWidth: 'thin' }}>
               {aiAnalysis?.analysis || 'Your AI Analysis is ready. Refer to the scores above for a detailed breakdown.'}

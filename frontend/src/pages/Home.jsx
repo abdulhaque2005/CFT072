@@ -2,17 +2,18 @@ import { Link } from 'react-router-dom';
 import {
   Sprout, FlaskConical, Wheat, CloudSun, BarChart3, Landmark,
   CalendarDays, ArrowRight, Sparkles, Tractor, MapPin, Zap,
-  Star, TrendingUp, ShieldCheck, Leaf, LifeBuoy, Droplet, Trees, Store
+  Star, TrendingUp, ShieldCheck, Leaf, HeartHandshake, Droplet, Trees, Store
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import useLocation from '../hooks/useLocation';
 import HeroCarousel from '../components/HeroCarousel';
 import MarketTicker from '../components/MarketTicker';
+import toast from 'react-hot-toast';
 
 const features = [
   { icon: <FlaskConical className="w-7 h-7" />, title: 'Soil Analysis', desc: 'Mitti ki poori report — N, P, K, pH score', path: '/soil-input', color: 'from-amber-500 to-orange-600', bg: 'from-amber-50 to-orange-50' },
   { icon: <Wheat className="w-7 h-7" />, title: 'Crop Recommendation', desc: 'Best fasal suggest karega AI', path: '/crops', color: 'from-green-500 to-emerald-600', bg: 'from-green-50 to-emerald-50' },
-  { icon: <LifeBuoy className="w-7 h-7" />, title: 'Loss Recovery', desc: 'Fasal kharab hui? AI se emergency solution', path: '/recovery', color: 'from-red-500 to-rose-600', bg: 'from-red-50 to-rose-50' },
+  { icon: <HeartHandshake className="w-7 h-7" />, title: 'Loss Recovery', desc: 'Fasal kharab hui? AI se emergency solution', path: '/recovery', color: 'from-red-500 to-rose-600', bg: 'from-red-50 to-rose-50' },
   { icon: <Sprout className="w-7 h-7" />, title: 'Fertilizer Plan', desc: 'Kitna, kab, kaunsa fertilizer daalein', path: '/fertilizer', color: 'from-lime-500 to-green-600', bg: 'from-lime-50 to-green-50' },
   { icon: <Droplet className="w-7 h-7" />, title: 'Bio-Fertilizers', desc: 'Organic farming aur low cost khad', path: '/bio-inputs', color: 'from-emerald-500 to-teal-600', bg: 'from-emerald-50 to-teal-50' },
   { icon: <Trees className="w-7 h-7" />, title: 'Agroforestry', desc: 'Pedh lagao, karodo kamao (Long-term)', path: '/agroforestry', color: 'from-green-600 to-green-800', bg: 'from-green-50/50 to-green-100' },
@@ -100,7 +101,39 @@ export default function Home() {
 
   useEffect(() => {
     const t = setInterval(() => setActiveTip(p => (p + 1) % rotatingTips.length), 3500);
-    return () => clearInterval(t);
+
+    // Smart Alert (Mock Weather Notification)
+    const alertTimeout = setTimeout(() => {
+      toast(
+        (t) => (
+          <div className="flex gap-3 items-start">
+            <span className="text-3xl mt-1">⛈️</span>
+            <div>
+              <p className="font-black text-gray-900 text-base">Weather Alert</p>
+              <p className="text-sm text-gray-700 font-semibold mt-0.5">Bhaari baarish ke asaar hain agle 24 ghante mein. Fasal cover karein.</p>
+            </div>
+            <button onClick={() => toast.dismiss(t.id)} className="self-start text-xs text-blue-600 font-black ml-2 py-1 px-2 hover:bg-blue-50 rounded-lg">Dismiss</button>
+          </div>
+        ),
+        { 
+          duration: 8000, 
+          position: 'top-right', 
+          style: { 
+            borderRadius: '16px', 
+            padding: '16px',
+            background: '#ffffff', // Explicitly set background to white
+            color: '#1f2937',     // Ensure default text color is dark
+            boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)',
+            border: '1px solid #fee2e2' // Light red border for alert feel
+          } 
+        }
+      );
+    }, 4000);
+
+    return () => {
+      clearInterval(t);
+      clearTimeout(alertTimeout);
+    };
   }, []);
 
   const filteredCrops = allCrops.filter(c => activeTab === 'All' || c.season === activeTab);

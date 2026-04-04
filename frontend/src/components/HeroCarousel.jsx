@@ -110,11 +110,10 @@ export default function HeroCarousel({ children }) {
           <button
             key={i}
             onClick={() => goTo(i)}
-            className={`transition-all duration-400 rounded-full ${
-              i === current
+            className={`transition-all duration-400 rounded-full ${i === current
                 ? 'w-8 h-3 bg-green-400 shadow-[0_0_10px_rgba(74,222,128,0.7)]'
                 : 'w-3 h-3 bg-white/40 hover:bg-white/70'
-            }`}
+              }`}
           />
         ))}
       </div>

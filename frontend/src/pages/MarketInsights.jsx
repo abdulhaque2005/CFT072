@@ -104,11 +104,10 @@ export default function MarketInsights() {
               <button
                 key={crop}
                 onClick={() => handleCropChange(crop)}
-                className={`px-5 py-2.5 rounded-xl text-sm font-bold whitespace-nowrap transition-all flex-shrink-0 ${
-                  selectedCrop === crop
+                className={`px-5 py-2.5 rounded-xl text-sm font-bold whitespace-nowrap transition-all flex-shrink-0 ${selectedCrop === crop
                     ? 'bg-primary-800 text-white shadow-lg shadow-primary-800/25'
                     : 'bg-primary-50 text-primary-700 hover:bg-primary-100 border border-primary-100'
-                }`}
+                  }`}
               >
                 {crop}
               </button>
@@ -134,10 +133,10 @@ export default function MarketInsights() {
                       <ResponsiveContainer width="100%" height="100%">
                         <LineChart data={marketData.trendData}>
                           <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" />
-                          <XAxis dataKey="day" axisLine={false} tickLine={false} tick={{fill: '#6B7280', fontSize: 12}} dy={10} />
-                          <YAxis axisLine={false} tickLine={false} tick={{fill: '#6B7280', fontSize: 12}} dx={-10} domain={['auto', 'auto']} />
+                          <XAxis dataKey="day" axisLine={false} tickLine={false} tick={{ fill: '#6B7280', fontSize: 12 }} dy={10} />
+                          <YAxis axisLine={false} tickLine={false} tick={{ fill: '#6B7280', fontSize: 12 }} dx={-10} domain={['auto', 'auto']} />
                           <Tooltip content={<CustomTooltip />} />
-                          <Line type="monotone" dataKey="price" stroke="#059669" strokeWidth={4} dot={{r: 6, fill: '#059669', strokeWidth: 2, stroke: '#fff'}} activeDot={{r: 8, strokeWidth: 0}} />
+                          <Line type="monotone" dataKey="price" stroke="#059669" strokeWidth={4} dot={{ r: 6, fill: '#059669', strokeWidth: 2, stroke: '#fff' }} activeDot={{ r: 8, strokeWidth: 0 }} />
                         </LineChart>
                       </ResponsiveContainer>
                     </div>
@@ -176,7 +175,7 @@ export default function MarketInsights() {
 
           {/* Sidebar */}
           <div className="lg:col-span-2 space-y-6">
-            
+
             {/* Government Helpline Banner */}
             <div className="bg-gradient-to-br from-white to-green-50 rounded-3xl p-6 shadow-lg border border-green-200 relative overflow-hidden group hover:shadow-xl transition-all">
               <div className="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-green-200 rounded-full blur-2xl opacity-50 group-hover:bg-green-300 transition-colors"></div>
@@ -202,7 +201,7 @@ export default function MarketInsights() {
                   { tip: 'Sell in groups for better rates — join an FPO', url: null }
                 ].map((item, i) => (
                   <div key={i} className="flex items-start gap-3 text-sm">
-                    <span className="w-6 h-6 bg-primary-50 rounded-full flex items-center justify-center text-xs font-bold text-primary-700 flex-shrink-0 mt-0.5">{i+1}</span>
+                    <span className="w-6 h-6 bg-primary-50 rounded-full flex items-center justify-center text-xs font-bold text-primary-700 flex-shrink-0 mt-0.5">{i + 1}</span>
                     <p className="text-gray-600 font-medium leading-relaxed mt-0.5">
                       {item.tip}
                       {item.url && <a href={item.url} target="_blank" rel="noopener noreferrer" className="text-primary-600 ml-1 font-bold underline decoration-primary-200 underline-offset-2">→ Visit</a>}
@@ -215,9 +214,9 @@ export default function MarketInsights() {
             {/* Real Image */}
             <div className="rounded-3xl overflow-hidden shadow-sm border border-gray-100 group">
               <div className="overflow-hidden">
-                <img 
-                  src="https://images.unsplash.com/photo-1595855759920-86582396756a?w=600&h=250&fit=crop" 
-                  alt="Indian crop market" 
+                <img
+                  src="https://images.unsplash.com/photo-1595855759920-86582396756a?w=600&h=250&fit=crop"
+                  alt="Indian crop market"
                   className="w-full h-36 object-cover group-hover:scale-105 transition-transform duration-500"
                 />
               </div>

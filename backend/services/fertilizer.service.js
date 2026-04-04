@@ -1,8 +1,9 @@
-import { GoogleGenAI } from '@google/genai';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 import { logger } from '../utils/logger.js';
 import { FERTILIZER_MAP } from '../utils/constants.js';
 
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
 
 export async function getFertilizerPlan(soilData, crop) {
   // Use a default empty object if soilData is missing
@@ -36,13 +37,10 @@ OUTPUT FORMAT: Return ONLY valid JSON inside a code block, exactly like this:
 
   try {
     logger.ai('Calling Gemini for fertilizer plan...');
-    const response = await ai.models.generateContent({
-      model: 'gemini-2.0-flash',
-      contents: prompt
-    });
+    const response = await model.generateContent(prompt);
     
     // Parse the JSON blocks out of the markdown response
-    const rawText = response.text;
+    const rawText = response.response.text();
     const jsonMatch = rawText.match(/```(?:json)?\n([\s\S]*?)\n```/) || rawText.match(/{[\s\S]*}/);
     const resultJson = jsonMatch ? JSON.parse(jsonMatch[1] || jsonMatch[0]) : null;
     

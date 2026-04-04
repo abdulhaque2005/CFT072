@@ -141,7 +141,7 @@ export default function FarmingCalendar() {
               <div className="space-y-3">
                 {season.tips.map((tip, i) => (
                   <div key={i} className="flex items-start gap-2 text-sm">
-                    <span className="w-5 h-5 bg-primary-50 rounded-full flex items-center justify-center text-[10px] font-bold text-primary-700 mt-0.5 flex-shrink-0">{i+1}</span>
+                    <span className="w-5 h-5 bg-primary-50 rounded-full flex items-center justify-center text-[10px] font-bold text-primary-700 mt-0.5 flex-shrink-0">{i + 1}</span>
                     <p className="text-gray-600 font-medium leading-relaxed">{tip}</p>
                   </div>
                 ))}

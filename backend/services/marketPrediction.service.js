@@ -1,7 +1,8 @@
-import { GoogleGenAI } from '@google/genai';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 import { logger } from '../utils/logger.js';
 
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
 
 export async function predictMarketPrice(crop, location, currentPrice, pastTrend) {
   const prompt = `You are an expert agricultural market analyst.
@@ -27,12 +28,9 @@ OUTPUT FORMAT: Return ONLY valid JSON inside a code block exactly like this:
 
   try {
     logger.ai('Calling Gemini for market prediction...');
-    const response = await ai.models.generateContent({
-      model: 'gemini-2.0-flash',
-      contents: prompt
-    });
-    
-    const rawText = response.text;
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    const rawText = response.text();
     const jsonMatch = rawText.match(/```(?:json)?\n([\s\S]*?)\n```/) || rawText.match(/{[\s\S]*}/);
     const resultJson = jsonMatch ? JSON.parse(jsonMatch[1] || jsonMatch[0]) : null;
 

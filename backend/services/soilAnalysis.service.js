@@ -1,8 +1,9 @@
-import { GoogleGenAI } from '@google/genai';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 import { logger } from '../utils/logger.js';
 import { SOIL_THRESHOLDS, PH_RANGES } from '../utils/constants.js';
 
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
 
 function classifySoil(ph) {
   for (const [key, range] of Object.entries(PH_RANGES)) {
@@ -67,11 +68,8 @@ OUTPUT STYLE: Structured, clean, pointwise, strictly in English. Keep it under 2
   let aiAnalysis = '';
   try {
     logger.ai('Calling Gemini for soil analysis...');
-    const response = await ai.models.generateContent({
-      model: 'gemini-2.0-flash',
-      contents: prompt
-    });
-    aiAnalysis = response.text;
+    const result = await model.generateContent(prompt);
+    aiAnalysis = result.response.text();
     logger.ai('Soil analysis complete');
   } catch (error) {
     logger.error(`Gemini API error: ${error.message}`);
@@ -93,7 +91,6 @@ OUTPUT STYLE: Structured, clean, pointwise, strictly in English. Keep it under 2
 }
 
 function generateFallbackAnalysis(data, soilType, score, nLevel, pLevel, kLevel) {
-  let msg = `## Mitti ki Report (Score: ${score}/100)\n\n`;
   msg += `Aapki mitti **${soilType}** category mein hai (pH: ${data.ph}).\n\n`;
 
   if (nLevel === 'Low') msg += `⚠️ **Nitrogen kam hai** — fasal ki growth slow ho sakti hai. Urea ya organic compost use karein.\n`;

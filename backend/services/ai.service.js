@@ -1,12 +1,18 @@
-import { GoogleGenAI } from '@google/genai';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 import { logger } from '../utils/logger.js';
-import { analyzeSoil } from './soilAnalysis.service.js';
-import { recommendCrops } from './cropRecommendation.service.js';
-import { getFertilizerPlan } from './fertilizer.service.js';
-import { getWeatherAdvisory } from './weather.service.js';
-import { findSchemes } from './govScheme.service.js';
 
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+let _ai = null;
+function getAI() {
+  if (!_ai) {
+    const apiKey = process.env.GEMINI_API_KEY;
+    if (!apiKey) {
+      logger.error('GEMINI_API_KEY is missing in .env');
+      throw new Error('GEMINI_API_KEY is missing');
+    }
+    _ai = new GoogleGenerativeAI(apiKey);
+  }
+  return _ai;
+}
 
 export async function masterAdvisor(input) {
   const { soilData, location, crop, season, farmerQuery } = input;
@@ -57,11 +63,10 @@ Keep under 300 words.`;
 
   try {
     logger.ai('Calling Gemini MASTER MODE...');
-    const response = await ai.models.generateContent({
-      model: 'gemini-2.0-flash',
-      contents: masterPrompt
-    });
-    return { masterAdvice: response.text, details: results, query: farmerQuery || null };
+    const model = getAI().getGenerativeModel({ model: 'gemini-1.5-flash' });
+    const result = await model.generateContent(masterPrompt);
+    const response = await result.response;
+    return { masterAdvice: response.text(), details: results, query: farmerQuery || null };
   } catch (error) {
     logger.error(`Gemini master error: ${error.message}`);
     let fallback = `## 🌾 Smart Farming Report\n\n`;
@@ -103,15 +108,13 @@ IMPORTANT: You MUST respond ONLY with a valid JSON object in the exact format be
 
   try {
     logger.ai('Calling Gemini for advanced structured recovery advice...');
-    const response = await ai.models.generateContent({
-      model: 'gemini-2.0-flash',
-      contents: prompt,
-      generationConfig: {
-        responseMimeType: "application/json",
-      }
+    const model = getAI().getGenerativeModel({ 
+      model: 'gemini-1.5-flash',
+      generationConfig: { responseMimeType: "application/json" }
     });
-
-    let rawText = response.text.trim();
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    let rawText = response.text().trim();
     // In case model ignores mimeType and wraps in markdown (fallback cleanup)
     if (rawText.startsWith('\`\`\`json')) {
       rawText = rawText.substring(7, rawText.length - 3).trim();
@@ -163,7 +166,7 @@ IMPORTANT: You MUST respond ONLY with a valid JSON object in the exact format be
 }
 
 export async function processVoiceQuery(transcript) {
-  const prompt = `You are AgriSaar Fast Voice AI for farmers.
+  const prompt = `You are AgriSaar Fast Voice AI for farmers. Use a professional, helpful female voice tone.
 
 USER SPEECH: "${transcript}"
 
@@ -177,14 +180,20 @@ OUTPUT ONLY THE RESPONSE TEXT. NO INTRO. NO QUOTES.`;
 
   try {
     logger.ai('Calling Gemini for Voice AI...');
-    const response = await ai.models.generateContent({
-      model: 'gemini-2.0-flash',
-      contents: prompt
+    const model = getAI().getGenerativeModel({ model: 'gemini-1.5-flash' });
+    const result = await model.generateContent({
+      contents: [{ role: 'user', parts: [{ text: prompt }] }],
+      generationConfig: {
+        maxOutputTokens: 200,
+        temperature: 0.7,
+      }
     });
-    return { success: true, advice: response.text.trim() };
+    const response = await result.response;
+    return { success: true, advice: response.text().trim() };
   } catch (error) {
-    logger.error(`Gemini voice error: ${error.message}`);
-    return { success: false, advice: `Main samajh nahi paaya. Kripya dobara bolein.` };
+    console.error('STRICT_AI_ERROR:', error);
+    logger.error(`Gemini voice error [Model: gemini-1.5-flash]: ${error.message}`);
+    return { success: false, advice: `Maafi chaahte hain, AI server se jud nahi pa raha hai. Kripya thodi der baad koshish karein.` };
   }
 }
 
@@ -222,15 +231,14 @@ Keep response under 250 words. Be specific to the location.`;
 
   try {
     logger.ai('Calling Gemini for nearby farming info...');
-    const response = await ai.models.generateContent({
-      model: 'gemini-2.0-flash',
-      contents: prompt
-    });
+    const model = getAI().getGenerativeModel({ model: 'gemini-1.5-flash' });
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
     return {
       location: location || `${lat}, ${lon}`,
       season: currentSeason,
       month: currentMonth,
-      info: response.text,
+      info: response.text(),
       timestamp: new Date().toISOString()
     };
   } catch (error) {
@@ -261,11 +269,10 @@ Keep response under 250 words. Focus on maximum profit for small farmers.`;
 
   try {
     logger.ai('Calling Gemini for agroforestry advice...');
-    const response = await ai.models.generateContent({
-      model: 'gemini-2.0-flash',
-      contents: prompt
-    });
-    return { location, advice: response.text };
+    const model = getAI().getGenerativeModel({ model: 'gemini-1.5-flash' });
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    return { location, advice: response.text() };
   } catch (error) {
     logger.error(`Gemini agroforestry error: ${error.message}`);
     return {
@@ -290,16 +297,21 @@ Keep response under 200 words. Be practical and low-cost.`;
 
   try {
     logger.ai('Calling Gemini for bio-input intelligence...');
-    const response = await ai.models.generateContent({
-      model: 'gemini-2.0-flash',
-      contents: prompt
-    });
-    return { crop, intelligence: response.text };
+    const model = getAI().getGenerativeModel({ model: 'gemini-1.5-flash' });
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    return { crop, intelligence: response.text() };
   } catch (error) {
     logger.error(`Gemini bio-input error: ${error.message}`);
     return {
       crop,
-      intelligence: `🌿 Bio-Input: Jeevamrut (Cow dung + Urine + Jaggery).\n✅ Benefits: Low cost, soil health, better yield.\n🧪 Action: Apply every 15 days near roots.\n\n_Detailed AI report unavailable._`
+      intelligence: `🌿 Bio-Input Formula for ${crop || 'your crop'}:
+      
+1. Jeevamrut: 10L Water + 1kg Cow Dung + 1L Cow Urine + 100g Jaggery.
+2. Mix and ferment for 3 days.
+3. Spray on roots every 15 days.
+
+(Note: Connection issue with AI server, displaying stable offline recipe.)`
     };
   }
 }

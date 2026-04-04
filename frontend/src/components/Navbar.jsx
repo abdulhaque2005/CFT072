@@ -1,12 +1,12 @@
-import { useState } from 'react';
+import { useState, useRef, useCallback } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, Sprout, FlaskConical, Wheat, Leaf, CloudSun, BarChart3, Landmark, CalendarDays, Home as HomeIcon, ShieldCheck, LifeBuoy, Trees, Store, Droplet, Globe, ChevronDown } from 'lucide-react';
+import { Menu, X, Sprout, FlaskConical, Wheat, BarChart3, Landmark, Home as HomeIcon, HeartHandshake, Trees, Store, Droplet, Globe, ChevronDown, User, Settings, LogOut, Moon, Sun, Award, ChevronRight } from 'lucide-react';
 
 const navLinks = [
   { path: '/', label: 'Home', Icon: HomeIcon },
   { path: '/soil-input', label: 'Soil', Icon: FlaskConical },
   { path: '/crops', label: 'Crops', Icon: Wheat },
-  { path: '/recovery', label: 'Loss Recovery', Icon: LifeBuoy },
+  { path: '/recovery', label: 'Loss Recovery', Icon: HeartHandshake },
   { path: '/bio-inputs', label: 'Bio-Fertilizer', Icon: Droplet },
   { path: '/agroforestry', label: 'Profit Trees', Icon: Trees },
   { path: '/b2b', label: 'Direct Market', Icon: Store },
@@ -27,51 +27,233 @@ const languages = [
   { code: 'pa', label: 'ਪੰਜਾਬੀ (Punjabi)' },
 ];
 
-function LanguageSelector() {
-  const [isOpen, setIsOpen] = useState(false);
+/* ── Inline styles for effects Tailwind can't easily do ── */
+const navItemStyles = `
+  .nav-link {
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.2s ease, box-shadow 0.2s ease;
+  }
 
-  const getCurrentLang = () => {
+  /* Ripple circle */
+  .nav-link .ripple-circle {
+    position: absolute;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(22,163,74,0.35) 0%, rgba(22,163,74,0.08) 50%, transparent 70%);
+    transform: scale(0);
+    pointer-events: none;
+    z-index: 0;
+  }
+  .nav-link .ripple-circle.animate {
+    animation: rippleExpand 0.6s ease-out forwards;
+  }
+
+  @keyframes rippleExpand {
+    0%   { transform: scale(0); opacity: 1; }
+    70%  { opacity: 0.5; }
+    100% { transform: scale(2.5); opacity: 0; }
+  }
+
+  /* Spring press */
+  .nav-link.pressing {
+    transform: scale(0.92);
+    transition: transform 0.1s ease-in;
+  }
+  .nav-link.releasing {
+    transform: scale(1);
+    transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  /* Hover glow */
+  .nav-link:hover {
+    box-shadow: 0 0 0 3px rgba(22,163,74,0.08);
+  }
+
+  /* Icon bounce on click */
+  .nav-link.pressing .nav-icon {
+    transform: scale(0.85) rotate(-8deg);
+    transition: transform 0.1s ease-in;
+  }
+  .nav-link.releasing .nav-icon {
+    transform: scale(1.15) rotate(0deg);
+    transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  .nav-link > * {
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Active indicator bar */
+  .nav-link-active-bar {
+    position: absolute;
+    left: 15%;
+    right: 15%;
+    bottom: -2px;
+    height: 3px;
+    border-radius: 3px 3px 0 0;
+    background: linear-gradient(90deg, #2e7d32, #66bb6a, #2e7d32);
+    background-size: 200% 100%;
+    animation: shimmerBar 2s ease-in-out infinite;
+    box-shadow: 0 -2px 12px rgba(22,163,74,0.5);
+  }
+
+  @keyframes shimmerBar {
+    0%, 100% { background-position: 0% 50%; }
+    50%      { background-position: 100% 50%; }
+  }
+`;
+
+function UserProfile() {
+  const [isOpen, setIsOpen] = useState(false);
+  const [showLanguages, setShowLanguages] = useState(false);
+  const menuRef = useRef(null);
+
+  const mockUser = {
+    name: 'Ramesh Patel',
+    email: 'kisan.ramesh@agrisaar.com',
+    coins: 2450,
+    avatar: 'RP'
+  };
+
+  const getCurrentLangLabel = () => {
     const match = document.cookie.match(/googtrans=\/en\/([a-z]{2})/);
-    return match ? match[1] : 'en';
+    const code = match ? match[1] : 'en';
+    return languages.find(l => l.code === code)?.label || 'English';
   };
 
   const changeLanguage = (langCode) => {
     document.cookie = `googtrans=/en/${langCode}; path=/;`;
-    if(window.location.hostname !== 'localhost') {
-        document.cookie = `googtrans=/en/${langCode}; domain=.${window.location.hostname}; path=/;`;
-    }
     window.location.reload();
   };
 
   return (
-    <div className="relative">
-      <button 
+    <div className="relative" ref={menuRef}>
+      <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 px-4 py-2.5 rounded-full bg-gradient-to-r from-primary-50 to-green-50 text-primary-800 hover:from-primary-100 hover:to-green-100 border border-primary-100/50 transition-all duration-300 font-bold text-sm shadow-[0_2px_10px_rgba(22,163,74,0.1)] hover:shadow-[0_4px_15px_rgba(22,163,74,0.15)] hover:-translate-y-0.5"
+        className="flex items-center gap-2 p-1 pr-3 rounded-full bg-white border border-gray-200 hover:border-primary-300 hover:shadow-md transition-all active:scale-95 group"
       >
-        <Globe className="w-4 h-4 text-primary-600" />
-        <span className="hidden sm:block">{languages.find(l => l.code === getCurrentLang())?.label || 'English'}</span>
-        <ChevronDown className={`w-3.5 h-3.5 text-primary-600 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} />
+        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary-600 to-primary-500 flex items-center justify-center text-white text-xs font-black shadow-sm group-hover:scale-105 transition-transform">
+          {mockUser.avatar}
+        </div>
+        <div className="hidden sm:block text-left">
+          <p className="text-[10px] font-black text-gray-400 uppercase tracking-wider leading-none mb-0.5">Mera Profile</p>
+          <div className="flex items-center gap-1">
+            <span className="text-xs font-bold text-gray-700">{mockUser.name}</span>
+            <ChevronDown className={`w-3 h-3 text-gray-400 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} />
+          </div>
+        </div>
       </button>
-      
+
       {isOpen && (
         <>
-          <div className="fixed inset-0 z-40" onClick={() => setIsOpen(false)}></div>
-          <div className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-xl border border-gray-100 py-2 z-50 max-h-[60vh] overflow-y-auto">
-            {languages.map((lang) => (
-              <button
-                key={lang.code}
-                onClick={() => {
-                  changeLanguage(lang.code);
-                  setIsOpen(false);
-                }}
-                className={`w-full text-left px-4 py-3 text-sm font-bold transition-colors border-b border-gray-50 last:border-0
-                  ${getCurrentLang() === lang.code ? 'text-primary-800 bg-primary-50' : 'text-gray-600 hover:bg-primary-50'}
-                `}
-              >
-                {lang.label}
-              </button>
-            ))}
+          <div className="fixed inset-0 z-40 bg-black/5" onClick={() => { setIsOpen(false); setShowLanguages(false); }} />
+          <div className="absolute right-0 mt-3 w-72 bg-white/95 backdrop-blur-xl rounded-[2rem] shadow-[0_20px_50px_rgba(0,0,0,0.15)] border border-gray-100 overflow-hidden z-50 animate-in fade-in slide-in-from-top-2 duration-300">
+            {/* Header / Identity */}
+            <div className="p-5 bg-gradient-to-br from-primary-50 to-emerald-50/30 border-b border-gray-100">
+              <div className="flex items-center gap-4 mb-4">
+                <div className="w-12 h-12 rounded-2xl bg-white flex items-center justify-center text-primary-600 font-black text-lg shadow-sm border border-primary-100">
+                  {mockUser.avatar}
+                </div>
+                <div>
+                  <h4 className="font-black text-gray-900 leading-none">{mockUser.name}</h4>
+                  <p className="text-[11px] text-gray-500 font-bold mt-1">{mockUser.email}</p>
+                </div>
+              </div>
+
+              {/* AgriCoins Section */}
+              <div className="bg-primary-600 rounded-2xl p-3 text-white shadow-lg shadow-primary-600/20 flex items-center justify-between group cursor-pointer hover:scale-[1.02] transition-transform">
+                <div className="flex items-center gap-2.5">
+                  <span className="text-xl group-hover:rotate-12 transition-transform">🪙</span>
+                  <div>
+                    <p className="text-[10px] font-black text-primary-100 uppercase tracking-widest leading-none">AgriCoins</p>
+                    <p className="text-sm font-black mt-0.5">{mockUser.coins.toLocaleString()}</p>
+                  </div>
+                </div>
+                <button className="bg-white/20 hover:bg-white/30 text-[10px] font-black px-3 py-1.5 rounded-lg transition-colors">
+                  REDEEM
+                </button>
+              </div>
+            </div>
+
+            {/* Menu Items */}
+            <div className="p-2">
+              {!showLanguages ? (
+                <>
+                  <button className="w-full flex items-center justify-between p-3 rounded-xl hover:bg-primary-50 text-gray-600 hover:text-primary-700 transition-colors group">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 bg-gray-50 rounded-lg group-hover:bg-primary-100 transition-colors">
+                        <Award className="w-4 h-4 text-gray-500 group-hover:text-primary-600" />
+                      </div>
+                      <span className="text-sm font-bold">My Growth Chart</span>
+                    </div>
+                    <ChevronRight className="w-4 h-4 opacity-40" />
+                  </button>
+
+                  <button
+                    onClick={() => setShowLanguages(true)}
+                    className="w-full flex items-center justify-between p-3 rounded-xl hover:bg-primary-50 text-gray-600 hover:text-primary-700 transition-colors group"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 bg-gray-50 rounded-lg group-hover:bg-primary-100 transition-colors">
+                        <Globe className="w-4 h-4 text-gray-500 group-hover:text-primary-600" />
+                      </div>
+                      <div>
+                        <span className="text-sm font-bold">Language Setting</span>
+                        <p className="text-[10px] text-gray-400 font-bold uppercase">{getCurrentLangLabel()}</p>
+                      </div>
+                    </div>
+                    <ChevronRight className="w-4 h-4 opacity-40" />
+                  </button>
+
+                  <div className="flex items-center justify-between p-3 rounded-xl hover:bg-gray-50 text-gray-600 transition-colors">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 bg-gray-50 rounded-lg">
+                        <Moon className="w-4 h-4 text-gray-500" />
+                      </div>
+                      <span className="text-sm font-bold">Dark Mode</span>
+                    </div>
+                    <div className="w-10 h-5 bg-gray-200 rounded-full relative p-1 cursor-pointer">
+                      <div className="w-3 h-3 bg-white rounded-full shadow-sm" />
+                    </div>
+                  </div>
+
+                  <button className="w-full flex items-center justify-between p-3 rounded-xl hover:bg-red-50 text-gray-500 hover:text-red-600 transition-colors group mt-2">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 bg-gray-50 rounded-lg group-hover:bg-red-100 transition-colors">
+                        <LogOut className="w-4 h-4 text-gray-400 group-hover:text-red-500" />
+                      </div>
+                      <span className="text-sm font-bold">Logout</span>
+                    </div>
+                  </button>
+                </>
+              ) : (
+                <div className="animate-in slide-in-from-right-4 duration-300">
+                  <header className="flex items-center gap-2 p-3 border-b border-gray-50 mb-1">
+                    <button onClick={() => setShowLanguages(false)} className="p-1 hover:bg-gray-100 rounded-lg">
+                      <X className="w-4 h-4 text-gray-400" />
+                    </button>
+                    <span className="text-[11px] font-black text-gray-400 uppercase tracking-widest">Select Language</span>
+                  </header>
+                  <div className="max-h-[250px] overflow-y-auto pr-1 custom-scrollbar">
+                    {languages.map((lang) => (
+                      <button
+                        key={lang.code}
+                        onClick={() => changeLanguage(lang.code)}
+                        className={`w-full text-left px-4 py-2.5 rounded-xl text-sm font-bold transition-all mb-0.5
+                          ${getCurrentLangLabel() === lang.label
+                            ? 'text-primary-700 bg-primary-50'
+                            : 'text-gray-500 hover:bg-gray-50 hover:text-gray-900'
+                          }`}
+                      >
+                        {lang.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         </>
       )}
@@ -79,84 +261,154 @@ function LanguageSelector() {
   );
 }
 
+/* ── Nav Link with real ripple + spring press ── */
+function NavItem({ path, label, Icon, isActive }) {
+  const linkRef = useRef(null);
+
+  const spawnRipple = useCallback((e) => {
+    const el = linkRef.current;
+    if (!el) return;
+    const rect = el.getBoundingClientRect();
+    const size = Math.max(rect.width, rect.height) * 2;
+    const x = e.clientX - rect.left - size / 2;
+    const y = e.clientY - rect.top - size / 2;
+
+    // Create ripple element
+    const ripple = document.createElement('span');
+    ripple.className = 'ripple-circle animate';
+    ripple.style.width = `${size}px`;
+    ripple.style.height = `${size}px`;
+    ripple.style.left = `${x}px`;
+    ripple.style.top = `${y}px`;
+    el.appendChild(ripple);
+
+    // Remove after animation
+    ripple.addEventListener('animationend', () => ripple.remove());
+
+    // Spring press class
+    el.classList.remove('releasing');
+    el.classList.add('pressing');
+  }, []);
+
+  const releasePress = useCallback(() => {
+    const el = linkRef.current;
+    if (!el) return;
+    el.classList.remove('pressing');
+    el.classList.add('releasing');
+  }, []);
+
+  return (
+    <Link
+      ref={linkRef}
+      to={path}
+      onPointerDown={spawnRipple}
+      onPointerUp={releasePress}
+      onPointerLeave={releasePress}
+      className={`nav-link flex items-center gap-1.5 px-3 py-2 rounded-lg text-[13px] font-semibold whitespace-nowrap select-none cursor-pointer
+        ${isActive
+          ? 'text-primary-700 bg-primary-50 shadow-sm'
+          : 'text-gray-500 hover:text-primary-700 hover:bg-primary-50/60'
+        }`}
+    >
+      <Icon
+        className={`nav-icon w-4 h-4 shrink-0
+          ${isActive
+            ? 'text-primary-600'
+            : 'text-gray-400'
+          }`}
+        strokeWidth={isActive ? 2.5 : 2}
+      />
+      <span>{label}</span>
+      {isActive && <span className="nav-link-active-bar" />}
+    </Link>
+  );
+}
+
+
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
 
   return (
-    <nav className="sticky top-0 w-full z-50 bg-white/95 backdrop-blur-xl shadow-[0_4px_40px_rgb(22,163,74,0.12)] border-b-2 border-primary-100">
-      <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-20">
-          <Link to="/" className="flex items-center gap-3 group">
-            <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-primary-700 via-primary-600 to-primary-500 flex items-center justify-center shadow-lg shadow-primary-500/40 group-hover:-translate-y-1 group-hover:shadow-primary-500/60 transition-all duration-300">
-              <Sprout className="w-7 h-7 text-white drop-shadow-md" />
-            </div>
-            <div>
-              <span className="text-[26px] font-black tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-gray-900 to-gray-700">Agri<span className="bg-clip-text text-transparent bg-gradient-to-r from-primary-600 to-primary-400">Saar</span></span>
-              <span className="text-[10px] block text-primary-600 -mt-1.5 font-extrabold uppercase tracking-[0.2em]">Smart Farming AI</span>
-            </div>
-          </Link>
+    <>
+      {/* Inject custom styles once */}
+      <style>{navItemStyles}</style>
 
-          <div className="hidden lg:flex items-center gap-2">
-            {navLinks.map(({ path, label, Icon }) => {
-              const isActive = location.pathname === path;
-              return (
-                <Link
+      <nav className="sticky top-0 w-full z-50 bg-white/95 backdrop-blur-xl border-b border-gray-200/80 shadow-[0_1px_12px_rgba(0,0,0,0.06)]">
+        <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16">
+
+            {/* ── Logo ── */}
+            <Link to="/" className="flex items-center gap-2.5 shrink-0 group">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-600 to-primary-500 flex items-center justify-center shadow-md shadow-primary-500/30 group-hover:shadow-primary-500/50 group-hover:-translate-y-0.5 transition-all duration-300">
+                <Sprout className="w-5 h-5 text-white" />
+              </div>
+              <div className="leading-tight">
+                <span className="text-xl font-black tracking-tight text-gray-900">
+                  Agri<span className="text-primary-600">Saar</span>
+                </span>
+                <span className="text-[9px] block text-primary-600/80 -mt-0.5 font-bold uppercase tracking-[0.15em]">
+                  Smart Farming AI
+                </span>
+              </div>
+            </Link>
+
+            {/* ── Desktop Nav ── */}
+            <div className="hidden lg:flex items-center gap-1 mx-4">
+              {navLinks.map(({ path, label, Icon }) => (
+                <NavItem
                   key={path}
-                  to={path}
-                  className={`relative px-3 py-2 rounded-xl text-sm font-bold transition-all duration-300 flex items-center gap-2 group
-                    ${isActive
-                      ? 'text-primary-700 bg-primary-50/50'
-                      : 'text-gray-500 hover:text-primary-700 hover:bg-primary-50/30'
-                    }`}
-                >
-                  <Icon className={`w-5 h-5 transition-transform duration-300 group-hover:scale-110 ${isActive ? 'text-primary-600 drop-shadow-md' : 'text-gray-400 group-hover:text-primary-500 group-hover:drop-shadow-sm'}`} />
-                  {label}
-                  {isActive && (
-                    <span className="absolute inset-x-2 -bottom-[24px] h-1.5 bg-gradient-to-r from-primary-600 to-primary-400 rounded-t-full shadow-[0_-3px_12px_rgba(22,163,74,0.6)]"></span>
-                  )}
-                </Link>
-              );
-            })}
-          </div>
+                  path={path}
+                  label={label}
+                  Icon={Icon}
+                  isActive={location.pathname === path}
+                />
+              ))}
+            </div>
 
-          <div className="flex items-center gap-4">
-            <LanguageSelector />
-            <div id="google_translate_element" className="hidden"></div>
-            <button
-              onClick={() => setIsOpen(!isOpen)}
-              className="lg:hidden p-2 rounded-xl bg-gray-50 text-gray-600 hover:bg-primary-50 hover:text-primary-600 transition-colors"
-              aria-label="Toggle menu"
-            >
-              {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {isOpen && (
-        <div className="lg:hidden bg-white border-t border-primary-100 animate-fade-in">
-          <div className="px-4 py-3 space-y-1">
-            {navLinks.map(({ path, label, Icon }) => (
-              <Link
-                key={path}
-                to={path}
-                onClick={() => setIsOpen(false)}
-                className={`flex items-center gap-3 px-4 py-3 rounded-xl text-base font-bold transition-all
-                  ${location.pathname === path
-                    ? 'bg-primary-800 text-white'
-                    : 'text-gray-600 hover:bg-primary-50'
-                  }`}
+            {/* ── Right side ── */}
+            <div className="flex items-center gap-3 shrink-0">
+              <UserProfile />
+              <div id="google_translate_element" className="hidden" />
+              <button
+                onClick={() => setIsOpen(!isOpen)}
+                className="lg:hidden p-2 rounded-lg bg-gray-100 text-gray-600 hover:bg-primary-50 hover:text-primary-600 transition-colors active:scale-95"
+                aria-label="Toggle menu"
               >
-                <div className={`p-2 rounded-lg ${location.pathname === path ? 'bg-white/20' : 'bg-primary-100'} `}>
-                  <Icon className={`w-5 h-5 ${location.pathname === path ? 'text-white' : 'text-primary-700'}`} />
-                </div>
-                {label}
-              </Link>
-            ))}
+                {isOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+              </button>
+            </div>
           </div>
         </div>
-      )}
-    </nav>
+
+        {/* ── Mobile Nav ── */}
+        {isOpen && (
+          <div className="lg:hidden bg-white border-t border-gray-100 animate-fade-in shadow-lg">
+            <div className="px-4 py-3 space-y-1">
+              {navLinks.map(({ path, label, Icon }) => {
+                const active = location.pathname === path;
+                return (
+                  <Link
+                    key={path}
+                    to={path}
+                    onClick={() => setIsOpen(false)}
+                    className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all active:scale-[0.98]
+                      ${active
+                        ? 'bg-primary-600 text-white shadow-md shadow-primary-600/30'
+                        : 'text-gray-600 hover:bg-gray-50'
+                      }`}
+                  >
+                    <div className={`p-1.5 rounded-lg ${active ? 'bg-white/20' : 'bg-primary-50'}`}>
+                      <Icon className={`w-4 h-4 ${active ? 'text-white' : 'text-primary-600'}`} />
+                    </div>
+                    {label}
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
+        )}
+      </nav>
+    </>
   );
 }

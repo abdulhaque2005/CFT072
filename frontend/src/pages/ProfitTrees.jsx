@@ -3,6 +3,7 @@ import { Trees, TrendingUp, Sun, Droplets, MapPin } from 'lucide-react';
 import api from '../services/api';
 import useLocation from '../hooks/useLocation';
 import Loading from '../components/Loading';
+import SpeakButton from '../components/SpeakButton';
 
 export default function ProfitTrees() {
   const { locationText, loading: locLoading } = useLocation();
@@ -50,8 +51,11 @@ export default function ProfitTrees() {
           
           <div className="md:col-span-2">
             <div className="bg-white rounded-3xl p-8 shadow-sm border border-gray-100 h-full">
-              <h2 className="text-2xl font-black text-gray-900 mb-6 flex items-center gap-3">
-                <TrendingUp className="w-6 h-6 text-green-600" /> AI Recommendations
+              <h2 className="text-2xl font-black text-gray-900 mb-6 flex items-center justify-between">
+                <span className="flex items-center gap-3">
+                  <TrendingUp className="w-6 h-6 text-green-600" /> AI Recommendations
+                </span>
+                {data && <SpeakButton text={data} label="🔊 Listen" />}
               </h2>
               <div className="prose prose-green max-w-none text-gray-700 font-medium whitespace-pre-wrap leading-relaxed">
                 {data}

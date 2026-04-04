@@ -15,6 +15,7 @@ import mandiRoutes from './routes/mandi.routes.js';
 import schemesRoutes from './routes/schemes.routes.js';
 import aiRoutes from './routes/ai.routes.js';
 import transparencyRoutes from './routes/transparency.routes.js';
+import ttsRoutes from './routes/tts.routes.js';
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -43,6 +44,7 @@ app.use('/api/mandi', mandiRoutes);
 app.use('/api/schemes', schemesRoutes);
 app.use('/api/ai', aiRoutes);
 app.use('/api/transparency', transparencyRoutes);
+app.use('/api/tts', ttsRoutes);
 
 app.use((req, res) => {
   res.status(404).json({ success: false, message: 'Route not found' });

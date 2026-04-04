@@ -15,6 +15,9 @@ import LossRecovery from './pages/LossRecovery';
 import BioFertilizer from './pages/BioFertilizer';
 import ProfitTrees from './pages/ProfitTrees';
 import DirectMarket from './pages/DirectMarket';
+import DiseaseScanner from './pages/DiseaseScanner';
+import Login from './pages/Login';
+import Signup from './pages/Signup';
 import KisaanAIAssistant from './components/KisaanAIAssistant';
 
 function App() {
@@ -38,6 +41,9 @@ function App() {
             <Route path="/bio-inputs" element={<BioFertilizer />} />
             <Route path="/agroforestry" element={<ProfitTrees />} />
             <Route path="/b2b" element={<DirectMarket />} />
+            <Route path="/lens" element={<DiseaseScanner />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<Signup />} />
           </Routes>
         </main>
         <KisaanAIAssistant />

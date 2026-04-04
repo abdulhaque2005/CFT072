@@ -1,7 +1,8 @@
-import { GoogleGenAI } from '@google/genai';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 import { logger } from '../utils/logger.js';
 
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
 
 export async function checkFertilizerSafety(soilData, weatherSummary, crop) {
   const prompt = `You are a fertilizer safety expert. Give warnings in English.
@@ -35,12 +36,10 @@ OUTPUT:
 Keep response under 150 words.`;
 
   try {
-    logger.ai('Calling Gemini for fertilizer safety...');
-    const response = await ai.models.generateContent({
-      model: 'gemini-2.5-pro',
-      contents: prompt
-    });
-    return { safety: response.text };
+    logger.ai('Calling Gemini for safety advisor...');
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    return { safety: response.text() };
   } catch (error) {
     logger.error(`Gemini safety error: ${error.message}`);
     let msg = '⚠️ **General Safety Tips:**\n\n';

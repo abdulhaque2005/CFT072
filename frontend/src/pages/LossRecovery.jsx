@@ -1,8 +1,9 @@
 import { useState } from 'react';
-import { LifeBuoy, AlertTriangle, CloudRain, Bug, Sun, Sprout, ArrowRight, XCircle, ShieldCheck, Clock, CheckCircle2, ChevronRight, Landmark } from 'lucide-react';
+import { HeartHandshake, AlertTriangle, CloudRain, Bug, Sun, Sprout, ArrowRight, XCircle, ShieldCheck, Clock, CheckCircle2, ChevronRight, Landmark } from 'lucide-react';
 import api from '../services/api';
 import useLocation from '../hooks/useLocation';
 import Loading from '../components/Loading';
+import SpeakButton from '../components/SpeakButton';
 
 const PROBLEMS = [
   { id: 'rain', icon: <CloudRain className="w-8 h-8" />, label: 'Unseasonal Rain / Flood', desc: 'Sthiti: Baarish ya baad se fasal kharab ho gayi' },
@@ -55,7 +56,7 @@ export default function LossRecovery() {
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-10">
           <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-red-100 mb-5 shadow-inner border-4 border-white">
-            <LifeBuoy className="w-10 h-10 text-red-600" />
+            <HeartHandshake className="w-10 h-10 text-red-600" />
           </div>
           <h1 className="text-4xl md:text-5xl font-black text-gray-900 mb-4 tracking-tight">Disaster Recovery & Support</h1>
           <p className="text-gray-600 font-medium text-lg">Nuksaan ke baad kya karein? AI se PMFBY Claim, NDRF Funds aur Cash Crops ka plan ({city})</p>
@@ -110,7 +111,7 @@ export default function LossRecovery() {
             {/* Header Alert */}
             <div className="bg-gradient-to-r from-red-600 to-rose-700 rounded-[2rem] shadow-2xl p-8 sm:p-10 text-white relative overflow-hidden">
               <div className="absolute right-0 top-0 opacity-10 transform translate-x-8 -translate-y-8">
-                <LifeBuoy className="w-64 h-64" />
+                <HeartHandshake className="w-64 h-64" />
               </div>
               <div className="relative z-10">
                 <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-md px-4 py-1.5 rounded-full text-sm font-bold mb-4 border border-red-400/30">
@@ -118,6 +119,13 @@ export default function LossRecovery() {
                 </div>
                 <h2 className="text-3xl md:text-5xl font-black mb-3">Don't Panic. Here is the Plan.</h2>
                 <p className="text-red-100 text-lg font-medium max-w-2xl">Based on the disaster reported, follow these exact steps to claim compensation and replant your fields for immediate cash flow.</p>
+                <div className="mt-4">
+                  <SpeakButton 
+                    text={`Recovery Plan: ${report.compensation?.steps?.join('. ')}. Immediate Actions: ${report.immediateAction?.steps?.join('. ')}. Recovery Crops: ${report.recoveryCrops?.crops?.map(c => c.name + ' takes ' + c.duration).join(', ')}`} 
+                    label="🔊 Listen to Plan" 
+                    size="md" 
+                  />
+                </div>
               </div>
             </div>
 

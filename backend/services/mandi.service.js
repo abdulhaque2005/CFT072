@@ -1,7 +1,8 @@
-import { GoogleGenAI } from '@google/genai';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 import { logger } from '../utils/logger.js';
 
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
 
 export async function compareMandis(crop, location, mandiPrices) {
   const mandiList = mandiPrices && mandiPrices.length > 0
@@ -24,15 +25,13 @@ OUTPUT STYLE: Pointwise, clear English. Keep under 100 words.`;
 
   try {
     logger.ai('Calling Gemini for mandi comparison...');
-    const response = await ai.models.generateContent({
-      model: 'gemini-2.0-flash',
-      contents: prompt
-    });
+    const result = await model.generateContent(prompt);
+    const aiResponse = result.response.text();
     return {
       crop,
       location,
       mandis: mandiPrices || [],
-      comparison: response.text
+      comparison: aiResponse
     };
   } catch (error) {
     logger.error(`Gemini mandi error: ${error.message}`);

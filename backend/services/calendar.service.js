@@ -1,7 +1,8 @@
-import { GoogleGenAI } from '@google/genai';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 import { logger } from '../utils/logger.js';
 
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
 
 export async function generateFarmingCalendar(crop, season, location) {
   const prompt = `You are a farming planner for Indian farmers. Give a complete farming calendar in English.
@@ -30,16 +31,14 @@ Use approximate days. Give practical tips at each stage.
 Keep response under 350 words.`;
 
   try {
-    logger.ai('Calling Gemini for farming calendar...');
-    const response = await ai.models.generateContent({
-      model: 'gemini-2.0-flash',
-      contents: prompt
-    });
+    logger.ai('Calling Gemini for crop calendar...');
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
     return {
       crop,
       season: season || 'Current',
       location: location || 'India',
-      calendar: response.text
+      calendar: response.text()
     };
   } catch (error) {
     logger.error(`Gemini calendar error: ${error.message}`);

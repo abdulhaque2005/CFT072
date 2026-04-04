@@ -1,8 +1,9 @@
-import { GoogleGenAI } from '@google/genai';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 import { logger } from '../utils/logger.js';
 import { API_ENDPOINTS } from '../utils/constants.js';
 
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
 
 function generateMockWeatherData(lat, lon) {
   // Generate realistic-looking weather if no API key is present
@@ -158,10 +159,7 @@ TASK:
 OUTPUT STYLE: Simple, practical English. Keep under 300 words.`;
 
   try {
-    const response = await ai.models.generateContent({
-      model: 'gemini-2.0-flash',
-      contents: prompt
-    });
+    const response = await model.generateContent(prompt);
 
     return {
       location: loc,
@@ -176,7 +174,7 @@ OUTPUT STYLE: Simple, practical English. Keep under 300 words.`;
         visibility: current.visibility ? Math.round(current.visibility / 1000) : null
       } : null,
       forecast: forecastDays,
-      advisory: response.text,
+      advisory: response.response.text(),
       timestamp: new Date().toISOString()
     };
   } catch (error) {

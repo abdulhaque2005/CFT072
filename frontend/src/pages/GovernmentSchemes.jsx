@@ -53,10 +53,10 @@ export default function GovernmentSchemes() {
       setLoading(true);
       setError('');
       const farmerDesc = `${farmerProfile.landSize} farmer, ${farmerProfile.category} category, ${farmerProfile.income} annual income`;
-      const res = await findSchemes({ 
-        location: locationText || 'India', 
-        crop: '', 
-        farmerType: initialLoad ? 'Small Farmer' : farmerDesc 
+      const res = await findSchemes({
+        location: locationText || 'India',
+        crop: '',
+        farmerType: initialLoad ? 'Small Farmer' : farmerDesc
       });
       const payload = res.data || res;
       setData(payload);
@@ -78,9 +78,9 @@ export default function GovernmentSchemes() {
 
   const schemes = data.schemes || [];
   const categories = ['All', ...new Set(schemes.map(s => s.category).filter(Boolean))];
-  
+
   const filteredSchemes = schemes.filter(s => {
-    const matchSearch = searchTerm === '' || 
+    const matchSearch = searchTerm === '' ||
       (s.name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
       (s.benefit || '').toLowerCase().includes(searchTerm.toLowerCase());
     const matchCategory = selectedCategory === 'All' || s.category === selectedCategory;
@@ -103,7 +103,7 @@ export default function GovernmentSchemes() {
             <Landmark className="w-9 h-9" /> Government Schemes
           </h1>
           <p className="text-primary-200 text-lg font-medium mb-6">{schemes.length}+ government benefits available for you</p>
-          
+
           <div className="grid sm:grid-cols-3 gap-4">
             <div className="bg-white/10 backdrop-blur-md rounded-2xl p-5 border border-white/15">
               <p className="text-3xl font-extrabold text-white">{schemes.length}+</p>
@@ -141,11 +141,10 @@ export default function GovernmentSchemes() {
                 <button
                   key={cat}
                   onClick={() => setSelectedCategory(cat)}
-                  className={`px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all flex-shrink-0 ${
-                    selectedCategory === cat
+                  className={`px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all flex-shrink-0 ${selectedCategory === cat
                       ? 'bg-primary-800 text-white shadow-md'
                       : 'bg-gray-50 text-gray-600 hover:bg-gray-100'
-                  }`}
+                    }`}
                 >
                   {config?.icon || '📋'} {cat}
                 </button>
@@ -195,9 +194,9 @@ export default function GovernmentSchemes() {
           </div>
         ) : (
           <div className="text-right mb-6">
-             <button onClick={() => setShowWizard(true)} className="text-sm font-bold text-green-600 hover:text-green-800 underline">
-               Edit Profile for Better Matches
-             </button>
+            <button onClick={() => setShowWizard(true)} className="text-sm font-bold text-green-600 hover:text-green-800 underline">
+              Edit Profile for Better Matches
+            </button>
           </div>
         )}
 
@@ -235,7 +234,7 @@ export default function GovernmentSchemes() {
 
                 <div className="p-5 flex flex-col flex-1">
                   <h4 className="text-base font-bold text-gray-900 mb-2 leading-snug group-hover:text-primary-800 transition-colors">{scheme.name}</h4>
-                  
+
                   {/* Amount - Prominent */}
                   <div className="bg-green-50 rounded-xl p-3 mb-3 border border-green-100">
                     <div className="flex items-center gap-2 mb-1">

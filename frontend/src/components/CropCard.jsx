@@ -38,7 +38,7 @@ export default function CropCard({ rank, name, score, reason }) {
     2: 'text-emerald-700',
     3: 'text-lime-700'
   };
-  
+
   const barColors = {
     1: 'bg-gradient-to-r from-green-400 to-green-600',
     2: 'bg-gradient-to-r from-emerald-400 to-emerald-600',
@@ -46,7 +46,7 @@ export default function CropCard({ rank, name, score, reason }) {
   };
 
   const imageUrl = getCropImage(name);
-  
+
   // Fake weather/season data for demo based on name length or static to make UI look good
   const season = name.length > 5 ? 'Kharif' : 'Rabi';
   const temp = name.length > 5 ? '28°C - 35°C' : '15°C - 25°C';
@@ -54,10 +54,10 @@ export default function CropCard({ rank, name, score, reason }) {
   return (
     <div className={`bg-white rounded-3xl shadow-sm border hover:border-green-400 relative overflow-hidden transition-all hover:shadow-2xl hover:-translate-y-2 group flex flex-col ${bgColors[rank] || bgColors[3]}`}>
       <div className="h-48 w-full relative overflow-hidden">
-        <img 
-          src={imageUrl} 
-          alt={name} 
-          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" 
+        <img
+          src={imageUrl}
+          alt={name}
+          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-green-900/90 via-green-900/30 to-transparent"></div>
         {isTop && (
@@ -65,23 +65,23 @@ export default function CropCard({ rank, name, score, reason }) {
             <Award className="w-4 h-4 text-green-600" /> Top Match
           </div>
         )}
-        
+
         <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-md text-gray-800 text-[10px] font-black px-2.5 py-1 rounded-full flex items-center shadow-lg border border-gray-100 uppercase tracking-wider">
           {season}
         </div>
-        
+
         <h4 className="absolute bottom-4 left-5 text-3xl font-black text-white drop-shadow-xl">{name}</h4>
       </div>
 
       <div className="p-6 flex-grow flex flex-col bg-white">
-        
+
         <div className="flex gap-2 mb-5">
-           <span className="bg-blue-50 border border-blue-100 text-blue-700 text-[10px] font-bold px-2 py-1 rounded-md flex items-center gap-1">
-             <Droplets className="w-3 h-3" /> Opt. Water
-           </span>
-           <span className="bg-orange-50 border border-orange-100 text-orange-700 text-[10px] font-bold px-2 py-1 rounded-md flex items-center gap-1">
-             ☀️ {temp}
-           </span>
+          <span className="bg-blue-50 border border-blue-100 text-blue-700 text-[10px] font-bold px-2 py-1 rounded-md flex items-center gap-1">
+            <Droplets className="w-3 h-3" /> Opt. Water
+          </span>
+          <span className="bg-orange-50 border border-orange-100 text-orange-700 text-[10px] font-bold px-2 py-1 rounded-md flex items-center gap-1">
+            ☀️ {temp}
+          </span>
         </div>
 
         {score && (
@@ -106,8 +106,8 @@ export default function CropCard({ rank, name, score, reason }) {
         )}
 
         {/* Link to Fertilizer Planner */}
-        <Link 
-          to="/fertilizer" 
+        <Link
+          to="/fertilizer"
           className="mt-auto flex items-center justify-center gap-2 w-full py-3 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white rounded-xl text-sm font-black transition-all shadow-md group-hover:shadow-lg"
         >
           <Sprout className="w-4 h-4" /> Plan Fertilizer
