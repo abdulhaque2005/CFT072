@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Menu, X, Sprout, FlaskConical, Wheat, BarChart3, Landmark, Home as HomeIcon, HeartHandshake, Trees, Store, Droplet, Globe, ChevronDown, User, Settings, LogOut, Moon, Sun, Award, ChevronRight, CalendarDays, Bell, ScanLine } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
@@ -30,7 +30,6 @@ const languages = [
   { code: 'pa', label: 'ਪੰਜਾਬੀ (Punjabi)' },
 ];
 
-/* ── Inline styles for effects Tailwind can't easily do ── */
 const navItemStyles = `
   .nav-link {
     position: relative;
@@ -241,7 +240,7 @@ function LanguageSelector() {
   const getCurrentLangLabel = () => {
     const match = document.cookie.match(/googtrans=\/en\/([a-z]{2})/);
     const code = match ? match[1] : 'en';
-    return languages.find(l => l.code === code)?.label?.split(' ')[0] || 'EN';
+    return languages.find(l => l.code === code)?.label?.split(' ')[0] || 'English';
   };
 
   const getCurrentCode = () => {
@@ -250,9 +249,19 @@ function LanguageSelector() {
   };
 
   const changeLanguage = (langCode) => {
-    document.cookie = `googtrans=/en/${langCode}; path=/;`;
+    // Standardize to e.g. /en/en for English to satisfy Google script
+    const pathValue = langCode === 'en' ? '/en/en' : `/en/${langCode}`;
+    document.cookie = `googtrans=${pathValue}; path=/;`;
     window.location.reload();
   };
+
+  // Ensure English is the explicit default if nothing is set
+  useEffect(() => {
+    const match = document.cookie.match(/googtrans=\/en\/([a-z]{2})/);
+    if (!match) {
+      document.cookie = "googtrans=/en/en; path=/;";
+    }
+  }, []);
 
   return (
     <div className="relative" ref={menuRef}>

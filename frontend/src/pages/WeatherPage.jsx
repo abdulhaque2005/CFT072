@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { CloudRain, Thermometer, Droplets, Wind, Sun, MapPin, AlertTriangle, ShieldCheck, Send, MessageCircle, Phone, RefreshCw, Eye, CloudSun, Volume2, Sunrise, Sunset, Gauge, Bell, Sprout, Bug, CalendarClock, Antenna, Search, Command } from 'lucide-react';
+import { CloudRain, Thermometer, Droplets, Wind, Sun, MapPin, AlertTriangle, ShieldCheck, Send, MessageCircle, Phone, RefreshCw, Eye, CloudSun, Volume2, Sunrise, Sunset, Gauge, Bell, Sprout, Bug, CalendarClock, Antenna, Search, Command, CheckCircle2, XCircle, ShieldAlert, Zap, CloudLightning, Home } from 'lucide-react';
 import useLocation from '../hooks/useLocation';
 import Loading from '../components/Loading';
 import SpeakButton from '../components/SpeakButton';
@@ -7,7 +7,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
 import { useAuth } from '../context/AuthContext';
 
-/* ── Smart Decision Engine ── */
 function analyzeWeather(current, forecast) {
   const alerts = [];
   const actions = [];
@@ -25,41 +24,41 @@ function analyzeWeather(current, forecast) {
   });
   const rainProbability = isRaining ? 90 : willRain ? 70 : humidity > 85 ? 55 : 20;
 
-  let sprayStatus = { allowed: true, reason: 'Mausham bilkul saaf hai. Aap chemical ya fertilizer spray kar sakte hain.', time: 'Sunrise to 10 AM / After 4 PM', color: 'text-green-600', icon: '✅' };
-  let diseaseRisk = { risk: 'Low', reason: 'Fungal aur pest ka khatra kam hai.', color: 'text-green-600', icon: '🛡️' };
-  let soilMoisture = { status: 'Normal', action: 'Irrigation maintain rakhein.', icon: '💧' };
+  let sprayStatus = { allowed: true, reason: 'Mausham bilkul saaf hai. Aap chemical ya fertilizer spray kar sakte hain.', time: 'Sunrise to 10 AM / After 4 PM', color: 'text-green-600', icon: <CheckCircle2 className="w-5 h-5 text-green-600" /> };
+  let diseaseRisk = { risk: 'Low', reason: 'Fungal aur pest ka khatra kam hai.', color: 'text-green-600', icon: <ShieldCheck className="w-5 h-5 text-green-600" /> };
+  let soilMoisture = { status: 'Normal', action: 'Irrigation maintain rakhein.', icon: <Droplets className="w-5 h-5 text-blue-500" /> };
 
   if (wind > 15) {
-    sprayStatus = { allowed: false, reason: 'Tez hawa chal rahi hai! Spray udh jayega.', time: 'Wait for Wind < 10km/h', color: 'text-red-500', icon: '❌' };
+    sprayStatus = { allowed: false, reason: 'Tez hawa chal rahi hai! Spray udh jayega.', time: 'Wait for Wind < 10km/h', color: 'text-red-500', icon: <XCircle className="w-5 h-5 text-red-500" /> };
   } else if (rainProbability > 50) {
-    sprayStatus = { allowed: false, reason: 'Barish aane ke chance hain. Spray dhul jaega!', time: 'Wait for Clear Sky', color: 'text-red-500', icon: '❌' };
+    sprayStatus = { allowed: false, reason: 'Barish aane ke chance hain. Spray dhul jaega!', time: 'Wait for Clear Sky', color: 'text-red-500', icon: <XCircle className="w-5 h-5 text-red-500" /> };
   } else if (temp > 35) {
-    sprayStatus = { allowed: false, reason: 'Kadi dhoop hai! Dawaayi fasal ko jala sakti hai.', time: 'Only after 5 PM', color: 'text-orange-500', icon: '⚠️' };
+    sprayStatus = { allowed: false, reason: 'Kadi dhoop hai! Dawaayi fasal ko jala sakti hai.', time: 'Only after 5 PM', color: 'text-orange-500', icon: <AlertTriangle className="w-5 h-5 text-orange-500" /> };
   }
 
   if (humidity > 75 && temp > 25 && temp < 32) {
-    diseaseRisk = { risk: 'High', reason: 'Nami aur tapmaan ke karan FUNGAL disease failne ka zoro ka khatra hai!', color: 'text-red-500', icon: '🦠' };
+    diseaseRisk = { risk: 'High', reason: 'Nami aur tapmaan ke karan FUNGAL disease failne ka zoro ka khatra hai!', color: 'text-red-500', icon: <ShieldAlert className="w-5 h-5 text-red-500" /> };
   }
 
   if (temp > 36 && humidity < 40) {
-    soilMoisture = { status: 'Critical / Fast Drying', action: 'Dhoop tez hai, jald se jald paani do!', icon: '🔥' };
+    soilMoisture = { status: 'Critical / Fast Drying', action: 'Dhoop tez hai, jald se jald paani do!', icon: <Sun className="w-5 h-5 text-orange-600" /> };
   }
 
   if (rainProbability > 50) {
     dangerLevel = rainProbability > 75 ? 'danger' : 'warning';
     alerts.push({
       type: 'rain',
-      icon: '🌧️',
+      icon: <CloudRain className="w-6 h-6 text-blue-500" />,
       severity: rainProbability > 75 ? 'danger' : 'warning',
-      titleHi: '⚠️ Bhari Barish Ka Alert!',
-      titleEn: '⚠️ Heavy Rain Expected!',
+      titleHi: 'Bhari Barish Ka Alert!',
+      titleEn: 'Heavy Rain Expected!',
       probability: `${rainProbability}% CHANCE`,
       actions: [
-        { hi: '👉 Khet mein jama paani jald se jald nikalein', en: '👉 Open drainage channels immediately' },
-        { hi: '👉 Kati hui fasal ko turant cover karein', en: '👉 Cover harvested crops with tarps' },
-        { hi: '👉 Kisi bhi prakar ka spray bilkul na karein', en: '👉 STRICTLY NO SPRAYING today' },
+        { hi: 'Khet mein jama paani jald se jald nikalein', en: 'Open drainage channels immediately' },
+        { hi: 'Kati hui fasal ko turant cover karein', en: 'Cover harvested crops with tarps' },
+        { hi: 'Kisi bhi prakar ka spray bilkul na karein', en: 'STRICTLY NO SPRAYING today' },
       ],
-      whatsappMsg: `⚠️ AgriSaar DISASTER ALERT ⚠️\n☔ Rain Probability: ${rainProbability}%\n📍 Area Alert\n\nFarmer Instructions:\n- Stop spraying\n- Drain fields\n- Cover harvested crops\n\nStay Safe!`,
+      whatsappMsg: `AgriSaar DISASTER ALERT \nRain Probability: ${rainProbability}%\nArea Alert\n\nFarmer Instructions:\n- Stop spraying\n- Drain fields\n- Cover harvested crops\n\nStay Safe!`,
     });
   }
 
@@ -67,17 +66,17 @@ function analyzeWeather(current, forecast) {
     dangerLevel = temp > 42 ? 'danger' : 'warning';
     alerts.push({
       type: 'heat',
-      icon: '☀️',
+      icon: <Sun className="w-6 h-6 text-orange-500" />,
       severity: temp > 42 ? 'danger' : 'warning',
-      titleHi: `⚠️ Extreme Heat Alert! (${temp}°C)`,
-      titleEn: `⚠️ Extreme Heatwave! (${temp}°C)`,
+      titleHi: `Extreme Heat Alert! (${temp}°C)`,
+      titleEn: `Extreme Heatwave! (${temp}°C)`,
       probability: `${temp}°C PEAK`,
       actions: [
-        { hi: '👉 Fasal ki jadon ko mulching se dhakein', en: '👉 Use mulch to protect soil moisture' },
-        { hi: '👉 Sinchai kewal subah ya shaam mein karein', en: '👉 Irrigate ONLY during dawn or dusk' },
-        { hi: '👉 Dopahar 12-4 baje khet mein kaam se bachein', en: '👉 Avoid outdoor work from 12 PM - 4 PM' },
+        { hi: 'Fasal ki jadon ko mulching se dhakein', en: 'Use mulch to protect soil moisture' },
+        { hi: 'Sinchai kewal subah ya shaam mein karein', en: 'Irrigate ONLY during dawn or dusk' },
+        { hi: 'Dopahar 12-4 baje khet mein kaam se bachein', en: 'Avoid outdoor work from 12 PM - 4 PM' },
       ],
-      whatsappMsg: `⚠️ AgriSaar HEATWAVE ALERT ⚠️\n🌡️ Temp: ${temp}°C\n📍 Area Alert\n\nFarmer Instructions:\n- Irrigate ONLY morning/evening\n- NO spraying in afternoon\n- Stay hydrated!`,
+      whatsappMsg: `AgriSaar HEATWAVE ALERT \nTemp: ${temp}°C\nArea Alert\n\nFarmer Instructions:\n- Irrigate ONLY morning/evening\n- NO spraying in afternoon\n- Stay hydrated!`,
     });
   }
 
@@ -85,24 +84,24 @@ function analyzeWeather(current, forecast) {
     dangerLevel = 'warning';
     alerts.push({
       type: 'wind',
-      icon: '💨',
+      icon: <Wind className="w-6 h-6 text-gray-400" />,
       severity: 'warning',
-      titleHi: `⚠️ Khatarnak Aandhi! (${wind} km/h)`,
-      titleEn: `⚠️ Strong Gale/Wind! (${wind} km/h)`,
+      titleHi: `Khatarnak Aandhi! (${wind} km/h)`,
+      titleEn: `Strong Gale/Wind! (${wind} km/h)`,
       probability: `${wind} km/h GUSTS`,
       actions: [
-        { hi: '👉 Lambe aur patle paudho ko support dein', en: '👉 Stake tall crops to prevent breaking' },
-        { hi: '👉 Green-house aur shade-net tight karein', en: '👉 Secure shade nets and polyhouses' },
+        { hi: 'Lambe aur patle paudho ko support dein', en: 'Stake tall crops to prevent breaking' },
+        { hi: 'Green-house aur shade-net tight karein', en: 'Secure shade nets and polyhouses' },
       ],
-      whatsappMsg: `⚠️ AgriSaar WIND ALERT ⚠️\n💨 Speed: ${wind} km/h\n📍 Area Alert\n\nFarmer Instructions:\n- Stake tall crops\n- Secure polyhouses\n- Do not spray pesticides!`,
+      whatsappMsg: `AgriSaar WIND ALERT \nSpeed: ${wind} km/h\nArea Alert\n\nFarmer Instructions:\n- Stake tall crops\n- Secure polyhouses\n- Do not spray pesticides!`,
     });
   }
 
   if (alerts.length === 0) {
     dangerLevel = 'safe';
     actions.push(
-      { hi: '✅ Mausam bilkul laabhdayak hai — normal kaam jaari rakhein', en: '✅ Perfect weather for all farming activities' },
-      { hi: '✅ Khet mein zaroorat anusar fertilizer dalne ka sahi samay', en: '✅ Excellent window for applying fertilizers' },
+      { hi: 'Mausam bilkul laabhdayak hai — normal kaam jaari rakhein', en: 'Perfect weather for all farming activities' },
+      { hi: 'Khet mein zaroorat anusar fertilizer dalne ka sahi samay', en: 'Excellent window for applying fertilizers' },
     );
   }
 
@@ -115,27 +114,71 @@ function analyzeWeather(current, forecast) {
     
     if (tmrRain) {
       tomorrowDecision = {
-        icon: '🌊',
+        icon: <CloudLightning className="w-32 h-32 text-blue-200" />,
         title: 'KAL BHARI BARISH HAI',
-        hi: `👉 Khet ka khula anaj turant andar karein.\n👉 Drainage naliyan aaj hi saaf karein!`,
-        en: `👉 Move open grain indoors immediately.\n👉 Clear field drainage today!`,
+        hi: `Khet ka khula anaj turant andar karein.\nDrainage naliyan aaj hi saaf karein!`,
+        en: `Move open grain indoors immediately.\nClear field drainage today!`,
         color: 'from-blue-600 via-indigo-600 to-blue-900',
       };
     } else if (tmrHot) {
       tomorrowDecision = {
-        icon: '🔥',
+        icon: <Sun className="w-32 h-32 text-orange-200" />,
         title: 'KAL KADI DHOOP HOGI',
-        hi: `👉 Aaj raat khet mein halke paani ki sinchai zaroor karein.\n👉 Fasal sookhne se bachayein!`,
-        en: `👉 Apply light irrigation tonight.\n👉 Save crops from drying out!`,
+        hi: `Aaj raat khet mein halke paani ki sinchai zaroor karein.\nFasal sookhne se bachayein!`,
+        en: `Apply light irrigation tonight.\nSave crops from drying out!`,
         color: 'from-orange-500 via-red-600 to-rose-900',
       };
     }
   }
 
-  return { alerts, actions, dangerLevel, rainProbability, tomorrowDecision, sprayStatus, diseaseRisk, soilMoisture };
+  let fiveDaySummary = null;
+  if (forecast?.length >= 5) {
+    let rainyDays = 0;
+    let maxTempLimit = 0;
+    forecast.forEach(d => {
+      const desc = (d.description || '').toLowerCase();
+      if (desc.includes('rain') || desc.includes('shower')) rainyDays++;
+      if (d.tempMax > maxTempLimit) maxTempLimit = d.tempMax;
+    });
+
+    if (rainyDays >= 3) {
+      fiveDaySummary = {
+        title: "AgriSaar 5-Day Prediction: High Rain Alert",
+        en: `There is a significant chance of rain for ${rainyDays} out of the next 5 days. Expect cloudy skies and wet soil conditions. Halt any scheduled spraying or fertilization until weather clears up.`,
+        hi: `Agle 5 dinon mein se ${rainyDays} din bhari barish ki sambhavna hai. Khet mein dawa ya khad ka chhidkaw bilkul rok dein. Keedon ki roktham ke liye tayar rahein.`,
+        color: "bg-blue-50 dark:bg-blue-900/10 border-blue-200 dark:border-blue-800",
+        iconText: "text-blue-600 dark:text-blue-400"
+      };
+    } else if (maxTempLimit > 38 && rainyDays === 0) {
+      fiveDaySummary = {
+        title: "AgriSaar 5-Day Prediction: Severe Heatwave",
+        en: `No rain expected over the next 5 days with temperatures soaring up to ${maxTempLimit}°C. Immediate and frequent irrigation is highly recommended to protect crop roots.`,
+        hi: `Agle 5 din koi barish nahi hogi aur tapmaan ${maxTempLimit}°C tak ja sakta hai. Fasal ko sookhne se bachane ke liye lagatar sinchai (paani) dete rahein.`,
+        color: "bg-orange-50 dark:bg-orange-900/10 border-orange-200 dark:border-orange-800",
+        iconText: "text-orange-600 dark:text-orange-400"
+      };
+    } else if (rainyDays > 0) {
+      fiveDaySummary = {
+        title: "AgriSaar 5-Day Prediction: Mixed Weather",
+        en: `Expect mild fluctuations with ${rainyDays} day(s) of rain or showers. Plan your farming activities around these rainy windows. Keep drainage systems clear.`,
+        hi: `Mausam mila-jula rahega. Agle 5 dinon mein ${rainyDays} din barish ho sakti hai. Apne kheti ke kaam barish ka waqt dekh kar plan karein.`,
+        color: "bg-emerald-50 dark:bg-emerald-900/10 border-emerald-200 dark:border-emerald-800",
+        iconText: "text-emerald-600 dark:text-emerald-400"
+      };
+    } else {
+      fiveDaySummary = {
+        title: "AgriSaar 5-Day Prediction: Clear & Optimal",
+        en: `The weather will remain mostly clear and stable. This is an excellent 5-day window for any harvesting, sowing, or pesticide application.`,
+        hi: `Agle 5 din mausam bilkul saaf aur accha rahega. Aap bina kisi chinta ke khad, spray ya fasal ki kataai ka kaam aaram se kar sakte hain.`,
+        color: "bg-green-50 dark:bg-green-900/10 border-green-200 dark:border-green-800",
+        iconText: "text-green-600 dark:text-green-400"
+      };
+    }
+  }
+
+  return { alerts, actions, dangerLevel, rainProbability, tomorrowDecision, sprayStatus, diseaseRisk, soilMoisture, fiveDaySummary };
 }
 
-// Ultra Smooth Framer Motion Variants
 const containerVariants = {
   hidden: { opacity: 0 },
   visible: { opacity: 1, transition: { duration: 0.8, staggerChildren: 0.1, ease: 'easeOut' } }
@@ -151,10 +194,11 @@ export default function WeatherPage() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   
-  // Custom Location Search State
   const [searchQuery, setSearchQuery] = useState('');
   const [activeCity, setActiveCity] = useState('');
   const [activeState, setActiveState] = useState('');
+  const [mapLat, setMapLat] = useState(23.0225);
+  const [mapLon, setMapLon] = useState(72.5714);
   
   const { lat, lon, city: geoCity, state: geoState, loading: locLoading } = useLocation();
   const { user } = useAuth();
@@ -166,16 +210,28 @@ export default function WeatherPage() {
 
   const [isBroadcasting, setIsBroadcasting] = useState(false);
   const [isSendingPersonal, setIsSendingPersonal] = useState(false);
+  const [showSmsPreview, setShowSmsPreview] = useState(false);
   const [broadcastCount, setBroadcastCount] = useState(0);
 
-  // Initial Location Load
+  const resolveState = async (rlat, rlon) => {
+    try {
+      const res = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${rlat}&lon=${rlon}&format=json&accept-language=en&zoom=10`, { headers: { 'User-Agent': 'AgriSaar/1.0' } });
+      const geo = await res.json();
+      return geo?.address?.state || geo?.address?.region || 'India';
+    } catch { return 'India'; }
+  };
+
   useEffect(() => {
     if (!locLoading && lat && lon && !activeCity) {
-      setActiveCity(geoCity);
-      setActiveState(geoState);
+      setActiveCity(geoCity || 'Ahmedabad');
+      setActiveState(geoState || 'Gujarat');
+      setMapLat(lat);
+      setMapLon(lon);
       fetchWeatherData(`lat=${lat}&lon=${lon}`);
     }
   }, [locLoading, lat, lon]);
+
+
 
   const fetchWeatherData = async (queryParam) => {
     try {
@@ -186,12 +242,22 @@ export default function WeatherPage() {
       ]);
 
       if (currentRes.cod !== 200 && currentRes.cod !== 201) {
-        throw new Error('API Error'); // Push to fallback
+        throw new Error('API Error');
       }
 
-      // Update City/State from actual response
-      setActiveCity(currentRes.name);
-      setActiveState(currentRes.sys?.country === 'IN' ? 'India' : currentRes.sys?.country);
+      const apiCity = currentRes.name;
+      const apiLat = currentRes.coord?.lat;
+      const apiLon = currentRes.coord?.lon;
+
+      if (apiLat && apiLon) {
+        setMapLat(apiLat);
+        setMapLon(apiLon);
+      }
+
+      const detectedState = await resolveState(apiLat || lat, apiLon || lon);
+      setActiveCity(apiCity);
+      setActiveState(detectedState === apiCity ? 'India' : detectedState);
+      
       setBroadcastCount(Math.floor(Math.random() * 5000) + 1200);
 
       const current = {
@@ -229,8 +295,7 @@ export default function WeatherPage() {
       });
       setData({ current, forecast });
     } catch(err) {
-      console.warn("Using Fallback Weather Data because OWM API failed (401/Limit/Offline):", err);
-      // Provide lush dummy data so UI doesn't break
+      console.warn("Using Fallback Weather Data (API failed):", err);
       const fallbackCurrent = {
         temp: 32, feelsLike: 34, humidity: 65, wind: 12, pressure: 1013, visibility: 10,
         description: 'Partly cloudy', icon: 'https://openweathermap.org/img/wn/02d@4x.png',
@@ -245,10 +310,31 @@ export default function WeatherPage() {
         { date: '5', dayName: 'Fri', fullDay: '14 Nov', tempMax: 39, tempMin: 26, humidity: 35, wind: 5, description: 'hot sun', icon: 'https://openweathermap.org/img/wn/01d@2x.png' }
       ];
 
-      // Use searched title if it was manual search, otherwise fallback to offline GPS/default
-      const manualName = queryParam.includes('q=') ? decodeURIComponent(queryParam.split('q=')[1]) : geoCity || 'Surat';
-      setActiveCity(manualName);
-      setActiveState(geoState || 'Gujarat');
+      const manualName = queryParam.includes('q=') ? decodeURIComponent(queryParam.split('q=')[1]) : geoCity || 'Ahmedabad';
+
+      try {
+        const geoRes = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(manualName)}&format=json&accept-language=en&limit=1&countrycodes=in`, { headers: { 'User-Agent': 'AgriSaar/1.0' } });
+        const geoData = await geoRes.json();
+        if (geoData && geoData.length > 0) {
+          const place = geoData[0];
+          const pLat = parseFloat(place.lat);
+          const pLon = parseFloat(place.lon);
+          setMapLat(pLat);
+          setMapLon(pLon);
+
+          const resolvedState = await resolveState(pLat, pLon);
+          const displayName = place.display_name?.split(',')[0] || manualName;
+          setActiveCity(displayName);
+          setActiveState(resolvedState === displayName ? 'India' : resolvedState);
+        } else {
+          setActiveCity(manualName);
+          setActiveState('India');
+        }
+      } catch {
+        setActiveCity(manualName);
+        setActiveState('India');
+      }
+
       setBroadcastCount(3452);
       setData({ current: fallbackCurrent, forecast: fallbackForecast });
     } finally {
@@ -289,19 +375,20 @@ export default function WeatherPage() {
 
   const handlePersonalAlert = () => {
     setIsSendingPersonal(true);
-    const id = toast.loading(`📡 Sending SMS Alert to ${mockUser.name} (${mockUser.phone})...`, {
-      style: { background: '#cf6300', color: '#fff', borderRadius: '12px' }
-    });
+    setShowSmsPreview(true);
+    
+    // Auto-hide preview after 6 seconds
     setTimeout(() => {
+      setShowSmsPreview(false);
+      setIsSendingPersonal(false);
       toast.success(
         <div className="flex flex-col">
           <span className="font-black text-lg">Alert Delivered ✅</span>
-          <span className="text-sm">Check your phone! SMS alert successfully sent to {mockUser.phone}.</span>
+          <span className="text-sm">Check your phone! SMS alert successfully sent via AgriSaar.</span>
         </div>, 
-        { id, duration: 5000, style: { background: '#047857', color: '#fff' } }
+        { duration: 4000, style: { background: '#047857', color: '#fff' } }
       );
-      setIsSendingPersonal(false);
-    }, 2500);
+    }, 6000);
   };
 
   if (locLoading || loading && !data) return <Loading text="Initializing Atmospheric Radars..." />;
@@ -362,14 +449,19 @@ export default function WeatherPage() {
             {/* Top Bar: Manual Search & Tools */}
             <div className="flex flex-col lg:flex-row lg:items-center justify-between mb-8 gap-5">
               
-              {/* Location Badge */}
-              <motion.div variants={itemVariants} className="flex items-center gap-3 bg-black/30 backdrop-blur-3xl px-6 py-4 rounded-[2rem] border border-white/20 shadow-2xl w-max">
-                <MapPin className="w-6 h-6 text-green-400 drop-shadow-[0_0_10px_rgba(74,222,128,0.8)] animate-bounce" />
-                <div>
-                  <span className="text-white font-black text-lg tracking-widest uppercase block leading-none">{activeCity || 'Locating...'}</span>
-                  <span className="text-white/60 font-bold text-xs uppercase tracking-widest">{activeState}</span>
-                </div>
-              </motion.div>
+               {/* Location Badge */}
+              <div className="flex flex-col gap-3">
+                <motion.div variants={itemVariants} className="flex items-center gap-3 bg-black/30 backdrop-blur-3xl px-6 py-4 rounded-[2rem] border border-white/20 shadow-2xl w-max">
+                  <MapPin className="w-6 h-6 text-green-400 drop-shadow-[0_0_10px_rgba(74,222,128,0.8)] animate-bounce" />
+                  <div>
+                    <span className="text-white font-black text-lg tracking-widest uppercase block leading-none">{activeCity || 'Locating...'}</span>
+                    <span className="text-white/60 font-medium text-[10px] uppercase tracking-widest mt-1 block border-t border-white/10 pt-1">
+                      {activeState && activeState !== activeCity ? `${activeState}, India` : 'India'}
+                    </span>
+                  </div>
+                </motion.div>
+
+              </div>
 
               {/* Ultra Sleek Manual Search Bar */}
               <motion.form 
@@ -419,28 +511,58 @@ export default function WeatherPage() {
                     <img src={current.icon.replace('4x', '4x')} alt="icon" className="w-48 h-48 sm:w-[280px] sm:h-[280px] drop-shadow-[0_30px_60px_rgba(0,0,0,0.6)] relative z-10 filter hover:brightness-110 transition-all scale-110 sm:scale-125" />
                   </motion.div>
                 )}
-                <div className="text-center sm:text-left pt-4">
-                  <p className="text-[6rem] sm:text-[11rem] font-black tracking-tighter bg-gradient-to-b from-white via-white to-white/40 bg-clip-text text-transparent drop-shadow-2xl leading-none flex items-start justify-center sm:justify-start">
-                    {current?.temp}<span className="text-5xl sm:text-[5rem] text-white/50 mt-6 sm:mt-10 ml-2">°C</span>
-                  </p>
-                  <p className="text-blue-100 font-extrabold text-3xl sm:text-5xl capitalize mt-2 drop-shadow-xl tracking-tight bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
+                <div className="text-center sm:text-left pt-4 flex flex-col items-center sm:items-start w-full">
+                  <div className="notranslate text-[6rem] sm:text-[11rem] font-black tracking-tighter bg-gradient-to-b from-white via-white to-white/40 bg-clip-text text-transparent drop-shadow-2xl leading-none flex items-start justify-center sm:justify-start w-full max-w-full">
+                    {current?.temp}<span className="text-4xl sm:text-[4rem] text-white/50 mt-6 sm:mt-10 ml-2 block">°C</span>
+                  </div>
+                  <p className="text-blue-100 font-extrabold text-2xl sm:text-4xl capitalize mt-2 drop-shadow-xl tracking-tight bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent leading-tight w-full max-w-full break-words">
                     {current?.description}
                   </p>
-                  <p className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md border border-white/20 px-5 py-2.5 mt-6 text-green-300 font-black text-xl tracking-wide rounded-2xl shadow-inner shadow-green-500/10">
-                    <Thermometer className="w-6 h-6 text-green-400" /> Feels like {current?.feelsLike}°C
+                  <p className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md border border-white/20 px-5 py-2.5 mt-6 text-green-300 font-black text-xl tracking-wide rounded-2xl shadow-inner shadow-green-500/10 whitespace-nowrap">
+                    <Thermometer className="w-6 h-6 text-green-400 shrink-0" /> Feels like <span className="notranslate">{current?.feelsLike}°C</span>
                   </p>
                 </div>
               </motion.div>
 
-              <motion.div variants={itemVariants} className="grid grid-cols-2 gap-4 w-full xl:w-auto relative z-10 shrink-0 xl:min-w-[500px]">
-                <StatsCard icon={<Droplets className="w-7 h-7 text-cyan-400" />} label="Humidity" value={`${current?.humidity}%`} />
-                <StatsCard icon={<Wind className="w-7 h-7 text-emerald-400" />} label="Avg Wind" value={`${current?.wind} km/h`} />
-                <StatsCard icon={<Eye className="w-7 h-7 text-blue-300" />} label="Visibility" value={`${current?.visibility} km`} />
-                <StatsCard icon={<Gauge className="w-7 h-7 text-amber-300" />} label="Pressure" value={`${current?.pressure}`} sub="hPa" />
+              <motion.div variants={itemVariants} className="grid grid-cols-2 gap-4 w-full xl:w-auto relative z-10 shrink-0 xl:min-w-[450px]">
+                <StatsCard icon={<Droplets className="w-7 h-7 text-cyan-400 shrink-0" />} label="Humidity" value={`${current?.humidity}%`} />
+                <StatsCard icon={<Wind className="w-7 h-7 text-emerald-400 shrink-0" />} label="Avg Wind" value={`${current?.wind} km/h`} />
+                <StatsCard icon={<Eye className="w-7 h-7 text-blue-300 shrink-0" />} label="Visibility" value={`${current?.visibility} km`} />
+                <StatsCard icon={<Gauge className="w-7 h-7 text-amber-300 shrink-0" />} label="Pressure" value={`${current?.pressure}`} sub="hPa" />
               </motion.div>
             </div>
             
-            {/* Sunrise / Sunset Tags */}
+            {/* 📱 Real-time SMS Delivery Preview */}
+            <AnimatePresence>
+              {showSmsPreview && (
+                <motion.div 
+                  initial={{ opacity: 0, y: 100, scale: 0.8 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: 100, scale: 0.8 }}
+                  className="fixed bottom-10 right-10 z-[100] w-[320px] bg-black/80 backdrop-blur-2xl rounded-[2.5rem] border border-white/20 p-6 shadow-[0_40px_100px_rgba(0,0,0,0.6)] overflow-hidden"
+                >
+                  <div className="absolute top-0 left-0 w-full h-1.5 bg-green-500 shadow-[0_0_15px_rgba(34,197,94,0.8)]"></div>
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-10 h-10 rounded-full bg-green-600 flex items-center justify-center shadow-lg">
+                      <Sprout className="w-5 h-5 text-white" />
+                    </div>
+                    <div>
+                      <p className="text-[10px] font-black text-green-400 uppercase tracking-widest">Incoming SMS</p>
+                      <p className="text-sm font-black text-white uppercase tracking-tight">AgriSaar Official</p>
+                    </div>
+                  </div>
+                  <div className="bg-white/10 rounded-2xl p-4 border border-white/5 mb-2">
+                    <p className="text-white font-bold leading-snug">
+                       "AgriSaar Alert: {activeCity} mein {current?.description} dekhi gayi hai. {analysis.alerts[0]?.titleEn || 'Savdhan rahein!'} kisan sathi khet mein savdhani bartein."
+                    </p>
+                  </div>
+                  <div className="flex items-center justify-between mt-4">
+                    <span className="text-[10px] font-bold text-white/30 lowercase">powered by agrisaar ai</span>
+                    <span className="text-[10px] font-black text-green-400 uppercase tracking-widest bg-green-400/10 px-2 py-0.5 rounded">Verified</span>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
             {(current?.sunrise || current?.sunset) && (
               <motion.div variants={itemVariants} className="flex justify-center sm:justify-start flex-wrap gap-4 mt-8">
                 {current.sunrise && (
@@ -683,6 +805,78 @@ export default function WeatherPage() {
             </div>
           </motion.div>
         )}
+
+        {/* ═══════════ AI 5-Day Insight Summary ═══════════ */}
+        {analysis.fiveDaySummary && (
+          <motion.div initial={{ opacity: 0, scale: 0.95 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} transition={{ duration: 0.5 }} className="w-full max-w-5xl mx-auto pb-10">
+            <div className={`p-8 sm:p-12 rounded-[3.5rem] border-2 shadow-2xl ${analysis.fiveDaySummary.color} relative overflow-hidden group`}>
+              <div className="absolute inset-0 bg-white/40 dark:bg-black/20 mix-blend-overlay"></div>
+              <div className="absolute -right-20 -top-20 w-64 h-64 bg-current opacity-10 rounded-full blur-[50px] group-hover:scale-150 transition-transform duration-1000"></div>
+              
+              <div className="relative z-10 flex flex-col md:flex-row items-center md:items-start gap-8">
+                <div className={`p-6 rounded-3xl bg-white dark:bg-gray-900 shadow-xl shrink-0`}>
+                  <CalendarClock className={`w-14 h-14 ${analysis.fiveDaySummary.iconText}`} />
+                </div>
+                
+                <div className="text-center md:text-left flex-1">
+                  <span className={`inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-[0.2em] mb-4 bg-white/50 dark:bg-gray-900/50 ${analysis.fiveDaySummary.iconText}`}>
+                    <Sprout className="w-4 h-4" /> 5-Day Farming Advisory
+                  </span>
+                  <h3 className="text-3xl sm:text-4xl font-black text-gray-900 dark:text-white mb-6 tracking-tight leading-tight drop-shadow-sm">{analysis.fiveDaySummary.title}</h3>
+                  <div className="flex flex-col gap-5">
+                    <p className="text-xl sm:text-2xl font-black text-gray-800 dark:text-gray-200 border-l-4 border-gray-400 pl-5 leading-relaxed">
+                      {analysis.fiveDaySummary.hi}
+                    </p>
+                    <p className="text-base font-bold text-gray-600 dark:text-gray-400 border-l-4 border-gray-300 dark:border-gray-700 pl-5">
+                      {analysis.fiveDaySummary.en}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        )}
+
+        <motion.div
+          initial={{ opacity: 0, y: 40 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+          className="w-full max-w-6xl mx-auto pb-12"
+        >
+          <div className="bg-white dark:bg-gray-900 rounded-[3rem] shadow-2xl border border-gray-100 dark:border-gray-800 overflow-hidden">
+            <div className="px-8 pt-8 pb-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <div className="p-3 bg-emerald-50 dark:bg-emerald-900/30 rounded-2xl">
+                  <MapPin className="w-7 h-7 text-emerald-600" />
+                </div>
+                <div>
+                  <h3 className="text-2xl font-black text-gray-900 dark:text-white tracking-tight">Live Location Map</h3>
+                  <p className="text-sm font-bold text-gray-500 dark:text-gray-400">{activeCity}{activeState && activeState !== 'India' && activeState !== activeCity ? `, ${activeState}` : ''}, India</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2 text-xs font-bold text-emerald-600 bg-emerald-50 dark:bg-emerald-900/30 px-4 py-2 rounded-full">
+                <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
+                {mapLat.toFixed(4)}°N, {mapLon.toFixed(4)}°E
+              </div>
+            </div>
+            <div className="px-4 pb-4">
+              <div className="rounded-[2rem] overflow-hidden border-2 border-gray-100 dark:border-gray-800 shadow-inner">
+                <iframe
+                  key={`${mapLat}-${mapLon}`}
+                  title="Weather Location Map"
+                  width="100%"
+                  height="420"
+                  style={{ border: 0, display: 'block' }}
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                  src={`https://www.openstreetmap.org/export/embed.html?bbox=${mapLon - 0.15}%2C${mapLat - 0.1}%2C${mapLon + 0.15}%2C${mapLat + 0.1}&layer=mapnik&marker=${mapLat}%2C${mapLon}`}
+                ></iframe>
+              </div>
+            </div>
+          </div>
+        </motion.div>
+
       </div>
     </div>
   );
@@ -692,15 +886,16 @@ function StatsCard({ icon, label, value, sub }) {
   return (
     <motion.div 
       whileHover={{ scale: 1.05, backgroundColor: 'rgba(255,255,255,0.15)' }}
-      className="bg-white/10 backdrop-blur-3xl rounded-[2rem] p-6 border border-white/20 shadow-[0_10px_30px_rgba(0,0,0,0.1)] flex items-center gap-5 group cursor-default transition-all"
+      className="bg-white/10 backdrop-blur-3xl rounded-[2rem] p-5 border border-white/20 shadow-[0_10px_30px_rgba(0,0,0,0.1)] flex items-center gap-4 group cursor-default transition-all"
     >
-      <div className="bg-white/15 p-4 rounded-[1.5rem] shadow-inner border border-white/20 group-hover:bg-white/30 group-hover:rotate-12 transition-all drop-shadow-xl">
+      <div className="bg-white/15 p-3 rounded-2xl shadow-inner border border-white/20 group-hover:bg-white/30 group-hover:rotate-12 transition-all drop-shadow-xl shrink-0">
         {icon}
       </div>
-      <div>
-        <p className="text-white/70 text-xs font-black uppercase tracking-[0.2em] mb-1">{label}</p>
-        <p className="text-white font-black text-3xl flex items-baseline gap-1.5 drop-shadow-lg">
-          {value} {sub && <span className="text-lg text-white/60 font-bold">{sub}</span>}
+      <div className="overflow-hidden">
+        <p className="text-white/70 text-[10px] sm:text-xs font-black uppercase tracking-[0.2em] mb-1 truncate">{label}</p>
+        <p className="text-white font-black text-xl sm:text-2xl flex items-baseline gap-1 drop-shadow-lg leading-tight truncate overflow-hidden">
+          <span className="truncate" dangerouslySetInnerHTML={{ __html: value.replace(' km/h', ' <span class="text-sm">km/h</span>').replace(' km', ' <span class="text-sm">km</span>')}}></span>
+          {sub && <span className="text-sm text-white/60 font-bold ml-1">{sub}</span>}
         </p>
       </div>
     </motion.div>

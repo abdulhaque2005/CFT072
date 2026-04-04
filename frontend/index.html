@@ -49,6 +49,15 @@
   </head>
   <body>
     <div id="root"></div>
+    <script type="text/javascript">
+      // ENFORCE DEFAULT REGARDLESS OF PREVIOUS SESSIONS
+      if (!sessionStorage.getItem('agrisaar_lang_init')) {
+        document.cookie = "googtrans=/en/en; path=/";
+        // Also clear domain-specific variants just in case
+        document.cookie = "googtrans=/en/en; path=/; domain=" + window.location.hostname;
+        sessionStorage.setItem('agrisaar_lang_init', 'true');
+      }
+    </script>
     <script type="module" src="/src/main.jsx"></script>
     <script type="text/javascript">
       function googleTranslateElementInit() {
