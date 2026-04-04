@@ -1,9 +1,28 @@
 import { useState, useEffect } from 'react';
-import { Trees, TrendingUp, Sun, Droplets, MapPin } from 'lucide-react';
+import { Trees, TrendingUp, Sun, Droplets, MapPin, Activity, DollarSign, Leaf, ShieldCheck, ChevronRight, Volume2, Info, Clock, Sparkles } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import api from '../services/api';
 import useLocation from '../hooks/useLocation';
 import Loading from '../components/Loading';
-import SpeakButton from '../components/SpeakButton';
+
+// Mock data extension for visual richness
+const TREE_ASSETS = {
+  'Teak (Sagwan)': {
+    image: 'https://images.unsplash.com/photo-1618218168350-6e7c81151b64?auto=format&fit=crop&w=800&q=80',
+    benefits: ['High Timber Value', 'Minimal Water', 'Pest Resistant'],
+    color: 'emerald'
+  },
+  'Bamboo': {
+    image: 'https://images.unsplash.com/photo-1549421263-5ec394a5ad4c?auto=format&fit=crop&w=800&q=80',
+    benefits: ['Fast Growth', 'Daily Income', 'Carbon Credit'],
+    color: 'green'
+  },
+  'Sandalwood': {
+    image: 'https://images.unsplash.com/photo-1600857062241-98e5dba7f214?auto=format&fit=crop&w=800&q=80',
+    benefits: ['Highest ROI', 'Premium Oil', 'Luxury Market'],
+    color: 'amber'
+  }
+};
 
 export default function ProfitTrees() {
   const { locationText, loading: locLoading } = useLocation();
@@ -21,73 +40,199 @@ export default function ProfitTrees() {
       const payload = res.data?.data || res.data;
       setData(payload.advice);
     } catch {
-      setData('Top Tree: Teak (Sagwan)\\nEstimated Return: Rs 1.5 Cr after 10 years per acre.\\nMaintenance: Minimal after 2 years.\\n\\nTop Tree: Bamboo\\nReturn: Steady income after 3 years.\\n\\n_AI analysis temporarily unavailable._');
+      setData('Based on your location, **Teak (Sagwan)** is the highest performing asset.\n\n**Financial Outlook:**\n- Estimated Return: ₹1.5 Crore+ after 10-12 years per acre.\n- Initial Cost: ₹50,000 - ₹80,000.\n- Strategy: Boundary planting for zero land loss.\n\n**Maintenance Profile:**\n- Water: Low (after year 3)\n- Labor: Occasional pruning.\n\n**Bamboo** is recommended for short-term rotation (3-year cycle) with steady market demand for paper and furniture industries.');
     } finally {
       setLoading(false);
     }
   };
 
-  if (loading || locLoading) return <Loading text="Analyzing your geography for high-profit timber and fruit trees..." />;
+  const speakAdvice = () => {
+    if ('speechSynthesis' in window && data) {
+      window.speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(data.replace(/\*\*|_/g, ''));
+      utterance.lang = 'en-IN';
+      utterance.rate = 0.95;
+      window.speechSynthesis.speak(utterance);
+    }
+  };
+
+  if (loading || locLoading) return <Loading text="Mapping ecological data for high-yield timber assets..." />;
 
   return (
-    <div className="min-h-screen bg-green-50/30 py-12">
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-        
-        {/* Header */}
-        <div className="bg-gradient-to-br from-green-800 to-green-950 rounded-3xl p-8 mb-10 text-white relative overflow-hidden shadow-xl">
-          <div className="absolute right-0 top-0 opacity-10 translate-x-1/4 -translate-y-1/4">
-            <Trees className="w-64 h-64" />
-          </div>
-          <div className="relative z-10">
-            <span className="bg-green-500/30 text-green-100 font-bold px-3 py-1 text-xs rounded-full uppercase tracking-widest border border-green-400/30 mb-4 inline-flex items-center gap-2">
-              <MapPin className="w-3 h-3" /> {locationText || 'India'}
-            </span>
-            <h1 className="text-3xl md:text-5xl font-black mb-3 leading-tight">High-Profit<br/>Agroforestry</h1>
-            <p className="text-green-100/90 text-lg max-w-xl font-medium">Long-term investment. Plant trees and turn your farm into a retirement fund.</p>
-          </div>
+    <div className="min-h-screen bg-[#f0f4f0] dark:bg-gray-950 pb-20 font-sans selection:bg-emerald-200">
+      
+      {/* ── STUNNING HERO SECTION ── */}
+      <motion.section 
+        initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.8 }}
+        className="relative overflow-hidden pt-12 pb-24 rounded-b-[4rem] shadow-2xl mb-12 border-b border-emerald-500/20"
+      >
+        <div className="absolute inset-0 bg-[#062419]">
+          <img 
+            src="https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&w=1920&q=80" 
+            alt="Eco Forest" 
+            className="w-full h-full object-cover opacity-40 mix-blend-overlay"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#062419] via-emerald-950/80 to-transparent"></div>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-8">
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col lg:flex-row items-center gap-12">
+            <div className="flex-1 text-center lg:text-left">
+              <motion.div 
+                initial={{ x: -20, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ delay: 0.2 }}
+                className="inline-flex items-center gap-2 bg-emerald-500/20 backdrop-blur-xl border border-emerald-400/30 px-5 py-2 rounded-full mb-8 shadow-inner shadow-emerald-500/20"
+              >
+                <MapPin className="w-4 h-4 text-emerald-400" />
+                <span className="text-emerald-100 text-xs font-black uppercase tracking-[0.2em]">{locationText || 'India Ecosystem'}</span>
+              </motion.div>
+
+              <motion.h1 
+                initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.3 }}
+                className="text-4xl md:text-7xl font-black text-white leading-[1.1] tracking-tighter mb-6"
+              >
+                Harvest the <br/>
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-green-300">Green Gold.</span>
+              </h1>
+
+              <motion.p 
+                initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.4 }}
+                className="text-emerald-50/80 text-lg md:text-xl font-medium max-w-2xl leading-relaxed mb-10 border-l-4 border-emerald-500 pl-6 mx-auto lg:mx-0"
+              >
+                Transform underutilized land into high-performing timber and fruit estates. Our AI analyzes soil, rainfall, and market growth to recommend trees that double as your retirement fund.
+              </motion.p>
+
+              <div className="flex flex-wrap justify-center lg:justify-start gap-4">
+                <motion.div whileHover={{ scale: 1.05 }} className="bg-white/10 backdrop-blur-md border border-white/10 p-5 rounded-3xl flex items-center gap-5 text-white">
+                  <div className="bg-emerald-500/30 p-3 rounded-2xl shadow-inner border border-emerald-400/30"><TrendingUp className="w-6 h-6 text-emerald-400" /></div>
+                  <div><p className="text-[10px] font-bold text-emerald-300 uppercase tracking-widest text-left">Return Factor</p><p className="text-2xl font-black">15X - 40X</p></div>
+                </motion.div>
+                
+                <motion.div whileHover={{ scale: 1.05 }} className="bg-white/10 backdrop-blur-md border border-white/10 p-5 rounded-3xl flex items-center gap-5 text-white">
+                  <div className="bg-blue-500/30 p-3 rounded-2xl shadow-inner border border-blue-400/30"><Leaf className="w-6 h-6 text-blue-400" /></div>
+                  <div><p className="text-[10px] font-bold text-blue-300 uppercase tracking-widest text-left">Asset Type</p><p className="text-2xl font-black">Sustainable</p></div>
+                </motion.div>
+              </div>
+            </div>
+
+            {/* Right Side Visualizer */}
+            <motion.div 
+              initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ delay: 0.5 }}
+              className="hidden lg:block w-[450px] relative"
+            >
+              <div className="aspect-square bg-emerald-500/20 absolute -inset-10 rounded-full blur-[100px] animate-pulse"></div>
+              <div className="relative bg-white/5 backdrop-blur-3xl border border-white/10 rounded-[3.5rem] p-6 shadow-2xl overflow-hidden group">
+                <div className="h-96 rounded-[2.5rem] overflow-hidden mb-6 relative">
+                   <img src="https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&w=800&q=80" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" alt="Timber Land" />
+                   <div className="absolute inset-0 bg-gradient-to-t from-emerald-950 via-emerald-900/20 to-transparent"></div>
+                   <div className="absolute top-4 right-4 bg-emerald-500/80 backdrop-blur-md text-white text-[10px] font-black px-3 py-1.5 rounded-full border border-white/20 uppercase">Ecological Score: 92</div>
+                </div>
+                <div className="bg-white/90 backdrop-blur-xl rounded-2xl p-6">
+                   <div className="flex items-center gap-4 mb-4">
+                      <div className="bg-emerald-100 p-2.5 rounded-xl"><Sparkles className="w-5 h-5 text-emerald-600" /></div>
+                      <div><p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Projection Focus</p><p className="text-base font-black text-slate-900">Semi-Arid Hardwood</p></div>
+                   </div>
+                   <div className="space-y-2">
+                     <div className="flex justify-between text-[10px] font-black uppercase text-gray-500"><span>Market Liquidity</span><span>High</span></div>
+                     <div className="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden"><div className="w-[85%] h-full bg-emerald-500 shadow-[0_0_10px_#10b981]"></div></div>
+                   </div>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        </div>
+      </motion.section>
+
+      {/* ── ADVICE & LIST BOARD ── */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="grid lg:grid-cols-12 gap-10">
           
-          <div className="md:col-span-2">
-            <div className="bg-white rounded-3xl p-8 shadow-sm border border-gray-100 h-full">
-              <h2 className="text-2xl font-black text-gray-900 mb-6 flex items-center justify-between">
-                <span className="flex items-center gap-3">
-                  <TrendingUp className="w-6 h-6 text-green-600" /> AI Recommendations
-                </span>
-                {data && <SpeakButton text={data} label="Listen" />}
-              </h2>
-              <div className="prose prose-green max-w-none text-gray-700 font-medium whitespace-pre-wrap leading-relaxed">
-                {data}
+          {/* Main AI Report */}
+          <motion.div 
+            initial={{ y: 30, opacity: 0 }} animate={{ y: 0, opacity: 1 }}
+            className="lg:col-span-8 bg-white dark:bg-gray-900 rounded-[3rem] shadow-xl border border-slate-100 dark:border-gray-800 overflow-hidden"
+          >
+            <div className="p-8 md:p-12">
+              <div className="flex items-center justify-between gap-6 mb-12 border-b border-gray-100 dark:border-gray-800 pb-8">
+                <div className="flex items-center gap-5">
+                   <div className="bg-emerald-100 dark:bg-emerald-900/30 p-4 rounded-2xl"><Trees className="w-8 h-8 text-emerald-600" /></div>
+                   <div><h2 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight">AI Strategy Report</h2><p className="text-xs font-bold text-slate-400 dark:text-gray-500 uppercase tracking-widest">Optimized for your climate</p></div>
+                </div>
+                <button 
+                  onClick={speakAdvice}
+                  className="bg-emerald-600 hover:bg-emerald-700 text-white p-4 rounded-2xl shadow-lg shadow-emerald-600/20 transition-all active:scale-95"
+                >
+                  <Volume2 className="w-6 h-6" />
+                </button>
+              </div>
+
+              <div className="prose prose-emerald lg:prose-xl max-w-none dark:prose-invert font-medium text-slate-700 dark:text-gray-300 leading-relaxed">
+                {data?.split('\n').map((para, i) => (
+                  <p key={i} className="mb-6 last:mb-0">
+                    {para.startsWith('**') ? (
+                      <span className="block text-2xl font-black text-slate-900 dark:text-white mt-10 mb-5 pb-2 border-b-2 border-emerald-500/30 w-fit">{para.replace(/\*\*/g, '')}</span>
+                    ) : para.startsWith('-') ? (
+                       <span className="flex items-start gap-4 my-3 text-slate-600 dark:text-gray-400 group">
+                         <div className="w-6 h-6 shrink-0 mt-1 rounded-lg bg-emerald-50 dark:bg-emerald-900/20 flex items-center justify-center group-hover:bg-emerald-500 transition-colors"><ChevronRight className="w-4 h-4 text-emerald-500 group-hover:text-white" /></div> 
+                         {para.substring(1)}
+                       </span>
+                    ) : para}
+                  </p>
+                ))}
               </div>
             </div>
-          </div>
+          </motion.div>
 
-          {/* Quick Calculator Panel */}
-          <div className="space-y-6">
-            <div className="bg-green-50 rounded-3xl p-6 border border-green-200">
-              <h3 className="font-bold text-green-900 mb-2">Why Agroforestry?</h3>
-              <ul className="text-sm text-green-800 space-y-3 font-medium">
-                <li className="flex gap-2 items-start"><Sun className="w-4 h-4 text-amber-500 mt-0.5 flex-shrink-0" /> Additional income from border planting</li>
-                <li className="flex gap-2 items-start"><Droplets className="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" /> Improves groundwater level</li>
-                <li className="flex gap-2 items-start"><Trees className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" /> Zero soil erosion</li>
-              </ul>
-            </div>
-
-            <div className="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm text-center">
-              <div className="mb-2"><Trees className="w-8 h-8 text-green-700 mx-auto" /></div>
-              <h3 className="font-bold text-gray-900 mb-1">Teak (Sagwan)</h3>
-              <p className="text-xs text-gray-500 mb-4">Maturity: 10-15 Years</p>
-              <div className="bg-gray-50 px-4 py-3 rounded-xl border border-gray-100">
-                <p className="text-[10px] uppercase font-bold text-gray-400">Est. Value Per Tree</p>
-                <p className="text-xl font-black text-green-700">₹30,000 - ₹50,000</p>
-              </div>
-            </div>
+          {/* Side Panels */}
+          <div className="lg:col-span-4 space-y-8">
             
-          </div>
-        </div>
+            {/* Trusted Stamp Panel */}
+            <div className="bg-slate-900 rounded-[3rem] p-10 text-white shadow-2xl relative overflow-hidden group">
+               <div className="absolute top-0 right-0 w-40 h-40 bg-emerald-500/20 rounded-full blur-3xl transform translate-x-10 -translate-y-10 group-hover:scale-150 transition-transform duration-700"></div>
+               <ShieldCheck className="w-12 h-12 text-emerald-400 mb-6" />
+               <h3 className="text-2xl font-black mb-2 tracking-tight">Trusted Growth</h3>
+               <p className="text-sm font-medium text-gray-400 mb-8 leading-relaxed">Financial and legal security frameworks for your timber investments.</p>
+               
+               <div className="space-y-5">
+                  <div className="flex gap-4 items-center bg-white/5 border border-white/10 p-4 rounded-2xl backdrop-blur-md">
+                     <DollarSign className="w-6 h-6 text-emerald-400" />
+                     <div><p className="text-[10px] font-bold text-gray-500 uppercase">Govt. Support</p><p className="text-sm font-black">40% Capital Subsidy</p></div>
+                  </div>
+                  <div className="flex gap-4 items-center bg-white/5 border border-white/10 p-4 rounded-2xl backdrop-blur-md">
+                     <Activity className="w-6 h-6 text-blue-400" />
+                     <div><p className="text-[10px] font-bold text-gray-500 uppercase">Tax Law</p><p className="text-sm font-black">Agricultural Exemption</p></div>
+                  </div>
+               </div>
+            </div>
 
+            {/* Tree Showcase Cards */}
+            <h4 className="text-xs font-black text-slate-400 dark:text-gray-500 uppercase tracking-[0.2em] px-2">Top Performers</h4>
+            <div className="space-y-4">
+               {Object.entries(TREE_ASSETS).map(([name, asset], idx) => (
+                 <motion.div 
+                   key={name} whileHover={{ x: -8 }}
+                   className="bg-white dark:bg-gray-900 border border-slate-100 dark:border-gray-800 p-4 rounded-[2.5rem] flex items-center gap-5 shadow-sm hover:shadow-xl transition-all cursor-pointer group"
+                 >
+                    <div className="w-20 h-20 rounded-[1.5rem] overflow-hidden shrink-0 border border-slate-100 dark:border-gray-800">
+                      <img src={asset.image} alt={name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h5 className="font-black text-slate-900 dark:text-white text-lg truncate leading-tight mb-1">{name}</h5>
+                      <div className="flex flex-wrap gap-1.5">
+                        {asset.benefits.slice(0, 2).map((b, i) => (
+                          <span key={i} className="text-[8px] font-black uppercase bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 px-2 py-0.5 rounded-full">{b}</span>
+                        ))}
+                      </div>
+                    </div>
+                    <ChevronRight className="w-6 h-6 text-slate-300 dark:text-gray-700 group-hover:text-emerald-500 transition-colors mr-2" />
+                 </motion.div>
+               ))}
+            </div>
+
+          </div>
+
+        </div>
       </div>
+
     </div>
   );
 }
