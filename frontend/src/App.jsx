@@ -11,6 +11,10 @@ import MarketInsights from './pages/MarketInsights';
 import GovernmentSchemes from './pages/GovernmentSchemes';
 import FarmingCalendar from './pages/FarmingCalendar';
 import SubsidyTracker from './pages/SubsidyTracker';
+import BioFertilizer from './pages/BioFertilizer';
+import LossRecovery from './pages/LossRecovery';
+import ProfitTrees from './pages/ProfitTrees';
+import DirectMarket from './pages/DirectMarket';
 
 import { AgriProvider } from './context/AgriContext';
 import FarmerVoiceAssistant from './components/FarmerVoiceAssistant';
@@ -28,6 +32,10 @@ function App() {
               <Route path="/analysis" element={<AnalysisDashboard />} />
               <Route path="/crops" element={<CropRecommendations />} />
               <Route path="/fertilizer" element={<FertilizerPlan />} />
+              <Route path="/bio-inputs" element={<BioFertilizer />} />
+              <Route path="/recovery" element={<LossRecovery />} />
+              <Route path="/agroforestry" element={<ProfitTrees />} />
+              <Route path="/b2b" element={<DirectMarket />} />
               <Route path="/weather" element={<WeatherPage />} />
               <Route path="/market" element={<MarketInsights />} />
               <Route path="/schemes" element={<GovernmentSchemes />} />
