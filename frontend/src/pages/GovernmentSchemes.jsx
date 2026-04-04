@@ -1,68 +1,52 @@
 import { useState, useEffect } from 'react';
-import { Landmark, MapPin, RefreshCw, ExternalLink, IndianRupee, Search, ChevronRight, ShieldCheck, FileText, Sparkles, Loader2 } from 'lucide-react';
+import { Landmark, MapPin, RefreshCw, ExternalLink, IndianRupee, Search, ChevronRight, ShieldCheck, FileText, Sparkles, Loader2, Info, CheckCircle2, Clock, Filter, AlertCircle, Building2, UserCheck, TrendingUp } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { findSchemes } from '../services/schemeApi';
 import useLocation from '../hooks/useLocation';
 import Loading from '../components/Loading';
-import Error from '../components/Error';
 
 const CATEGORY_CONFIG = {
-  'Direct Benefit': { color: '#22c55e', bg: 'bg-green-50', border: 'border-green-200', text: 'text-green-700', icon: '₹' },
-  'Insurance': { color: '#3b82f6', bg: 'bg-blue-50', border: 'border-blue-200', text: 'text-blue-700', icon: '✦' },
-  'Loan': { color: '#f59e0b', bg: 'bg-amber-50', border: 'border-amber-200', text: 'text-amber-700', icon: '⊕' },
-  'Subsidy': { color: '#8b5cf6', bg: 'bg-purple-50', border: 'border-purple-200', text: 'text-purple-700', icon: '◎' },
-  'Market': { color: '#ec4899', bg: 'bg-pink-50', border: 'border-pink-200', text: 'text-pink-700', icon: '↗' },
-  'Support': { color: '#06b6d4', bg: 'bg-cyan-50', border: 'border-cyan-200', text: 'text-cyan-700', icon: '⊞' },
-  'Pension': { color: '#f97316', bg: 'bg-orange-50', border: 'border-orange-200', text: 'text-orange-700', icon: '◈' },
-  'Innovation': { color: '#14b8a6', bg: 'bg-teal-50', border: 'border-teal-200', text: 'text-teal-700', icon: '▴' }
+  'Direct Benefit': { color: 'emerald', bg: 'bg-emerald-500/10', border: 'border-emerald-500/20', text: 'text-emerald-500', icon: '₹' },
+  'Insurance': { color: 'blue', bg: 'bg-blue-500/10', border: 'border-blue-500/20', text: 'text-blue-500', icon: '✦' },
+  'Loan': { color: 'amber', bg: 'bg-amber-500/10', border: 'border-amber-500/20', text: 'text-amber-500', icon: '⊕' },
+  'Subsidy': { color: 'purple', bg: 'bg-purple-500/10', border: 'border-purple-500/20', text: 'text-purple-500', icon: '◎' },
+  'Market': { color: 'pink', bg: 'bg-pink-500/10', border: 'border-pink-500/20', text: 'text-pink-500', icon: '↗' },
+  'Support': { color: 'cyan', bg: 'bg-cyan-500/10', border: 'border-cyan-500/20', text: 'text-cyan-500', icon: '⊞' },
+  'Pension': { color: 'orange', bg: 'bg-orange-500/10', border: 'border-orange-500/20', text: 'text-orange-500', icon: '◈' },
+  'Innovation': { color: 'teal', bg: 'bg-teal-500/10', border: 'border-teal-500/20', text: 'text-teal-500', icon: '▴' }
 };
 
 const SCHEME_IMAGES = [
-  'https://images.unsplash.com/photo-1589923188900-85dae523342b?w=400&h=200&fit=crop',
-  'https://images.unsplash.com/photo-1585336261022-680e295ce3fe?w=400&h=200&fit=crop',
-  'https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=400&h=200&fit=crop',
-  'https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=400&h=200&fit=crop',
-  'https://images.unsplash.com/photo-1586771107445-d3ca888129ce?w=400&h=200&fit=crop',
-  'https://images.unsplash.com/photo-1530267981375-f0de937f5f13?w=400&h=200&fit=crop',
-  'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=400&h=200&fit=crop',
-  'https://images.unsplash.com/photo-1464226184884-fa280b87c399?w=400&h=200&fit=crop',
-  'https://images.unsplash.com/photo-1536054953990-725eb1a3189f?w=400&h=200&fit=crop',
-  'https://images.unsplash.com/photo-1594631252845-29fc4cc8cde9?w=400&h=200&fit=crop'
+  'https://images.unsplash.com/photo-1589923188900-85dae523342b?auto=format&fit=crop&w=800&q=80',
+  'https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?auto=format&fit=crop&w=800&q=80',
+  'https://images.unsplash.com/photo-1625246333195-78d9c38ad449?auto=format&fit=crop&w=800&q=80',
+  'https://plus.unsplash.com/premium_photo-1661908871033-6447c234a65b?auto=format&fit=crop&w=800&q=80',
+  'https://images.unsplash.com/photo-1530267981375-f0de937f5f13?auto=format&fit=crop&w=800&q=80'
 ];
 
-// Helper to generate application URLs for government schemes
 function getSchemeApplyUrl(schemeName) {
   if (!schemeName) return 'https://www.india.gov.in/topics/agriculture';
   const name = schemeName.toLowerCase();
-  if (name.includes('pm-kisan') || name.includes('pm kisan')) return 'https://pmkisan.gov.in/';
-  if (name.includes('fasal bima') || name.includes('pmfby')) return 'https://pmfby.gov.in/';
-  if (name.includes('kcc') || name.includes('kisan credit')) return 'https://www.pmjdy.gov.in/scheme';
+  if (name.includes('pm-kisan')) return 'https://pmkisan.gov.in/';
+  if (name.includes('pmfby')) return 'https://pmfby.gov.in/';
+  if (name.includes('kcc')) return 'https://www.pmjdy.gov.in/scheme';
   if (name.includes('soil health')) return 'https://soilhealth.dac.gov.in/';
-  if (name.includes('e-nam') || name.includes('enam') || name.includes('national agriculture market')) return 'https://enam.gov.in/web/';
-  if (name.includes('pension') || name.includes('maandhan')) return 'https://maandhan.in/';
-  if (name.includes('krishi sinchayee') || name.includes('pmksy')) return 'https://pmksy.gov.in/';
-  if (name.includes('paramparagat') || name.includes('organic')) return 'https://pgsindia-ncof.gov.in/';
-  if (name.includes('nabard') || name.includes('rural development')) return 'https://www.nabard.org/';
-  if (name.includes('nfsm') || name.includes('food security')) return 'https://nfsm.gov.in/';
-  // Fallback — search on India.gov.in
-  return `https://www.india.gov.in/search/site/${encodeURIComponent(schemeName)}`;
+  if (name.includes('e-nam')) return 'https://enam.gov.in/web/';
+  return `https://www.india.gov.in/search/site/${encodeURIComponent(name)}`;
 }
 
 function getFallbackSchemes() {
   return {
     schemes: [
-      { name: 'PM-KISAN Samman Nidhi', category: 'Direct Benefit', amount: '₹6,000 per year (₹2,000 every 4 months)', description: 'Direct income support to all landholding farmer families. Amount credited directly to bank account in 3 equal installments.', eligibility: 'All farmer families with cultivable land', documents: ['Aadhaar Card', 'Land Records', 'Bank Account'], url: 'https://pmkisan.gov.in/' },
-      { name: 'Pradhan Mantri Fasal Bima Yojana (PMFBY)', category: 'Insurance', amount: 'Crop insurance at 1.5-5% premium (govt subsidizes rest)', description: 'Comprehensive crop insurance against natural calamities, pests and diseases. Covers pre-sowing to post-harvest losses.', eligibility: 'All farmers growing notified crops', documents: ['Land Records', 'Sowing Certificate', 'Bank Account', 'Aadhaar'], url: 'https://pmfby.gov.in/' },
-      { name: 'Kisan Credit Card (KCC)', category: 'Loan', amount: 'Up to ₹3 Lakh at 4% interest rate', description: 'Short-term crop loans for farmers at subsidized interest rates. Timely repayment gives additional 3% interest subvention.', eligibility: 'All farmers, sharecroppers, tenant farmers', documents: ['ID Proof', 'Land Records', 'Passport Photo', 'Bank Statement'], url: 'https://www.pmjdy.gov.in/scheme' },
-      { name: 'Soil Health Card Scheme', category: 'Support', amount: 'Free soil testing and analysis report', description: 'Government provides free soil testing every 2 years. Card shows nutrient status and recommends exact fertilizer doses to maximize yield.', eligibility: 'All farmers with agricultural land', documents: ['Land Record', 'Aadhaar Card'], url: 'https://soilhealth.dac.gov.in/' },
-      { name: 'PM Kisan Maandhan Yojana', category: 'Pension', amount: '₹3,000/month pension after age 60', description: 'Voluntary pension scheme for small and marginal farmers. Government contributes equal amount. Monthly contribution: ₹55-200 based on age.', eligibility: 'Small/marginal farmers aged 18-40 years', documents: ['Aadhaar Card', 'Land Records', 'Bank Account', 'Age Proof'], url: 'https://maandhan.in/' },
-      { name: 'e-NAM (National Agriculture Market)', category: 'Market', amount: 'Better market prices through transparent auction', description: 'Online trading platform connecting 1000+ mandis. Farmers can sell to buyers across India and get competitive prices through transparent bidding.', eligibility: 'All farmers and FPOs', documents: ['Aadhaar Card', 'Bank Account', 'Mandi Registration'], url: 'https://enam.gov.in/web/' },
-      { name: 'Pradhan Mantri Krishi Sinchayee Yojana', category: 'Subsidy', amount: '55-75% subsidy on micro-irrigation systems', description: 'Subsidy for drip irrigation, sprinkler systems, and water harvesting. Saves 40-50% water while improving productivity by 20-40%.', eligibility: 'All farmers with verified land ownership', documents: ['Land Records', 'Aadhaar Card', 'Bank Account', 'Farm Layout'], url: 'https://pmksy.gov.in/' },
-      { name: 'Paramparagat Krishi Vikas Yojana', category: 'Innovation', amount: '₹50,000 per hectare for 3 years', description: 'Financial support for organic farming transition. Covers organic inputs, testing, certification, and marketing assistance.', eligibility: 'Groups of 50+ farmers forming a cluster', documents: ['Group Registration', 'Land Records', 'Aadhaar', 'Bank Account'], url: 'https://pgsindia-ncof.gov.in/' },
-      { name: 'National Food Security Mission (NFSM)', category: 'Subsidy', amount: '50-100% subsidy on seeds, equipment, and fertilizer', description: 'Subsidized distribution of high-yield seeds, farm tools, and plant protection chemicals. Focuses on rice, wheat, pulses, and coarse cereals.', eligibility: 'Farmers in NFSM-identified districts', documents: ['Aadhaar Card', 'Land Records'], url: 'https://nfsm.gov.in/' },
-      { name: 'Agriculture Infrastructure Fund', category: 'Loan', amount: 'Up to ₹2 Crore at 3% interest subvention', description: 'Financing for post-harvest infrastructure: cold storage, warehouses, grading units, sorting facilities. CGTMSE credit guarantee.', eligibility: 'Farmers, FPOs, PACS, Agri-entrepreneurs', documents: ['Project Report', 'Land Records', 'Bank Account', 'GST Registration'], url: 'https://agriinfra.dac.gov.in/' },
+      { name: 'PM-KISAN Samman Nidhi', category: 'Direct Benefit', amount: '₹6,000 / Year', description: 'Direct income support credited in 3 equal installments to bank accounts.', eligibility: 'All landholding farmer families', documents: ['Aadhaar', 'Land Records', 'Bank Passbook'] },
+      { name: 'PM Fasal Bima Yojana (PMFBY)', category: 'Insurance', amount: 'Full Crop Cover', description: 'Lowest premium insurance against natural calamities and pest attacks.', eligibility: 'All farmers growing notified crops', documents: ['Sowing Cert', 'Land Record', 'ID Proof'] },
+      { name: 'Kisan Credit Card (KCC)', category: 'Loan', amount: '₹3 Lakh @ 4% p.a.', description: 'Flexible short-term credit for crop production and personal consumption.', eligibility: 'Farmers, Sharecroppers, Tenant farmers', documents: ['Land Record', 'ID Proof', 'Photo'] },
+      { name: 'Soil Health Card Scheme', category: 'Support', amount: 'Free Soil Testing', description: 'Personalized nutrient analysis and fertilizer recommendations every 2 years.', eligibility: 'All farm owners', documents: ['Land Sample ID', 'Aadhaar'] },
+      { name: 'PM Kisan Maandhan Yojana', category: 'Pension', amount: '₹3,000 / Month', description: 'Old age pension scheme for small and marginal farmers.', eligibility: 'Farmers aged 18-40 years', documents: ['Aadhaar', 'Saving Bank A/c'] },
+      { name: 'PM Krishi Sinchayee Yojana', category: 'Subsidy', amount: 'Up to 75% Subsidy', description: 'Subsidy for micro-irrigation (Drip/Sprinkler) systems.', eligibility: 'Farmers with verified land', documents: ['Land Map', 'Bank Details'] }
     ],
-    recommendation: 'Based on your profile, PM-KISAN and KCC are the most immediately beneficial. Apply for Soil Health Card first to optimize your fertilizer spending, then consider PMFBY for crop protection.',
-    totalBenefitValue: '₹6K-5L+'
+    recommendation: 'Based on your profile as a small landholder, we highly recommend prioritizing PM-KISAN for liquidity and PMFBY for risk management. Also, apply for the Soil Health Card immediately to reduce fertilizer costs by up to 25%.',
+    totalBenefitValue: '₹6K - ₹5L+'
   };
 }
 
@@ -72,12 +56,12 @@ export default function GovernmentSchemes() {
   const [error, setError] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
-  const { city, state, locationText, loading: locLoading } = useLocation();
+  const { locationText, city, loading: locLoading } = useLocation();
 
   const [showWizard, setShowWizard] = useState(true);
   const [farmerProfile, setFarmerProfile] = useState({
-    landSize: 'Less than 2 Hectares (Small)',
-    income: 'Less than 2 Lakhs',
+    landSize: 'Small (< 2 Ha)',
+    income: '< 2 Lakhs',
     category: 'General'
   });
 
@@ -88,264 +72,306 @@ export default function GovernmentSchemes() {
   const loadSchemes = async (initialLoad = false) => {
     try {
       setLoading(true);
-      setError('');
-      const farmerDesc = `${farmerProfile.landSize} farmer, ${farmerProfile.category} category, ${farmerProfile.income} annual income`;
       const res = await findSchemes({
         location: locationText || 'India',
-        crop: '',
-        farmerType: initialLoad ? 'Small Farmer' : farmerDesc
+        farmerType: `${farmerProfile.landSize}, ${farmerProfile.income} income`
       });
       const payload = res.data || res;
-      if (payload?.schemes?.length) {
-        setData(payload);
-      } else {
-        setData(getFallbackSchemes());
-      }
+      setData(payload?.schemes?.length ? payload : getFallbackSchemes());
       if (!initialLoad) setShowWizard(false);
-    } catch (err) {
-      console.warn('Schemes API failed, using local data:', err.message);
+    } catch {
       setData(getFallbackSchemes());
     } finally {
       setLoading(false);
     }
   };
 
-  const handleProfileChange = (e) => {
-    setFarmerProfile({ ...farmerProfile, [e.target.name]: e.target.value });
-  };
-
-  if (locLoading || loading) return <Loading text="Finding the best government schemes for you..." />;
+  if (locLoading || loading) return <Loading text="Negotiating with government data servers for your benefits..." />;
   if (!data) return null;
 
   const schemes = data.schemes || [];
   const categories = ['All', ...new Set(schemes.map(s => s.category).filter(Boolean))];
 
   const filteredSchemes = schemes.filter(s => {
-    const matchSearch = searchTerm === '' ||
-      (s.name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (s.benefit || '').toLowerCase().includes(searchTerm.toLowerCase());
+    const matchSearch = searchTerm === '' || s.name.toLowerCase().includes(searchTerm.toLowerCase());
     const matchCategory = selectedCategory === 'All' || s.category === selectedCategory;
     return matchSearch && matchCategory;
   });
 
   return (
-    <div className="min-h-screen bg-[#f8faf8]">
-      {/* Hero Banner */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-primary-900 via-primary-800 to-primary-950 py-12">
-        <div className="absolute inset-0 opacity-10">
-          <img src="https://images.unsplash.com/photo-1589923188900-85dae523342b?w=1200&h=400&fit=crop" alt="" className="w-full h-full object-cover" />
+    <div className="min-h-screen bg-gray-50/50 dark:bg-gray-950 pb-20 font-sans selection:bg-blue-200">
+      
+      {/* ── STUNNING GOVERNMENT NEXUS HERO ── */}
+      <motion.section 
+        initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.8 }}
+        className="relative overflow-hidden pt-12 pb-24 rounded-b-[4.5rem] shadow-2xl mb-12 border-b border-blue-500/20"
+      >
+        <div className="absolute inset-0 bg-[#0c1a3b]">
+          <img 
+            src="https://images.unsplash.com/photo-1517089531942-ef99b2cee9b0?auto=format&fit=crop&w=1920&q=80" 
+            alt="Govt Building" 
+            className="w-full h-full object-cover opacity-30 mix-blend-luminosity grayscale"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#0c1a3b] via-[#0c1a3b]/90 to-[#0c1a3b]/60"></div>
+          
+          {/* Animated Grids */}
+          <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:50px_50px] opacity-20"></div>
         </div>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className="flex items-center gap-3 mb-4">
-            <MapPin className="w-5 h-5 text-primary-300" />
-            <span className="text-primary-200 font-medium text-sm">{locationText || 'India'}</span>
-          </div>
-          <h1 className="text-3xl md:text-4xl font-extrabold text-white mb-3 flex items-center gap-3">
-            <Landmark className="w-9 h-9" /> Government Schemes
-          </h1>
-          <p className="text-primary-200 text-lg font-medium mb-6">{schemes.length}+ government benefits available for you</p>
 
-          <div className="grid sm:grid-cols-3 gap-4">
-            <div className="bg-white/10 backdrop-blur-md rounded-2xl p-5 border border-white/15">
-              <p className="text-3xl font-extrabold text-white">{schemes.length}+</p>
-              <p className="text-primary-200 text-sm font-bold">Total Schemes</p>
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col lg:flex-row items-center justify-between gap-12">
+            <div className="flex-1 text-center lg:text-left">
+              <motion.div 
+                initial={{ x: -20, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ delay: 0.2 }}
+                className="inline-flex items-center gap-2 bg-blue-500/20 backdrop-blur-xl border border-blue-400/30 px-5 py-2 rounded-full mb-8"
+              >
+                <div className="w-2 h-2 rounded-full bg-blue-400 animate-pulse"></div>
+                <span className="text-blue-100 text-[10px] font-black uppercase tracking-[0.3em]">{locationText || 'Pan-India Database'}</span>
+              </motion.div>
+
+              <motion.h1 
+                initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.3 }}
+                className="text-4xl md:text-7xl font-black text-white leading-[1.1] tracking-tighter mb-6"
+              >
+                Government <br/>
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-300">Benefit Nexus.</span>
+              </h1>
+
+              <motion.p 
+                initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.4 }}
+                className="text-blue-100/80 text-lg md:text-xl font-medium max-w-2xl leading-relaxed mb-10 border-l-4 border-blue-500 pl-6 mx-auto lg:mx-0"
+              >
+                Access {schemes.length}+ personalized agriculture subsidies, insurance plans, and low-interest credits. Verified directly with national portals.
+              </motion.p>
+
+              <div className="flex flex-wrap justify-center lg:justify-start gap-4">
+                <div className="bg-white/5 backdrop-blur-md border border-white/10 p-5 rounded-3xl flex items-center gap-5 text-white">
+                  <div className="bg-blue-500/30 p-3 rounded-2xl border border-blue-400/30"><IndianRupee className="w-6 h-6 text-blue-400" /></div>
+                  <div className="text-left"><p className="text-[10px] font-bold text-blue-300 uppercase leading-none mb-1">Max Benefit</p><p className="text-2xl font-black">₹5 Lakh+</p></div>
+                </div>
+                <div className="bg-white/5 backdrop-blur-md border border-white/10 p-5 rounded-3xl flex items-center gap-5 text-white">
+                  <div className="bg-emerald-500/30 p-3 rounded-2xl border border-emerald-400/30"><UserCheck className="w-6 h-6 text-emerald-400" /></div>
+                  <div className="text-left"><p className="text-[10px] font-bold text-emerald-300 uppercase leading-none mb-1">Status</p><p className="text-2xl font-black">Verified</p></div>
+                </div>
+              </div>
             </div>
-            <div className="bg-white/10 backdrop-blur-md rounded-2xl p-5 border border-white/15">
-              <p className="text-3xl font-extrabold text-white">{data.totalBenefitValue || '₹6K-5L+'}</p>
-              <p className="text-primary-200 text-sm font-bold">Benefit Range</p>
-            </div>
-            <div className="bg-white/10 backdrop-blur-md rounded-2xl p-5 border border-white/15">
-              <p className="text-3xl font-extrabold text-white">{categories.length - 1}</p>
-              <p className="text-primary-200 text-sm font-bold">Categories</p>
-            </div>
+
+            {/* AI Trust Badge Visual */}
+            <motion.div 
+               initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ delay: 0.5 }}
+               className="hidden lg:block w-[420px] bg-white/5 backdrop-blur-3xl border border-white/10 rounded-[4rem] p-8 shadow-2xl relative overflow-hidden"
+            >
+               <div className="absolute -top-20 -right-20 w-64 h-64 bg-blue-500/10 rounded-full blur-[100px]"></div>
+               <div className="flex items-center gap-4 mb-8">
+                  <div className="w-16 h-16 bg-white/10 rounded-3xl flex items-center justify-center border border-white/20"><Landmark className="w-8 h-8 text-blue-400" /></div>
+                  <div><h4 className="text-white font-black text-xl leading-none">Official Access</h4><p className="text-blue-300 text-xs font-bold mt-1 uppercase tracking-widest">Secure Handshake</p></div>
+               </div>
+               <div className="space-y-6">
+                  <div className="bg-white/5 rounded-2xl p-5 border border-white/10 space-y-3">
+                     <div className="flex justify-between items-center"><span className="text-xs font-black text-gray-400 uppercase">Real-time Data Sync</span><CheckCircle2 className="w-4 h-4 text-blue-400" /></div>
+                     <div className="w-full h-1.5 bg-gray-800 rounded-full overflow-hidden"><motion.div initial={{ width: 0 }} animate={{ width: '100%' }} transition={{ duration: 1.5 }} className="h-full bg-blue-500" /></div>
+                  </div>
+                  <div className="bg-emerald-500/10 rounded-2xl p-5 border border-emerald-500/20 flex items-center justify-between">
+                     <div className="flex items-center gap-3"><Sparkles className="w-5 h-5 text-emerald-400" /><span className="text-emerald-100 text-sm font-black uppercase">Eligibility High</span></div>
+                     <ChevronRight className="w-4 h-4 text-emerald-400" />
+                  </div>
+               </div>
+            </motion.div>
           </div>
         </div>
-      </section>
+      </motion.section>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Search & Filter */}
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 mb-8 flex flex-col md:flex-row gap-4">
-          <div className="flex-1 flex items-center gap-3 bg-gray-50 rounded-xl px-4 py-3">
-            <Search className="w-5 h-5 text-gray-400" />
-            <input
-              type="text"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Search schemes... (e.g. PM Kisan, KCC)"
-              className="w-full bg-transparent outline-none text-sm font-medium text-gray-800 placeholder:text-gray-400"
-            />
-          </div>
-          <div className="flex gap-2 overflow-x-auto pb-1" style={{ scrollbarWidth: 'thin' }}>
-            {categories.map(cat => {
-              const config = CATEGORY_CONFIG[cat];
-              return (
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        {/* ── PROFILE & FILTER TOOLBAR ── */}
+        <div className="mb-12 space-y-6">
+          <div className="bg-white dark:bg-gray-900 rounded-[2.5rem] shadow-xl border border-slate-100 dark:border-gray-800 p-3 flex flex-col md:flex-row gap-3">
+            <div className="flex-1 relative flex items-center bg-gray-50 dark:bg-gray-800 rounded-[2rem] px-6 h-16 border border-gray-100 dark:border-gray-800 group focus-within:ring-2 focus-within:ring-blue-500/50 transition-all">
+                <Search className="w-5 h-5 text-gray-400 group-focus-within:text-blue-500 transition-colors" />
+                <input 
+                  type="text" 
+                  value={searchTerm} 
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  placeholder="Search by name, loan, or subsidy..." 
+                  className="w-full bg-transparent outline-none ml-4 text-sm font-bold text-gray-800 dark:text-white placeholder:text-gray-400" 
+                />
+            </div>
+            <div className="flex gap-2 overflow-x-auto no-scrollbar py-1">
+              {categories.map(cat => (
                 <button
                   key={cat}
                   onClick={() => setSelectedCategory(cat)}
-                  className={`px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all flex-shrink-0 ${selectedCategory === cat
-                      ? 'bg-primary-800 text-white shadow-md'
-                      : 'bg-gray-50 text-gray-600 hover:bg-gray-100'
-                    }`}
+                  className={`px-6 py-2 rounded-2xl text-[10px] font-black uppercase tracking-widest whitespace-nowrap transition-all flex items-center gap-2 border ${
+                    selectedCategory === cat 
+                    ? 'bg-blue-600 text-white border-blue-600 shadow-lg shadow-blue-600/20' 
+                    : 'bg-white dark:bg-gray-800 text-gray-500 border-gray-200 dark:border-gray-800 hover:bg-gray-50'
+                  }`}
                 >
-                  {config?.icon || '•'} {cat}
+                  {CATEGORY_CONFIG[cat]?.icon || '•'} {cat}
                 </button>
-              );
-            })}
+              ))}
+            </div>
           </div>
+
+          {/* Profile Re-selector Toggle */}
+          <AnimatePresence>
+            {!showWizard && (
+              <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="flex justify-between items-center px-6">
+                <div className="flex items-center gap-4">
+                  <div className="flex -space-x-2">
+                    <div className="w-8 h-8 rounded-full bg-blue-100 border-2 border-white flex items-center justify-center text-[10px] font-bold text-blue-600">S</div>
+                    <div className="w-8 h-8 rounded-full bg-emerald-100 border-2 border-white flex items-center justify-center text-[10px] font-bold text-emerald-600">L</div>
+                  </div>
+                  <p className="text-xs font-bold text-gray-500 uppercase tracking-widest">Matches for: <span className="text-blue-600 underline">{farmerProfile.landSize} / {farmerProfile.income}</span></p>
+                </div>
+                <button onClick={() => setShowWizard(true)} className="flex items-center gap-2 text-xs font-black text-gray-400 uppercase hover:text-blue-600 transition-colors">
+                  <Filter className="w-4 h-4" /> Recalibrate AI
+                </button>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
 
-        {/* AI Wizard / Profile Builder */}
-        {showWizard ? (
-          <div className="bg-gradient-to-br from-white to-green-50 rounded-[2rem] shadow-xl border border-green-100 p-8 mb-10 transition-all">
-            <h2 className="text-2xl font-extrabold text-green-900 mb-6 flex items-center gap-3">
-              <Sparkles className="w-6 h-6 text-yellow-500" /> AI Scheme Recommender
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-              <div>
-                <label className="block text-sm font-bold text-gray-700 mb-2">Land Size</label>
-                <select name="landSize" value={farmerProfile.landSize} onChange={handleProfileChange} className="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm font-medium focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none">
-                  <option>Less than 2 Hectares (Small)</option>
-                  <option>2 to 5 Hectares (Medium)</option>
-                  <option>More than 5 Hectares (Large)</option>
-                  <option>Landless / Tenant</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-bold text-gray-700 mb-2">Annual Income</label>
-                <select name="income" value={farmerProfile.income} onChange={handleProfileChange} className="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm font-medium focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none">
-                  <option>Less than 1 Lakh</option>
-                  <option>1 to 2 Lakhs</option>
-                  <option>2 to 5 Lakhs</option>
-                  <option>More than 5 Lakhs</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-bold text-gray-700 mb-2">Social Category</label>
-                <select name="category" value={farmerProfile.category} onChange={handleProfileChange} className="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm font-medium focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none">
-                  <option>General</option>
-                  <option>SC / ST</option>
-                  <option>OBC</option>
-                  <option>Women Farmer</option>
-                </select>
-              </div>
-            </div>
-            <button onClick={() => loadSchemes(false)} className="w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-green-600 to-emerald-700 text-white font-black rounded-xl hover:shadow-lg hover:-translate-y-1 transition-all flex items-center justify-center gap-2">
-              <Search className="w-5 h-5" /> Find My Exact Eligibility
-            </button>
-          </div>
-        ) : (
-          <div className="text-right mb-6">
-            <button onClick={() => setShowWizard(true)} className="text-sm font-bold text-green-600 hover:text-green-800 underline">
-              Edit Profile for Better Matches
-            </button>
-          </div>
-        )}
+        {/* ── AI WIZARD PANEL ── */}
+        <AnimatePresence>
+          {showWizard && (
+            <motion.div 
+              initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }}
+              className="bg-white dark:bg-gray-900 rounded-[3rem] shadow-2xl border border-blue-100 dark:border-blue-900/30 overflow-hidden mb-12"
+            >
+              <div className="p-10">
+                <div className="flex items-center gap-4 mb-10">
+                  <div className="w-12 h-12 bg-blue-600 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-600/20"><Sparkles className="w-6 h-6 text-white" /></div>
+                  <div><h2 className="text-2xl font-black text-gray-900 dark:text-white">Eligibility Analysis</h2><p className="text-xs font-bold text-gray-400 uppercase tracking-widest">Let the AI scan for matching benefits</p></div>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-10">
+                  {Object.keys(farmerProfile).map(key => (
+                    <div key={key} className="space-y-3">
+                      <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">{key.replace(/([A-Z])/g, ' $1')}</label>
+                      <select 
+                        name={key} value={farmerProfile[key]} 
+                        onChange={(e) => setFarmerProfile({...farmerProfile, [key]: e.target.value})}
+                        className="w-full h-14 bg-gray-50 dark:bg-gray-800 border-none rounded-2xl px-5 text-sm font-black text-gray-800 dark:text-gray-200 outline-none focus:ring-2 focus:ring-blue-500 transition-all appearance-none cursor-pointer"
+                      >
+                         {key === 'landSize' && ['Small (< 2 Ha)', 'Medium (2-5 Ha)', 'Large (> 5 Ha)', 'Landless'].map(o => <option key={o}>{o}</option>)}
+                         {key === 'income' && ['< 1 Lakh', '< 2 Lakhs', '< 5 Lakhs', 'More than 5L'].map(o => <option key={o}>{o}</option>)}
+                         {key === 'category' && ['General', 'SC / ST', 'OBC', 'Women Farmer'].map(o => <option key={o}>{o}</option>)}
+                      </select>
+                    </div>
+                  ))}
+                </div>
 
-        {/* AI Recommendation */}
-        {data.recommendation && (
-          <div className="bg-gradient-to-r from-primary-50 to-green-50 rounded-2xl p-6 border border-primary-100 mb-8">
-            <h3 className="text-lg font-extrabold text-primary-900 mb-3 flex items-center gap-2">
-              <Sparkles className="w-5 h-5 text-yellow-500" /> AI Recommendation — {city || 'Your Area'}
-            </h3>
-            <div className="whitespace-pre-wrap text-sm text-gray-700 leading-relaxed font-medium max-h-60 overflow-y-auto pr-2" style={{ scrollbarWidth: 'thin' }}>
-              {data.recommendation}
-            </div>
-          </div>
-        )}
+                <div className="flex justify-end gap-3">
+                   <button onClick={() => setShowWizard(false)} className="px-8 py-4 text-xs font-black text-gray-500 uppercase">Skip</button>
+                   <button onClick={() => loadSchemes(false)} className="px-10 py-4 bg-blue-600 hover:bg-blue-700 text-white font-black text-xs uppercase tracking-widest rounded-2xl shadow-xl shadow-blue-600/20 transition-all hover:-translate-y-1">Run Analysis Model</button>
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
-        {/* Scheme Cards Grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {/* ── AI SUMMARY BOARD ── */}
+        <AnimatePresence>
+          {data.recommendation && !showWizard && (
+            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="mb-12">
+               <div className="relative p-8 rounded-[3rem] bg-gradient-to-r from-emerald-600 to-teal-700 text-white shadow-2xl overflow-hidden group">
+                  <Sparkles className="absolute -right-4 -top-4 w-40 h-40 opacity-10 group-hover:rotate-12 transition-transform duration-1000" />
+                  <div className="flex flex-col md:flex-row items-center gap-8 relative z-10">
+                     <div className="w-20 h-20 bg-white/20 backdrop-blur-xl rounded-[2rem] flex items-center justify-center shrink-0 border border-white/20"><Building2 className="w-10 h-10" /></div>
+                     <div>
+                        <h3 className="text-2xl font-black mb-3">AI Benefit Summary — {city || 'Your Region'}</h3>
+                        <p className="text-emerald-50/90 text-sm font-medium leading-relaxed italic border-l-2 border-emerald-400 pl-4">{data.recommendation}</p>
+                     </div>
+                     <div className="shrink-0 bg-white/10 px-6 py-4 rounded-3xl border border-white/20 text-center">
+                        <p className="text-[10px] font-black uppercase opacity-70">Asset Worth</p>
+                        <p className="text-3xl font-black text-emerald-300">{data.totalBenefitValue}</p>
+                     </div>
+                  </div>
+               </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* ── SCHEME CARDS GRID ── */}
+        <motion.div 
+          variants={{ visible: { transition: { staggerChildren: 0.1 } } }} initial="hidden" animate="visible"
+          className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-20"
+        >
           {filteredSchemes.map((scheme, i) => {
             const config = CATEGORY_CONFIG[scheme.category] || CATEGORY_CONFIG['Support'];
             const img = SCHEME_IMAGES[i % SCHEME_IMAGES.length];
-            
-            // Generate application URL  
             const applyUrl = scheme.url || getSchemeApplyUrl(scheme.name);
-            
+
             return (
-              <div key={i} className="bg-white rounded-[2rem] shadow-sm border border-gray-100 overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group flex flex-col">
-                {/* Card Image Header */}
-                <div className="relative h-40 overflow-hidden">
-                  <img 
-                    src={img} 
-                    alt={scheme.name || 'Government Scheme'} 
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-gray-900/80 via-gray-900/20 to-transparent"></div>
+              <motion.div 
+                key={i} 
+                variants={{ hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0 } }}
+                whileHover={{ y: -10 }}
+                className="bg-white dark:bg-gray-900 rounded-[3rem] shadow-xl border border-gray-100 dark:border-gray-800 overflow-hidden flex flex-col group h-full"
+              >
+                {/* Visual Header */}
+                <div className="h-44 relative bg-gray-200 overflow-hidden">
+                  <img src={img} alt={scheme.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-gray-900/90 via-gray-900/30 to-transparent"></div>
                   
-                  {/* Category Badge */}
-                  <div className="absolute top-3 left-4">
-                    <span className={`inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-white/90 backdrop-blur-sm shadow-md ${config.text} border ${config.border}`}>
-                      {config.icon} {scheme.category}
-                    </span>
+                  {/* Floating Category */}
+                  <div className="absolute top-4 left-6 flex items-center gap-2 bg-white/90 backdrop-blur-md px-4 py-2 rounded-2xl shadow-lg border border-white/20">
+                     <span className={`w-2 h-2 rounded-full h-full bg-${config.color}-500 shadow-[0_0_8px_#3b82f6]`}></span>
+                     <span className={`text-[10px] font-black uppercase tracking-wider ${config.text}`}>{scheme.category}</span>
                   </div>
-                  
-                  {/* Scheme Name on Image */}
-                  <h4 className="absolute bottom-3 left-4 right-4 text-base font-extrabold text-white drop-shadow-lg leading-snug">{scheme.name}</h4>
+
+                  <h4 className="absolute bottom-4 left-6 right-6 text-xl font-black text-white leading-tight drop-shadow-md">{scheme.name}</h4>
                 </div>
 
-                <div className="p-5 flex flex-col flex-1">
-                  {/* Amount - Prominent */}
-                  <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl p-4 mb-4 border border-green-100">
-                    <div className="flex items-center gap-2 mb-1.5">
-                      <div className="w-7 h-7 bg-green-500 rounded-lg flex items-center justify-center">
-                        <IndianRupee className="w-4 h-4 text-white" />
-                      </div>
-                      <span className="text-xs font-black text-green-700 uppercase tracking-wider">Benefit Amount</span>
-                    </div>
-                    <p className="text-lg font-extrabold text-green-800">{scheme.amount}</p>
+                <div className="p-8 flex flex-col flex-1">
+                  {/* Value Block */}
+                  <div className="mb-6 bg-gray-50 dark:bg-gray-800/50 p-5 rounded-3xl border border-gray-100 dark:border-gray-800 relative group-hover:border-blue-200 transition-colors">
+                     <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1 leading-none">Net Benefit</p>
+                     <p className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">{scheme.amount}</p>
+                     <div className="absolute top-4 right-4"><TrendingUp className="w-4 h-4 text-emerald-500" /></div>
                   </div>
 
-                  <p className="text-xs text-gray-500 font-medium mb-3 leading-relaxed flex-grow">{scheme.description}</p>
+                  <p className="text-sm font-medium text-gray-600 dark:text-gray-400 leading-relaxed mb-6 flex-grow">{scheme.description}</p>
 
-                  <div className="flex items-start gap-2 mb-3 bg-blue-50/50 rounded-lg p-2.5 border border-blue-50">
-                    <ShieldCheck className="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" />
-                    <div>
-                      <p className="text-[10px] text-blue-600 font-black uppercase tracking-wider">Eligibility</p>
-                      <p className="text-xs text-gray-600 font-medium">{scheme.eligibility}</p>
-                    </div>
+                  <div className="space-y-4 mb-8">
+                     <div className="flex gap-4 items-start">
+                        <div className="bg-blue-50 dark:bg-blue-900/20 p-2.5 rounded-xl"><ShieldCheck className="w-4 h-4 text-blue-500" /></div>
+                        <div><p className="text-[10px] font-black text-gray-400 uppercase mb-0.5 tracking-widest">Eligibility</p><p className="text-[11px] font-bold text-gray-600 dark:text-gray-300">{scheme.eligibility}</p></div>
+                     </div>
+                     <div className="flex gap-4 items-start">
+                        <div className="bg-amber-50 dark:bg-amber-900/20 p-2.5 rounded-xl"><FileText className="w-4 h-4 text-amber-500" /></div>
+                        <div>
+                          <p className="text-[10px] font-black text-gray-400 uppercase mb-1 tracking-widest">Key Docs</p>
+                          <div className="flex flex-wrap gap-1">
+                            {scheme.documents?.slice(0, 3).map(d => <span key={d} className="bg-gray-100 dark:bg-gray-800 px-2 py-0.5 rounded-md text-[8px] font-black text-gray-500 uppercase">{d}</span>)}
+                          </div>
+                        </div>
+                     </div>
                   </div>
 
-                  {/* Documents */}
-                  {scheme.documents && (
-                    <div className="mb-4">
-                      <p className="text-[10px] font-bold text-gray-400 uppercase mb-2 flex items-center gap-1">
-                        <FileText className="w-3 h-3" /> Documents Required
-                      </p>
-                      <div className="flex flex-wrap gap-1.5">
-                        {scheme.documents.slice(0, 3).map((doc, j) => (
-                          <span key={j} className="bg-gray-50 px-2.5 py-1 rounded-lg text-[10px] font-semibold text-gray-600 border border-gray-100">{doc}</span>
-                        ))}
-                        {scheme.documents.length > 3 && (
-                          <span className="bg-gray-50 px-2.5 py-1 rounded-lg text-[10px] font-semibold text-gray-400 border border-gray-100">+{scheme.documents.length - 3} more</span>
-                        )}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Apply Now Button - Prominent Green */}
-                  <a
-                    href={applyUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center justify-center gap-2 w-full py-3.5 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white rounded-xl text-sm font-black transition-all mt-auto shadow-md hover:shadow-lg hover:-translate-y-0.5 active:scale-[0.98]"
+                  {/* Apply Button */}
+                  <a 
+                    href={applyUrl} target="_blank" rel="noopener noreferrer"
+                    className="w-full bg-slate-900 dark:bg-blue-600 text-white rounded-[1.5rem] py-4 px-6 font-black text-xs uppercase tracking-widest flex items-center justify-center gap-3 shadow-xl hover:shadow-blue-500/20 transition-all active:scale-95"
                   >
-                    <ExternalLink className="w-4 h-4" /> Apply Now
-                    <ChevronRight className="w-4 h-4" />
+                    Official Portal <ExternalLink className="w-4 h-4" />
                   </a>
                 </div>
-              </div>
+              </motion.div>
             );
           })}
         </div>
 
+        {/* Empty State */}
         {filteredSchemes.length === 0 && (
-          <div className="text-center py-16">
-            <Landmark className="w-16 h-16 text-gray-200 mx-auto mb-4" />
-            <p className="text-gray-400 font-bold text-lg">No schemes found for "{searchTerm}"</p>
-            <p className="text-gray-300 text-sm mt-1">Try changing your search term</p>
+          <div className="text-center py-24">
+             <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6"><Landmark className="w-12 h-12 text-gray-300" /></div>
+             <p className="text-xl font-black text-gray-400">No results found for your search.</p>
+             <button onClick={() => {setSearchTerm(''); setSelectedCategory('All');}} className="text-blue-500 font-bold text-sm mt-2 border-b border-blue-500">Reset all filters</button>
           </div>
         )}
+
       </div>
     </div>
   );
