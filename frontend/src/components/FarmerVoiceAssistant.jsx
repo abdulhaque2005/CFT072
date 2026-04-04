@@ -8,46 +8,79 @@ import api from '../services/api';
 // ─── Farmer Avatar ───────────────────────────────────────────────────────────
 const FARMER_AVATAR = '/farmer_avatar.png';
 
-// ─── Home Page Guided Tour Script ────────────────────────────────────────────
-// Each step has:
-//   - label:    button number/name shown in the tour panel
-//   - sectionId:  ID of the DOM element to scroll to
-//   - speech:   full narration line-by-line for that section
-const HOME_TOUR_STEPS = [
+// ─── Full App Guided Tour Script (9 Nav Routes) ──────────────────────────────
+const TOUR_STEPS = [
   {
     step: 1,
-    label: 'Hero',
-    sectionId: 'section-hero',
-    title: '🌾 Welcome to AgriSaar',
-    speech: `Namaste Kisan Bhai! Yeh hai AgriSaar ka Hero Section. Yahan aapko ek badi headline dikhti hai — "Complex Soil Data ko Simple Farming" — iska matlab hai ki aapki mitti ki mushkil jaankari ko hum aasaan bana dete hain. Neeche ek haara button hai — "Start Free Analysis" — jo aapko seedha soil testing page par le jaata hai. Upar ek location badge bhi hai jo aapka city detect karta hai, jaise ki Indore ya Pune, taaki advice local ho.`,
+    label: 'Home',
+    route: '/',
+    sectionId: null,
+    title: '🏡 Home Page',
+    speech: `Namaste Kisan Bhai! Main hoon aapka AgriSaar AI Sahayak. Yeh hai AgriSaar ka Home Page. Yahan aapko poori farming duniya ek jagah milti hai. Upar ek live location badge hai jo aapka sheher detect karta hai. Bade bade hero section mein likha hai — Smart Farming for India. Neeche aapko stats dikhте hain — 11 se zyada AI modules, 50 se zyada crops supported. Yahan se aap kisi bhi tool mein seedha ja sakte hain. Chalo ab agle page par chalte hain!`,
   },
   {
     step: 2,
-    label: 'Stats',
-    sectionId: 'section-stats',
-    title: '📊 Our Numbers',
-    speech: `Yeh hai hamaara Stats Section. Yahan aap dekh sakte hain ki AgriSaar mein 11 se zyada AI modules hain, 50 se zyada crops supported hain, 10 se zyada government schemes ke baare mein jaankari dete hain, aur yeh service 24 ghante 7 din available hai. Yeh numbers dikhate hain ki AgriSaar kitna capable aur trustworthy platform hai.`,
+    label: 'Soil',
+    route: '/soil-input',
+    sectionId: null,
+    title: '🧪 Soil Analysis',
+    speech: `Yeh hai Soil Analysis Page. Yahan aap apni mitti ki jaankari daal sakte hain — Nitrogen, Phosphorus, Potassium yaani NPK values, pH level, aur Organic Carbon. Aap manually values type kar sakte hain, ya apni soil report ki photo upload kar sakte hain — AI khud values padh lega. Submit karne ke baad AI aapki mitti ka health score batata hai, best crops suggest karta hai, aur fertilizer plan bhi bana deta hai. Bilkul free hai, koi charge nahi.`,
   },
   {
     step: 3,
-    label: 'Features',
-    sectionId: 'section-features',
-    title: '🛠️ Our Features',
-    speech: `Ab aao Features Section mein. Yahan 7 powerful tools hain. Pehla hai Soil Analysis — N, P, K aur pH levels check karta hai. Doosra Crop Recommendation — AI aapki mitti ke hisaab se best crop suggest karta hai. Teesra Fertilizer Plan — kitna, kab aur kaunsa khaad daalna hai bataata hai. Chautha Weather Advisory — mausam ke hisaab se farming alert deta hai. Paanchwa Market Insights — mandi price prediction. Chhaata Government Schemes — sarkari yojanaon ki jaankari. Aur saatwa Farming Calendar — poori farming schedule seedha aapke phone mein.`,
+    label: 'Crops',
+    route: '/crops',
+    sectionId: null,
+    title: '🌾 Crop Recommendations',
+    speech: `Yeh hai Crop Recommendation Page. Yahan AI aapki mitti aur weather ke hisaab se best fasal suggest karta hai. Har crop ka ek AI score hota hai — jitna zyada score, utna behtar crop. Aap Highly Recommended crops aur Rotation Crops dono dekh sakte hain. Rotation crops mitti ki quality badhate hain aur agli baar ki fasal aur achhi hoti hai. Market prediction bhi yahan diya jaata hai.`,
   },
   {
     step: 4,
-    label: 'CTA',
-    sectionId: 'section-cta',
-    title: '🚀 Start Analysis',
-    speech: `Yeh hai hamaara Call To Action section. Ek sundar dark green background mein likha hai — "Test Your Soil, Grow Better Crops". Neeche ek white button hai — "Start Soil Analysis" — jo aapko seedha analysis page par le jaata hai. Yeh bilkul free hai. Bas apni mitti ki NPK values daalo, aur AI poora farming plan bana deta hai.`,
+    label: 'Loss Recovery',
+    route: '/recovery',
+    sectionId: null,
+    title: '💊 Loss Recovery',
+    speech: `Yeh hai Loss Recovery Page. Agar aapki fasal ko koi nuksan hua hai — baarish se, keede se, ya bimari se — toh yeh page aapke kaam aata hai. Yahan AI aapko emergency farming solutions deta hai. Aap apni samasya describe karo, aur AI turant solution aur agla kadam batata hai. Mitti ka nuksan ho ya fasal ka, hum har situation mein aapke saath hain.`,
   },
   {
     step: 5,
-    label: 'Footer',
-    sectionId: 'section-footer',
-    title: '📋 Footer',
-    speech: `Yeh hai AgriSaar ka Footer. Yahan AgriSaar ka logo hai aur likhaa hai — "Smart Farming Assistant, Made with love for Farmers." Copyright 2026 AgriSaar. Hum farmers ke liye dedicated hain. Yeh tha AgriSaar ka poora parichay! Agar aapke koi sawaal hain, toh main yahan hoon. Mic button dabaayein aur puchhein!`,
+    label: 'Bio-Fertilizer',
+    route: '/bio-inputs',
+    sectionId: null,
+    title: '🌿 Bio-Fertilizer',
+    speech: `Yeh hai Bio-Fertilizer Page. Yahan aap organic aur jaivik kheti ke baare mein jaante hain. Chemical fertilizers se mitti kharab hoti hai. Bio-fertilizers se mitti ka organic carbon badhta hai, fasal zyada healthy hoti hai, aur cost bhi kam hoti hai. Yahan aapko Jeevamrit, Beejamrit, aur doosre organic khad banane ke tarike bataye jaate hain — seedhe kheti mein istemal karne ke liye.`,
+  },
+  {
+    step: 6,
+    label: 'Profit Trees',
+    route: '/agroforestry',
+    sectionId: null,
+    title: '🌲 Profit Trees (Agroforestry)',
+    speech: `Yeh hai Agroforestry Page, jisse hum Profit Trees bhi kehte hain. Yahan AI aapko batata hai ki apne khet mein kaun se ped lagaye jo lambe samay mein zyada munafa dein. Jaise ki Sagwan, Poplar, Bamboo, ya Mahua. Yeh ped mitti ko rok ke rakhte hain, carbon absorb karte hain, aur 5 se 10 saal baad badi kamai dete hain. Khet mein fasal ke saath-saath ped lagana ek bahut smart faisa la hai.`,
+  },
+  {
+    step: 7,
+    label: 'Direct Market',
+    route: '/b2b',
+    sectionId: null,
+    title: '🤝 Direct Market (B2B)',
+    speech: `Yeh hai Direct Market Page. Yahan aap apni fasal seedha buyers ko bech sakte hain — bina beechiye ke. Aksar beechiya bahut kam daam deta hai aur zyada munafa khud rakhta hai. Yahaan B2B yaani Business to Business connection milti hai — restaurants, processor companies, aur bulk buyers seedha aapki fasal kharidenge. Isse aapko zyada daam milega aur fasal jaldi bikegi.`,
+  },
+  {
+    step: 8,
+    label: 'Mandi Rates',
+    route: '/market',
+    sectionId: null,
+    title: '📈 Mandi Rates',
+    speech: `Yeh hai Market Insights Page, jahan aapko real-time mandi prices milti hain. Aaj gehu ka bhav kya hai? Sarson ka? Soybean ka? Sab yahan milega. AI yeh bhi predict karta hai ki agle hafte daam badhenge ya ghattenge — taaki aap sahi samay par fasal bech sakein. Sahi samay par bechne se lakhs ka fark pad sakta hai.`,
+  },
+  {
+    step: 9,
+    label: 'Schemes',
+    route: '/schemes',
+    sectionId: null,
+    title: '🏛️ Govt Schemes',
+    speech: `Yeh hai Government Schemes Page. Yahan India ki sabse important sarkari yojanaon ki jaankari di gayi hai — jaise PM Kisan Samman Nidhi, Fasal Bima Yojana, Kisan Credit Card, aur aur bhi bahut kuch. Kitne paise milte hain, kaise apply karein, kya documents chahiye — sab kuch yahan clearly bataya gaya hai. Bahut se kisan in yojanaon ka laabh nahi uthate kyunki unhe jaankari nahi hoti. Ab aapko koi kami nahi hogi! Yeh tha AgriSaar ka poora guided tour. Main yahan hoon, koi bhi sawaal puchho mic button dabaake!`,
   },
 ];
 
@@ -61,6 +94,7 @@ export default function FarmerVoiceAssistant() {
   const [tooltip, setTooltip] = useState('Namaste! Tap to start tour.');
   const [showTourPanel, setShowTourPanel] = useState(false);
   const [activeTourStep, setActiveTourStep] = useState(null); // null | step number
+  const [userInteracted, setUserInteracted] = useState(false); // only speak after user clicks
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -99,27 +133,29 @@ export default function FarmerVoiceAssistant() {
 
   // ─── Guided Tour: Run a Step ─────────────────────────────────────────────
   const runTourStep = useCallback((stepNum) => {
-    // Only show tour on home page
-    if (location.pathname !== '/') {
-      navigate('/');
-      setTimeout(() => runTourStep(stepNum), 800);
-      return;
-    }
-
-    const step = HOME_TOUR_STEPS.find(s => s.step === stepNum);
+    const step = TOUR_STEPS.find(s => s.step === stepNum);
     if (!step) return;
 
     setActiveTourStep(stepNum);
     setTooltip(step.title);
 
-    // Scroll to section
-    const el = document.getElementById(step.sectionId);
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    // Navigate to the step's route if not already there
+    if (location.pathname !== step.route) {
+      navigate(step.route);
+      setTimeout(() => {
+        // After navigation, scroll to section if any
+        if (step.sectionId) {
+          const el = document.getElementById(step.sectionId);
+          if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }, 800);
+    } else if (step.sectionId) {
+      const el = document.getElementById(step.sectionId);
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 
     // Speak narration
-    const isLastStep = stepNum === HOME_TOUR_STEPS.length;
+    const isLastStep = stepNum === TOUR_STEPS.length;
     const farewell = isLastStep
       ? ' Dhanyawad! AgriSaar mein aapka swagat hai. Agar aur koi sawaal ho toh mic button click karein — main yahan hoon, aapka sahayak!'
       : '';
@@ -127,7 +163,7 @@ export default function FarmerVoiceAssistant() {
     speak(step.speech + farewell, () => {
       if (isLastStep) {
         setActiveTourStep(null);
-        setTooltip('Tour complete! Ask me anything. 🎉');
+        setTooltip('Tour complete! 🎉 Ask me anything.');
       }
     });
   }, [location.pathname, navigate, speak]);
@@ -153,6 +189,7 @@ export default function FarmerVoiceAssistant() {
   }, [location.pathname, analysis]);
 
   useEffect(() => {
+    if (!userInteracted) return; // don't auto-speak on refresh / first load
     if (location.pathname === '/') return; // handled by tour
     if (lastSpokenPath.current === location.pathname) return;
     const summary = getPageSummary();
@@ -160,7 +197,7 @@ export default function FarmerVoiceAssistant() {
       const t = setTimeout(() => { speak(summary); lastSpokenPath.current = location.pathname; }, 1200);
       return () => clearTimeout(t);
     }
-  }, [location.pathname, getPageSummary, speak]);
+  }, [location.pathname, getPageSummary, speak, userInteracted]);
 
   // ─── Voice Command Handler ────────────────────────────────────────────────
   const processQuery = async (query) => {
@@ -202,6 +239,7 @@ export default function FarmerVoiceAssistant() {
   };
 
   const toggleMic = () => {
+    setUserInteracted(true); // mark that user has deliberately interacted
     if (isListening) recognitionRef.current?.stop();
     else { synthesisRef.current?.cancel(); recognitionRef.current?.start(); }
   };
@@ -244,13 +282,13 @@ export default function FarmerVoiceAssistant() {
             {/* Tour Instruction */}
             <div className="px-5 py-3 bg-emerald-50 border-b border-emerald-100">
               <p className="text-[11px] text-emerald-800 font-semibold leading-snug">
-                Click a number to hear the explanation of that section. The page will auto-scroll!
+                Click a number — the assistant will navigate to that page and explain it line by line!
               </p>
             </div>
 
             {/* Tour Step Buttons */}
-            <div className="p-4 flex flex-col gap-2">
-              {HOME_TOUR_STEPS.map((step) => {
+            <div className="p-3 flex flex-col gap-1.5 max-h-[420px] overflow-y-auto">
+              {TOUR_STEPS.map((step) => {
                 const isActive = activeTourStep === step.step;
                 return (
                   <button
