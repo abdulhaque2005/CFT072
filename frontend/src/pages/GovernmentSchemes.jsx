@@ -135,7 +135,7 @@ export default function GovernmentSchemes() {
               >
                 Government <br/>
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-300">Benefit Nexus.</span>
-              </h1>
+              </motion.h1>
 
               <motion.p 
                 initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.4 }}
@@ -361,7 +361,7 @@ export default function GovernmentSchemes() {
               </motion.div>
             );
           })}
-        </div>
+        </motion.div>
 
         {/* Empty State */}
         {filteredSchemes.length === 0 && (
