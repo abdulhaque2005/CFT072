@@ -110,7 +110,6 @@ const navItemStyles = `
 
 function UserProfile() {
   const [isOpen, setIsOpen] = useState(false);
-  const [showLanguages, setShowLanguages] = useState(false);
   const { theme, toggleTheme } = useTheme();
   const { user, logout } = useAuth();
   const menuRef = useRef(null);
@@ -135,16 +134,7 @@ function UserProfile() {
     coins: 2450
   };
 
-  const getCurrentLangLabel = () => {
-    const match = document.cookie.match(/googtrans=\/en\/([a-z]{2})/);
-    const code = match ? match[1] : 'en';
-    return languages.find(l => l.code === code)?.label || 'English';
-  };
 
-  const changeLanguage = (langCode) => {
-    document.cookie = `googtrans=/en/${langCode}; path=/;`;
-    window.location.reload();
-  };
 
   return (
     <div className="relative" ref={menuRef}>
@@ -166,7 +156,7 @@ function UserProfile() {
 
       {isOpen && (
         <>
-          <div className="fixed inset-0 z-40 bg-black/5 dark:bg-black/20" onClick={() => { setIsOpen(false); setShowLanguages(false); }} />
+          <div className="fixed inset-0 z-40 bg-black/5 dark:bg-black/20" onClick={() => setIsOpen(false)} />
           <div className="absolute right-0 mt-3 w-72 bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl rounded-[2rem] shadow-[0_20px_50px_rgba(0,0,0,0.15)] border border-gray-100 dark:border-gray-800 overflow-hidden z-50 animate-in fade-in slide-in-from-top-2 duration-300">
             {/* Header / Identity */}
             <div className="p-5 bg-gradient-to-br from-primary-50 to-emerald-50/30 dark:from-primary-900/10 dark:to-emerald-900/5 border-b border-gray-100 dark:border-gray-800">
@@ -197,30 +187,12 @@ function UserProfile() {
 
             {/* Menu Items */}
             <div className="p-2">
-              {!showLanguages ? (
-                <>
                   <button className="w-full flex items-center justify-between p-3 rounded-xl hover:bg-primary-50 text-gray-600 hover:text-primary-700 transition-colors group">
                     <div className="flex items-center gap-3">
                       <div className="p-2 bg-gray-50 rounded-lg group-hover:bg-primary-100 transition-colors">
                         <Award className="w-4 h-4 text-gray-500 group-hover:text-primary-600" />
                       </div>
                       <span className="text-sm font-bold">My Growth Chart</span>
-                    </div>
-                    <ChevronRight className="w-4 h-4 opacity-40" />
-                  </button>
-
-                  <button
-                    onClick={() => setShowLanguages(true)}
-                    className="w-full flex items-center justify-between p-3 rounded-xl hover:bg-primary-50 text-gray-600 hover:text-primary-700 transition-colors group"
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="p-2 bg-gray-50 rounded-lg group-hover:bg-primary-100 transition-colors">
-                        <Globe className="w-4 h-4 text-gray-500 group-hover:text-primary-600" />
-                      </div>
-                      <div>
-                        <span className="text-sm font-bold">Language Setting</span>
-                        <p className="text-[10px] text-gray-400 font-bold uppercase">{getCurrentLangLabel()}</p>
-                      </div>
                     </div>
                     <ChevronRight className="w-4 h-4 opacity-40" />
                   </button>
@@ -253,32 +225,6 @@ function UserProfile() {
                     </div>
                     <span className="text-sm font-bold">Logout</span>
                   </button>
-                </>
-              ) : (
-                <div className="animate-in slide-in-from-right-4 duration-300">
-                  <header className="flex items-center gap-2 p-3 border-b border-gray-50 mb-1">
-                    <button onClick={() => setShowLanguages(false)} className="p-1 hover:bg-gray-100 rounded-lg">
-                      <X className="w-4 h-4 text-gray-400" />
-                    </button>
-                    <span className="text-[11px] font-black text-gray-400 uppercase tracking-widest">Select Language</span>
-                  </header>
-                  <div className="max-h-[250px] overflow-y-auto pr-1 custom-scrollbar">
-                    {languages.map((lang) => (
-                      <button
-                        key={lang.code}
-                        onClick={() => changeLanguage(lang.code)}
-                        className={`w-full text-left px-4 py-2.5 rounded-xl text-sm font-bold transition-all mb-0.5
-                          ${getCurrentLangLabel() === lang.label
-                            ? 'text-primary-700 bg-primary-50'
-                            : 'text-gray-500 hover:bg-gray-50 hover:text-gray-900'
-                          }`}
-                      >
-                        {lang.label}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
             </div>
           </div>
         </>
@@ -287,6 +233,73 @@ function UserProfile() {
   );
 }
 
+/* ── Standalone Language Selector ── */
+function LanguageSelector() {
+  const [isOpen, setIsOpen] = useState(false);
+  const menuRef = useRef(null);
+
+  const getCurrentLangLabel = () => {
+    const match = document.cookie.match(/googtrans=\/en\/([a-z]{2})/);
+    const code = match ? match[1] : 'en';
+    return languages.find(l => l.code === code)?.label?.split(' ')[0] || 'EN';
+  };
+
+  const getCurrentCode = () => {
+    const match = document.cookie.match(/googtrans=\/en\/([a-z]{2})/);
+    return match ? match[1] : 'en';
+  };
+
+  const changeLanguage = (langCode) => {
+    document.cookie = `googtrans=/en/${langCode}; path=/;`;
+    window.location.reload();
+  };
+
+  return (
+    <div className="relative" ref={menuRef}>
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="flex items-center gap-1.5 p-2 px-3 rounded-full bg-blue-50 hover:bg-blue-100 dark:bg-blue-900/20 dark:hover:bg-blue-900/30 text-blue-600 dark:text-blue-400 transition-all active:scale-95 border border-blue-100 dark:border-blue-800/30 group"
+      >
+        <Globe className="w-4 h-4 group-hover:rotate-12 transition-transform" />
+        <span className="text-[11px] font-black uppercase tracking-wider hidden sm:inline">{getCurrentLangLabel()}</span>
+        <ChevronDown className={`w-3 h-3 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} />
+      </button>
+
+      {isOpen && (
+        <>
+          <div className="fixed inset-0 z-40" onClick={() => setIsOpen(false)} />
+          <div className="absolute right-0 mt-3 w-56 bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.15)] border border-gray-100 dark:border-gray-800 overflow-hidden z-50 animate-in fade-in slide-in-from-top-2 duration-200">
+            <div className="p-3 border-b border-gray-100 dark:border-gray-800 bg-blue-50/50 dark:bg-blue-900/10">
+              <div className="flex items-center gap-2">
+                <Globe className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                <span className="text-[11px] font-black text-gray-500 dark:text-gray-400 uppercase tracking-widest">Select Language</span>
+              </div>
+            </div>
+            <div className="max-h-[300px] overflow-y-auto p-1.5">
+              {languages.map((lang) => {
+                const active = getCurrentCode() === lang.code;
+                return (
+                  <button
+                    key={lang.code}
+                    onClick={() => changeLanguage(lang.code)}
+                    className={`w-full text-left px-3 py-2.5 rounded-xl text-sm font-bold transition-all mb-0.5 flex items-center justify-between
+                      ${active
+                        ? 'text-blue-700 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800/40'
+                        : 'text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white'
+                      }`}
+                  >
+                    {lang.label}
+                    {active && <span className="text-[10px] bg-blue-600 text-white px-2 py-0.5 rounded-full font-black">Active</span>}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
 /* ── Nav Link with real ripple + spring press ── */
 function NavItem({ path, label, Icon, isActive }) {
   const linkRef = useRef(null);
@@ -510,7 +523,8 @@ export default function Navbar() {
             </div>
 
             {/* ── Right side ── */}
-            <div className="flex items-center gap-3 shrink-0">
+            <div className="flex items-center gap-2.5 shrink-0">
+              <LanguageSelector />
               <NotificationBell />
               <UserProfile />
               <div id="google_translate_element" className="hidden" />

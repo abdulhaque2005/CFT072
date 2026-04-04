@@ -11,8 +11,8 @@ const DEFAULT_CROPS = ['Wheat', 'Rice', 'Cotton', 'Soybean', 'Mustard', 'Tomato'
 
 const CROP_IMAGES = {
   'Wheat': 'https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?auto=format&fit=crop&w=400&q=80',
-  'Rice': 'https://images.unsplash.com/photo-1536304993881-460346276dfc?auto=format&fit=crop&w=400&q=80',
-  'Cotton': 'https://images.unsplash.com/photo-1616431101491-554c0932ea40?auto=format&fit=crop&w=400&q=80',
+  'Rice': '/Rice.png',
+  'Cotton': '/cotton.png',
   'Soybean': 'https://images.unsplash.com/photo-1599586120429-48281b6f0ece?auto=format&fit=crop&w=400&q=80',
   'Mustard': 'https://images.unsplash.com/photo-1501004318855-fce63e0b0b6e?auto=format&fit=crop&w=400&q=80',
   'Tomato': 'https://images.unsplash.com/photo-1592924357228-91a4daadcfea?auto=format&fit=crop&w=400&q=80',
