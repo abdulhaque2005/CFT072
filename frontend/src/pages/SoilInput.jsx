@@ -5,6 +5,7 @@ import SoilForm from '../components/SoilForm';
 import UploadBox from '../components/UploadBox';
 import VoiceButton from '../components/VoiceButton';
 import { useSoil } from '../hooks/useSoil';
+import { useAgri } from '../context/AgriContext';
 
 const NUTRIENT_INFO = [
   {
@@ -122,6 +123,7 @@ export default function SoilInput() {
   const [expandedNutrient, setExpandedNutrient] = useState(null);
   const navigate = useNavigate();
   const { loading: apiLoading, analyze, getCrops, getFertilizer } = useSoil();
+  const { setAnalysis } = useAgri();
 
   const isProcessing = apiLoading || fileLoading;
 
@@ -141,13 +143,18 @@ export default function SoilInput() {
     if (soilResult) {
       const cropResult = await getCrops(numericData);
       const fertResult = await getFertilizer({ ...numericData, crop: numericData.crop });
+      
+      const combinedAnalysis = {
+        soil: soilResult,
+        crops: cropResult,
+        fertilizer: fertResult,
+        inputData: numericData
+      };
+      
+      setAnalysis(combinedAnalysis);
+      
       navigate('/analysis', {
-        state: {
-          soil: soilResult,
-          crops: cropResult,
-          fertilizer: fertResult,
-          inputData: numericData
-        }
+        state: combinedAnalysis
       });
     }
   };

@@ -26,7 +26,7 @@ export default function Home() {
   return (
     <div className="overflow-hidden bg-[#f8faf8]">
       {/* Premium Hero Section with Background Video */}
-      <section className="relative min-h-[85vh] flex items-center justify-center">
+      <section id="section-hero" className="relative min-h-[85vh] flex items-center justify-center">
         {/* Background Farming Video */}
         <div className="absolute inset-0 overflow-hidden w-full h-full bg-[#0a1a0c]">
           {/* Fallback image shown instantly while video loads */}
@@ -94,7 +94,7 @@ export default function Home() {
       </section>
 
       {/* Stats Section with Glassmorphism */}
-      <section className="py-12 bg-[#f8faf8]">
+      <section id="section-stats" className="py-12 bg-[#f8faf8]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 -mt-24 relative z-20">
             {stats.map((stat, i) => (
@@ -108,7 +108,7 @@ export default function Home() {
       </section>
 
       {/* Features Section */}
-      <section className="py-20 bg-[#f8faf8]">
+      <section id="section-features" className="py-20 bg-[#f8faf8]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900 flex items-center justify-center gap-3">
@@ -139,7 +139,7 @@ export default function Home() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-24">
+      <section id="section-cta" className="py-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="bg-gradient-to-br from-primary-900 via-primary-800 to-[#0a2e0d] rounded-[3rem] p-10 md:p-20 text-center shadow-2xl relative overflow-hidden">
             <div className="absolute top-0 right-0 opacity-10 transform translate-x-1/4 -translate-y-1/4">
@@ -159,7 +159,7 @@ export default function Home() {
         </div>
       </section>
 
-      <footer className="bg-[#0a1a0c] text-white py-12">
+      <footer id="section-footer" className="bg-[#0a1a0c] text-white py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="flex items-center gap-3">

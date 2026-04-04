@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react';
 import { Sprout, CalendarClock, Beaker, Ban } from 'lucide-react';
+import { useAgri } from '../context/AgriContext';
 import { getFertilizerPlan } from '../services/fertilizerApi';
-import FertilizerTable from '../components/FertilizerTable';
-import Loading from '../components/Loading';
-import Error from '../components/Error';
+// ... existing imports ...
 
 export default function FertilizerPlan() {
+  const { setAnalysis } = useAgri();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -33,6 +33,7 @@ export default function FertilizerPlan() {
       // interceptor strips response.data → res = { success, data, message }
       const result = res.data || res;
       setData(result);
+      setAnalysis({ fertilizer: result });
     } catch (err) {
       console.error('Fertilizer load error:', err);
       setError(err.message);

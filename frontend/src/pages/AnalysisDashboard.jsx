@@ -1,14 +1,21 @@
+import { useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Download, AlertTriangle, Cpu, Wheat, FlaskConical, Sprout } from 'lucide-react';
+import { useAgri } from '../context/AgriContext';
 import SoilHealthCard from '../components/SoilHealthCard';
-import CropCard from '../components/CropCard';
-import FertilizerTable from '../components/FertilizerTable';
-import SoilChart from '../components/SoilChart';
+// ... existing imports ...
 
 export default function AnalysisDashboard() {
   const location = useLocation();
   const navigate = useNavigate();
+  const { setAnalysis } = useAgri();
   const state = location.state;
+
+  useEffect(() => {
+    if (state) {
+      setAnalysis(state);
+    }
+  }, [state, setAnalysis]);
 
   if (!state || !state.soil) {
     return (

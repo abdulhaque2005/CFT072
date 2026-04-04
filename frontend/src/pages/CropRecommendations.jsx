@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react';
 import { Wheat, CheckCircle2, TrendingUp, DollarSign } from 'lucide-react';
+import { useAgri } from '../context/AgriContext';
 import { getCrops } from '../services/cropApi';
-import CropCard from '../components/CropCard';
-import Loading from '../components/Loading';
-import Error from '../components/Error';
+// ... existing imports ...
 
 export default function CropRecommendations() {
+  const { setAnalysis } = useAgri();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -33,6 +33,7 @@ export default function CropRecommendations() {
       // interceptor strips response.data → res = { success, data, message }
       const result = res.data || res;
       setData(result);
+      setAnalysis({ crops: result });
     } catch (err) {
       console.error('Crop load error:', err);
       setError(err.message);
