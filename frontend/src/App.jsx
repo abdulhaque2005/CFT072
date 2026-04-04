@@ -33,6 +33,10 @@ function App() {
               <Route path="/analysis" element={<AnalysisDashboard />} />
               <Route path="/crops" element={<CropRecommendations />} />
               <Route path="/fertilizer" element={<FertilizerPlan />} />
+              <Route path="/bio-inputs" element={<BioFertilizer />} />
+              <Route path="/recovery" element={<LossRecovery />} />
+              <Route path="/agroforestry" element={<ProfitTrees />} />
+              <Route path="/b2b" element={<DirectMarket />} />
               <Route path="/weather" element={<WeatherPage />} />
               <Route path="/market" element={<MarketInsights />} />
               <Route path="/schemes" element={<GovernmentSchemes />} />
@@ -46,6 +50,7 @@ function App() {
             </Routes>
           </main>
           <FarmerVoiceAssistant />
+>>>>>>> 649c2b1ba4b238307e98856087c7ebe15980581f
           <Toaster
             position="bottom-right"
             toastOptions={{
@@ -54,8 +59,13 @@ function App() {
             }}
           />
         </div>
+<<<<<<< HEAD
+      </AuthProvider>
+    </Router>
+=======
       </Router>
     </AgriProvider>
+>>>>>>> 649c2b1ba4b238307e98856087c7ebe15980581f
   );
 }
 

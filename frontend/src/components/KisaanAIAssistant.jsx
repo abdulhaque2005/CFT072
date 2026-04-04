@@ -1,10 +1,15 @@
 import { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Mic, MicOff, Loader2, X, MessageSquare, Volume2, VolumeX, Send, MapPin } from 'lucide-react';
+import { toast } from 'react-hot-toast';
+import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 import useLocation from '../hooks/useLocation';
 import VoiceInput from './VoiceInput';
 
 export default function KisaanAIAssistant() {
+  const { user } = useAuth();
+  const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const [listening, setListening] = useState(false);
   const [speaking, setSpeaking] = useState(false);
@@ -293,7 +298,14 @@ export default function KisaanAIAssistant() {
       {/* Floating Button */}
       {!isOpen && (
         <button
-          onClick={() => setIsOpen(true)}
+          onClick={() => {
+            if (!user) {
+              toast.error('Bhaiya, AI Assistant ke liye pehle Login karein! 🙏');
+              navigate('/login');
+              return;
+            }
+            setIsOpen(true);
+          }}
           className="group relative flex items-center"
         >
           <div className="absolute right-full mr-4 bg-white px-4 py-2 rounded-xl shadow-lg border border-primary-100 opacity-0 group-hover:opacity-100 transition-all duration-300 translate-x-4 group-hover:translate-x-0 whitespace-nowrap hidden sm:block">

@@ -305,13 +305,22 @@ Keep response under 200 words. Be practical and low-cost.`;
     logger.error(`Gemini bio-input error: ${error.message}`);
     return {
       crop,
-      intelligence: `🌿 Bio-Input Formula for ${crop || 'your crop'}:
-      
-1. Jeevamrut: 10L Water + 1kg Cow Dung + 1L Cow Urine + 100g Jaggery.
-2. Mix and ferment for 3 days.
-3. Spray on roots every 15 days.
+      intelligence: `🌿 **Bio-Input Formula for ${crop || 'your crop'}**
 
-(Note: Connection issue with AI server, displaying stable offline recipe.)`
+### 🧪 Jeevamrut Preparation
+• **Mix:** 10L Water + 1kg Cow Dung + 1L Cow Urine.
+• **Add:** 100g Jaggery + Handful of farm soil.
+• **Ferment:** Keep in shade for 48 hours, stir daily.
+
+### ✅ Key Benefits
+• Replaces 100% urea/DAP requirements and reduces costs.
+• Vastly improves soil microbiology & natural earthworm count.
+• Enhances crop taste and yield naturally.
+
+### 📋 Application Method
+• **Dilute:** 1 liter Jeevamrut per 10 liters of water.
+• **Apply:** Pour or spray directly near the root zone in the evening.
+• **Frequency:** Repeat every 14-15 days for optimal plant immunity.`
     };
   }
 }

@@ -107,13 +107,28 @@ const navItemStyles = `
 function UserProfile() {
   const [isOpen, setIsOpen] = useState(false);
   const [showLanguages, setShowLanguages] = useState(false);
+  const { theme, toggleTheme } = useTheme();
+  const { user, logout } = useAuth();
   const menuRef = useRef(null);
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    setIsOpen(false);
+    try {
+      await logout();
+      toast.success('Logged out successfully');
+      navigate('/login', { replace: true });
+    } catch (error) {
+      console.error('Logout error:', error);
+      toast.error('Logout failed. Please try again.');
+    }
+  };
 
   const mockUser = {
-    name: 'Ramesh Patel',
-    email: 'kisan.ramesh@agrisaar.com',
-    coins: 2450,
-    avatar: 'RP'
+    name: user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'Kisan User',
+    email: user?.email || 'kisan@agrisaar.com',
+    avatar: (user?.user_metadata?.full_name?.[0] || user?.email?.[0] || 'K').toUpperCase(),
+    coins: 2450
   };
 
   const getCurrentLangLabel = () => {
@@ -131,7 +146,7 @@ function UserProfile() {
     <div className="relative" ref={menuRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 p-1 pr-3 rounded-full bg-white border border-gray-200 hover:border-primary-300 hover:shadow-md transition-all active:scale-95 group"
+        className="flex items-center gap-2 p-1 pr-3 rounded-full bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 hover:border-primary-300 dark:hover:border-primary-700 hover:shadow-md transition-all active:scale-95 group"
       >
         <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary-600 to-primary-500 flex items-center justify-center text-white text-xs font-black shadow-sm group-hover:scale-105 transition-transform">
           {mockUser.avatar}
@@ -139,25 +154,25 @@ function UserProfile() {
         <div className="hidden sm:block text-left">
           <p className="text-[10px] font-black text-gray-400 uppercase tracking-wider leading-none mb-0.5">My Profile</p>
           <div className="flex items-center gap-1">
-            <span className="text-xs font-bold text-gray-700">{mockUser.name}</span>
-            <ChevronDown className={`w-3 h-3 text-gray-400 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} />
+            <span className="text-xs font-bold text-gray-700 dark:text-gray-200">{mockUser.name}</span>
+            <ChevronDown className={`w-3 h-3 text-gray-400 dark:text-gray-500 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} />
           </div>
         </div>
       </button>
 
       {isOpen && (
         <>
-          <div className="fixed inset-0 z-40 bg-black/5" onClick={() => { setIsOpen(false); setShowLanguages(false); }} />
-          <div className="absolute right-0 mt-3 w-72 bg-white/95 backdrop-blur-xl rounded-[2rem] shadow-[0_20px_50px_rgba(0,0,0,0.15)] border border-gray-100 overflow-hidden z-50 animate-in fade-in slide-in-from-top-2 duration-300">
+          <div className="fixed inset-0 z-40 bg-black/5 dark:bg-black/20" onClick={() => { setIsOpen(false); setShowLanguages(false); }} />
+          <div className="absolute right-0 mt-3 w-72 bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl rounded-[2rem] shadow-[0_20px_50px_rgba(0,0,0,0.15)] border border-gray-100 dark:border-gray-800 overflow-hidden z-50 animate-in fade-in slide-in-from-top-2 duration-300">
             {/* Header / Identity */}
-            <div className="p-5 bg-gradient-to-br from-primary-50 to-emerald-50/30 border-b border-gray-100">
+            <div className="p-5 bg-gradient-to-br from-primary-50 to-emerald-50/30 dark:from-primary-900/10 dark:to-emerald-900/5 border-b border-gray-100 dark:border-gray-800">
               <div className="flex items-center gap-4 mb-4">
-                <div className="w-12 h-12 rounded-2xl bg-white flex items-center justify-center text-primary-600 font-black text-lg shadow-sm border border-primary-100">
+                <div className="w-12 h-12 rounded-2xl bg-white dark:bg-gray-800 flex items-center justify-center text-primary-600 dark:text-primary-400 font-black text-lg shadow-sm border border-primary-100 dark:border-primary-900/30">
                   {mockUser.avatar}
                 </div>
                 <div>
-                  <h4 className="font-black text-gray-900 leading-none">{mockUser.name}</h4>
-                  <p className="text-[11px] text-gray-500 font-bold mt-1">{mockUser.email}</p>
+                  <h4 className="font-black text-gray-900 dark:text-white leading-none">{mockUser.name}</h4>
+                  <p className="text-[11px] text-gray-500 dark:text-gray-400 font-bold mt-1">{mockUser.email}</p>
                 </div>
               </div>
 
@@ -206,25 +221,33 @@ function UserProfile() {
                     <ChevronRight className="w-4 h-4 opacity-40" />
                   </button>
 
-                  <div className="flex items-center justify-between p-3 rounded-xl hover:bg-gray-50 text-gray-600 transition-colors">
+                  <div 
+                    onClick={toggleTheme}
+                    className="flex items-center justify-between p-3 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-300 transition-colors cursor-pointer group"
+                  >
                     <div className="flex items-center gap-3">
-                      <div className="p-2 bg-gray-50 rounded-lg">
-                        <Moon className="w-4 h-4 text-gray-500" />
+                      <div className="p-2 bg-gray-50 dark:bg-gray-800 rounded-lg group-hover:bg-primary-100 dark:group-hover:bg-primary-900/30 transition-colors">
+                        {theme === 'dark' ? (
+                          <Sun className="w-4 h-4 text-yellow-500" />
+                        ) : (
+                          <Moon className="w-4 h-4 text-gray-500" />
+                        )}
                       </div>
-                      <span className="text-sm font-bold">Dark Mode</span>
+                      <span className="text-sm font-bold">{theme === 'dark' ? 'Light Mode' : 'Dark Mode'}</span>
                     </div>
-                    <div className="w-10 h-5 bg-gray-200 rounded-full relative p-1 cursor-pointer">
-                      <div className="w-3 h-3 bg-white rounded-full shadow-sm" />
+                    <div className={`w-10 h-5 rounded-full relative p-1 transition-colors duration-300 ${theme === 'dark' ? 'bg-primary-600' : 'bg-gray-200'}`}>
+                      <div className={`w-3 h-3 bg-white rounded-full shadow-sm transition-transform duration-300 ${theme === 'dark' ? 'translate-x-5' : 'translate-x-0'}`} />
                     </div>
                   </div>
 
-                  <button className="w-full flex items-center justify-between p-3 rounded-xl hover:bg-red-50 text-gray-500 hover:text-red-600 transition-colors group mt-2">
-                    <div className="flex items-center gap-3">
-                      <div className="p-2 bg-gray-50 rounded-lg group-hover:bg-red-100 transition-colors">
-                        <LogOut className="w-4 h-4 text-gray-400 group-hover:text-red-500" />
-                      </div>
-                      <span className="text-sm font-bold">Logout</span>
+                  <button 
+                    onClick={handleLogout}
+                    className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-red-50 dark:hover:bg-red-900/10 text-red-600 transition-colors group"
+                  >
+                    <div className="p-2 bg-red-50 dark:bg-red-900/20 rounded-lg group-hover:bg-red-100 transition-colors">
+                      <LogOut className="w-4 h-4" />
                     </div>
+                    <span className="text-sm font-bold">Logout</span>
                   </button>
                 </>
               ) : (
@@ -450,7 +473,7 @@ export default function Navbar() {
       {/* Inject custom styles once */}
       <style>{navItemStyles}</style>
 
-      <nav className="sticky top-0 w-full z-50 bg-white/95 backdrop-blur-xl border-b border-gray-200/80 shadow-[0_1px_12px_rgba(0,0,0,0.06)]">
+      <nav className="sticky top-0 w-full z-50 bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl border-b border-gray-200/80 dark:border-gray-800 shadow-[0_1px_12px_rgba(0,0,0,0.06)] transition-colors duration-500">
         <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
 
@@ -460,10 +483,10 @@ export default function Navbar() {
                 <Sprout className="w-5 h-5 text-white" />
               </div>
               <div className="leading-tight">
-                <span className="text-xl font-black tracking-tight text-gray-900">
-                  Agri<span className="text-primary-600">Saar</span>
+                <span className="text-xl font-black tracking-tight text-gray-900 dark:text-white">
+                  Agri<span className="text-primary-600 uppercase">Saar</span>
                 </span>
-                <span className="text-[9px] block text-primary-600/80 -mt-0.5 font-bold uppercase tracking-[0.15em]">
+                <span className="text-[9px] block text-primary-600/80 dark:text-primary-400 -mt-0.5 font-bold uppercase tracking-[0.15em]">
                   Smart Farming AI
                 </span>
               </div>
