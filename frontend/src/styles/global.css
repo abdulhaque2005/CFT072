@@ -109,3 +109,13 @@ iframe.goog-te-banner-frame {
 iframe[name="goog_te_banner"] {
   display: none !important;
 }
+
+/* SpeakButton sound wave animation */
+@keyframes soundWave {
+  0% { transform: scaleY(0.3); }
+  100% { transform: scaleY(1); }
+}
+
+/* No scrollbar utility */
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }

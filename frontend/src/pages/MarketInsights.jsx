@@ -294,26 +294,7 @@ export default function MarketInsights() {
                       </div>
                     </div>
 
-                    <button 
-                      onClick={(e) => {
-                        e.preventDefault();
-                        if ('speechSynthesis' in window) {
-                          window.speechSynthesis.cancel();
-                          const utterance = new SpeechSynthesisUtterance(speakText);
-                          const lang = getPageLanguage();
-                          utterance.lang = getSpeechLang(lang);
-                          utterance.rate = 0.9;
-                          const voices = window.speechSynthesis.getVoices();
-                          const v = voices.find(v => v.lang.startsWith(lang)) || voices.find(v => v.lang.includes('IN')) || voices[0];
-                          if (v) utterance.voice = v;
-                          window.speechSynthesis.speak(utterance);
-                        }
-                      }}
-                      className="shrink-0 flex items-center gap-2 px-4 py-3 bg-white/20 hover:bg-white/30 rounded-xl text-white backdrop-blur-xl border border-white/20 transition-all shadow-sm font-black text-xs uppercase tracking-widest"
-                      aria-label="Play Action Audio"
-                    >
-                      <Volume2 className="w-5 h-5" /> Listen
-                    </button>
+                    <SpeakButton text={speakText} label="Listen" size="md" />
                   </div>
                 </div>
 

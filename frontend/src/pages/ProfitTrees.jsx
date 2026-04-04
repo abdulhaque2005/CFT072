@@ -5,6 +5,7 @@ import api from '../services/api';
 import useLocation from '../hooks/useLocation';
 import Loading from '../components/Loading';
 import getPageLanguage, { getSpeechLang } from '../utils/getPageLanguage';
+import translateForSpeech from '../utils/translateForSpeech';
 
 const TREE_ASSETS = {
   'Teak (Sagwan)': {
@@ -46,8 +47,10 @@ export default function ProfitTrees() {
   const speakAdvice = () => {
     if ('speechSynthesis' in window && data) {
       window.speechSynthesis.cancel();
-      const utterance = new SpeechSynthesisUtterance(data.replace(/\*\*|_/g, ''));
       const lang = getPageLanguage();
+      const cleanText = data.replace(/\*\*|_/g, '');
+      const translated = translateForSpeech(cleanText, lang);
+      const utterance = new SpeechSynthesisUtterance(translated);
       utterance.lang = getSpeechLang(lang);
       utterance.rate = 0.95;
       const voices = window.speechSynthesis.getVoices();

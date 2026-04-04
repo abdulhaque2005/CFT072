@@ -1,10 +1,12 @@
 import { useState, useRef, useEffect } from 'react';
-import { Volume2, Square, Loader2 } from 'lucide-react';
+import { Volume2, Square, Loader2, Pause } from 'lucide-react';
 import getPageLanguage, { getSpeechLang } from '../utils/getPageLanguage';
+import translateForSpeech from '../utils/translateForSpeech';
 
 /**
- * Reusable "Listen" button — calls ElevenLabs TTS via backend (Rachel female voice).
- * Usage: <SpeakButton text="Some text to speak" />
+ * Premium "Listen" button — speaks AI text in user's chosen website language.
+ * Auto-translates English farming terms to Hindi/Marathi/etc.
+ * Shows animated sound waves while playing.
  */
 export default function SpeakButton({ text, label = 'Listen', size = 'sm' }) {
   const [status, setStatus] = useState('idle'); // idle | loading | playing
@@ -12,29 +14,23 @@ export default function SpeakButton({ text, label = 'Listen', size = 'sm' }) {
   const urlRef = useRef(null);
   const abortRef = useRef(null);
 
-  // Cleanup on unmount
   useEffect(() => {
     return () => stopAll();
   }, []);
 
   const stopAll = () => {
-    // Stop HTML5 audio
     if (audioRef.current) {
       audioRef.current.onplay = null;
       audioRef.current.onended = null;
       audioRef.current.onerror = null;
-      audioRef.current.onpause = null;
       audioRef.current.pause();
       audioRef.current = null;
     }
-    // Abort fetch if in progress
     if (abortRef.current) {
       abortRef.current.abort();
       abortRef.current = null;
     }
-    // Stop browser speech fallback
     window.speechSynthesis?.cancel();
-    // Revoke URL
     if (urlRef.current) {
       URL.revokeObjectURL(urlRef.current);
       urlRef.current = null;
@@ -43,17 +39,14 @@ export default function SpeakButton({ text, label = 'Listen', size = 'sm' }) {
   };
 
   const handleClick = async () => {
-    // If playing or loading, stop everything
     if (status === 'playing' || status === 'loading') {
       stopAll();
       return;
     }
-
     if (!text) return;
 
     try {
       setStatus('loading');
-      
       const controller = new AbortController();
       abortRef.current = controller;
 
@@ -62,22 +55,10 @@ export default function SpeakButton({ text, label = 'Listen', size = 'sm' }) {
       audioRef.current = audio;
 
       audio.onplay = () => setStatus('playing');
-      audio.onended = () => {
-        audioRef.current = null;
-        setStatus('idle');
-      };
-      audio.onerror = () => {
-        console.error('TTS streaming failed');
-        audioRef.current = null;
-        setStatus('idle');
-        fallbackSpeak(text);
-      };
-
-      // Native browser streaming! Starts playing immediately.
+      audio.onended = () => { audioRef.current = null; setStatus('idle'); };
+      audio.onerror = () => { audioRef.current = null; setStatus('idle'); fallbackSpeak(text); };
       await audio.play();
-    } catch (error) {
-      console.error(`Gemini voice error [Model: gemini-1.5-flash]: ${error.message}`);
-      if (error.stack) console.error(error.stack);
+    } catch {
       setStatus('idle');
       fallbackSpeak(text);
     }
@@ -87,24 +68,19 @@ export default function SpeakButton({ text, label = 'Listen', size = 'sm' }) {
     if ('speechSynthesis' in window) {
       window.speechSynthesis.cancel();
       const clean = txt.replace(/[\u{1F300}-\u{1FAD6}\u{2600}-\u{27BF}#*_\[\]()]/gu, '').replace(/\n+/g, '. ');
-      const utter = new SpeechSynthesisUtterance(clean);
-      utter.rate = 0.95;
-
-      // AUTO-DETECT page language from Google Translate
+      
+      // Detect page language and TRANSLATE the text
       const pageLang = getPageLanguage();
-      const speechLang = getSpeechLang(pageLang);
-      utter.lang = speechLang;
+      const translated = translateForSpeech(clean, pageLang);
+      
+      const utter = new SpeechSynthesisUtterance(translated);
+      utter.rate = 0.95;
+      utter.lang = getSpeechLang(pageLang);
 
       const voices = window.speechSynthesis.getVoices();
-      const langCode = pageLang; // 'hi', 'bn', 'ta', etc.
-
-      // Find voice matching the detected language
-      let bestVoice = voices.find(v => v.lang.startsWith(langCode));
-      // Fallback: any Indian voice
+      let bestVoice = voices.find(v => v.lang.startsWith(pageLang));
       if (!bestVoice) bestVoice = voices.find(v => v.lang.includes('IN'));
-      // Final fallback
       if (!bestVoice) bestVoice = voices[0];
-
       if (bestVoice) utter.voice = bestVoice;
       
       utter.onstart = () => setStatus('playing');
@@ -114,35 +90,47 @@ export default function SpeakButton({ text, label = 'Listen', size = 'sm' }) {
     }
   };
 
-  const sizeClasses = size === 'sm'
-    ? 'text-[11px] px-3 py-1.5 gap-1.5'
-    : 'text-xs px-4 py-2 gap-2';
+  // ─── RENDER ────────────────────────────────────
+  if (status === 'playing') {
+    return (
+      <button
+        onClick={handleClick}
+        className="inline-flex items-center gap-2 px-4 py-2 rounded-full font-black text-xs tracking-wider bg-red-50 text-red-600 border border-red-200 hover:bg-red-100 transition-all active:scale-95 shadow-sm select-none"
+      >
+        {/* Animated sound wave bars */}
+        <div className="flex items-end gap-[2px] h-4">
+          <span className="w-[3px] bg-red-500 rounded-full animate-[soundWave_0.5s_ease-in-out_infinite_alternate]" style={{ height: '40%', animationDelay: '0s' }} />
+          <span className="w-[3px] bg-red-500 rounded-full animate-[soundWave_0.5s_ease-in-out_infinite_alternate]" style={{ height: '80%', animationDelay: '0.15s' }} />
+          <span className="w-[3px] bg-red-400 rounded-full animate-[soundWave_0.5s_ease-in-out_infinite_alternate]" style={{ height: '60%', animationDelay: '0.3s' }} />
+          <span className="w-[3px] bg-red-500 rounded-full animate-[soundWave_0.5s_ease-in-out_infinite_alternate]" style={{ height: '100%', animationDelay: '0.1s' }} />
+          <span className="w-[3px] bg-red-400 rounded-full animate-[soundWave_0.5s_ease-in-out_infinite_alternate]" style={{ height: '50%', animationDelay: '0.25s' }} />
+        </div>
+        <Square className="w-3 h-3 fill-current" />
+        <span className="uppercase">Stop</span>
+      </button>
+    );
+  }
 
+  if (status === 'loading') {
+    return (
+      <button
+        onClick={handleClick}
+        className="inline-flex items-center gap-2 px-4 py-2 rounded-full font-bold text-xs bg-amber-50 text-amber-600 border border-amber-200 hover:bg-amber-100 transition-all select-none"
+      >
+        <Loader2 className="w-4 h-4 animate-spin" />
+        <span>Loading...</span>
+      </button>
+    );
+  }
+
+  // IDLE state — clean, inviting
   return (
     <button
       onClick={handleClick}
-      className={`inline-flex items-center ${sizeClasses} rounded-full font-bold transition-all active:scale-95 select-none ${
-        status === 'playing'
-          ? 'bg-red-100 text-red-600 hover:bg-red-200 shadow-sm'
-          : status === 'loading'
-            ? 'bg-amber-50 text-amber-600 hover:bg-amber-100'
-            : 'bg-primary-50 text-primary-700 hover:bg-primary-100 hover:text-primary-800'
-      }`}
+      className="inline-flex items-center gap-2 px-4 py-2 rounded-full font-black text-xs tracking-wider bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100 hover:shadow-md hover:shadow-emerald-100 transition-all active:scale-95 select-none group"
     >
-      {status === 'loading' ? (
-        <><Loader2 className="w-3.5 h-3.5 animate-spin" /> Loading... <span className="text-[9px] opacity-60">(click to cancel)</span></>
-      ) : status === 'playing' ? (
-        <>
-          <div className="flex items-center gap-0.5">
-            <span className="inline-block w-0.5 h-2 bg-red-500 rounded-full animate-pulse" style={{ animationDelay: '0ms' }} />
-            <span className="inline-block w-0.5 h-3 bg-red-600 rounded-full animate-pulse" style={{ animationDelay: '150ms' }} />
-            <span className="inline-block w-0.5 h-2 bg-red-400 rounded-full animate-pulse" style={{ animationDelay: '300ms' }} />
-          </div>
-          <Square className="w-3 h-3 fill-current" /> Stop
-        </>
-      ) : (
-        <><Volume2 className="w-3.5 h-3.5" /> {label}</>
-      )}
+      <Volume2 className="w-4 h-4 group-hover:scale-110 transition-transform" />
+      <span className="uppercase">{label}</span>
     </button>
   );
 }
