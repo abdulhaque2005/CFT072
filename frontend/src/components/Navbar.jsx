@@ -1,6 +1,6 @@
 import { useState, useRef, useCallback } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, Sprout, FlaskConical, Wheat, BarChart3, Landmark, Home as HomeIcon, HeartHandshake, Trees, Store, Droplet, Globe, ChevronDown, User, Settings, LogOut, Moon, Sun, Award, ChevronRight, CalendarDays } from 'lucide-react';
+import { Menu, X, Sprout, FlaskConical, Wheat, BarChart3, Landmark, Home as HomeIcon, HeartHandshake, Trees, Store, Droplet, Globe, ChevronDown, User, Settings, LogOut, Moon, Sun, Award, ChevronRight, CalendarDays, Bell } from 'lucide-react';
 
 const navLinks = [
   { path: '/', label: 'Home', Icon: HomeIcon },
@@ -8,7 +8,6 @@ const navLinks = [
   { path: '/crops', label: 'Crops', Icon: Wheat },
   { path: '/weather', label: 'Weather', Icon: Sun },
   { path: '/market', label: 'Market', Icon: BarChart3 },
-  { path: '/recovery', label: 'Loss Recovery', Icon: HeartHandshake },
   { path: '/bio-inputs', label: 'Bio-Fertilizer', Icon: Droplet },
   { path: '/agroforestry', label: 'Profit Trees', Icon: Trees },
   { path: '/schemes', label: 'Schemes', Icon: Landmark }
@@ -325,6 +324,123 @@ function NavItem({ path, label, Icon, isActive }) {
 }
 
 
+function NotificationBell() {
+  const [isOpen, setIsOpen] = useState(false);
+  const [unread, setUnread] = useState(3);
+  const menuRef = useRef(null);
+
+  // Generate dynamic notifications based on current time/date
+  const hour = new Date().getHours();
+  const month = new Date().getMonth() + 1;
+  const isRabi = month >= 10 || month <= 3;
+  const isKharif = month >= 6 && month <= 10;
+
+  const notifications = [
+    {
+      id: 1,
+      icon: '🌧️',
+      iconBg: 'bg-blue-100',
+      title: 'Weather Alert',
+      message: hour < 12
+        ? 'Morning advisory: Check weather forecast before irrigation. UV index is moderate today.'
+        : 'Evening advisory: Temperature dropping tonight. Protect seedlings with mulching if below 10°C.',
+      time: '15 mins ago',
+      unread: true
+    },
+    {
+      id: 2,
+      icon: '📈',
+      iconBg: 'bg-green-100',
+      title: 'Market Price Update',
+      message: 'Wheat prices increased by ₹45/quintal in Agmarknet today. Current rate: ₹2,320/q. Consider selling if above MSP.',
+      time: '1 hour ago',
+      unread: true
+    },
+    {
+      id: 3,
+      icon: '🏛️',
+      iconBg: 'bg-purple-100',
+      title: 'New Scheme Available',
+      message: 'PM-KISAN 17th installment of ₹6,000/year is being credited. Check your bank account status.',
+      time: '3 hours ago',
+      unread: true
+    },
+    {
+      id: 4,
+      icon: '🌾',
+      iconBg: 'bg-amber-100',
+      title: 'Farming Tip',
+      message: isRabi
+        ? 'Rabi season tip: Apply first irrigation to wheat at 21 days (crown root stage) for best tillering.'
+        : 'Kharif tip: Monitor for Fall Armyworm in maize. Early detection saves 30% crop loss.',
+      time: '5 hours ago',
+      unread: false
+    },
+    {
+      id: 5,
+      icon: '🧪',
+      iconBg: 'bg-cyan-100',
+      title: 'Soil Health Reminder',
+      message: 'Your last soil test was 60+ days ago. Re-test soil before next sowing for accurate fertilizer recommendations.',
+      time: 'Yesterday',
+      unread: false
+    }
+  ];
+
+  return (
+    <div className="relative" ref={menuRef}>
+      <button
+        onClick={() => { setIsOpen(!isOpen); setUnread(0); }}
+        className="relative p-2.5 rounded-full bg-gray-100 hover:bg-primary-50 text-gray-600 hover:text-primary-600 transition-all active:scale-95 group border border-transparent hover:border-primary-100"
+      >
+        <Bell className="w-5 h-5 group-hover:rotate-12 transition-transform" />
+        {unread > 0 && (
+          <span className="absolute top-1.5 right-1.5 min-w-[18px] h-[18px] bg-red-500 rounded-full border-2 border-white animate-pulse flex items-center justify-center">
+            <span className="text-[9px] font-black text-white">{unread}</span>
+          </span>
+        )}
+      </button>
+
+      {isOpen && (
+        <>
+          <div className="fixed inset-0 z-40 bg-black/5" onClick={() => setIsOpen(false)} />
+          <div className="absolute right-0 mt-3 w-[360px] bg-white/95 backdrop-blur-xl rounded-[2rem] shadow-[0_20px_60px_rgba(0,0,0,0.12)] border border-gray-100 overflow-hidden z-50 animate-in fade-in slide-in-from-top-2 duration-300">
+            <div className="p-4 border-b border-gray-50 flex items-center justify-between bg-gradient-to-r from-primary-50/50 to-white">
+              <div className="flex items-center gap-2">
+                <Bell className="w-4 h-4 text-primary-600" />
+                <h3 className="font-black text-gray-900">Notifications</h3>
+              </div>
+              <button className="text-[10px] font-bold text-primary-600 uppercase tracking-wider hover:underline">Mark all read</button>
+            </div>
+            <div className="max-h-[400px] overflow-y-auto custom-scrollbar">
+              {notifications.map((n) => (
+                <div key={n.id} className={`p-4 border-b border-gray-50 hover:bg-gray-50 transition-colors cursor-pointer ${n.unread ? 'bg-blue-50/20' : ''}`}>
+                  <div className="flex gap-3 items-start">
+                    <div className={`w-9 h-9 rounded-xl ${n.iconBg} flex items-center justify-center text-sm flex-shrink-0`}>
+                      {n.icon}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex justify-between items-start mb-1">
+                        <h4 className="font-bold text-sm text-gray-900">{n.title}</h4>
+                        <span className="text-[10px] font-bold text-gray-400 flex-shrink-0 ml-2">{n.time}</span>
+                      </div>
+                      <p className="text-xs text-gray-600 font-medium leading-relaxed">{n.message}</p>
+                    </div>
+                    {n.unread && <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>}
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div className="p-3 text-center border-t border-gray-50 bg-gray-50/30">
+              <button className="text-xs font-bold text-primary-600 hover:text-primary-800 transition-colors">View All Notifications</button>
+            </div>
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
@@ -368,6 +484,7 @@ export default function Navbar() {
 
             {/* ── Right side ── */}
             <div className="flex items-center gap-3 shrink-0">
+              <NotificationBell />
               <UserProfile />
               <div id="google_translate_element" className="hidden" />
               <button

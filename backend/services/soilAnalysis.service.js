@@ -91,13 +91,14 @@ OUTPUT STYLE: Structured, clean, pointwise, strictly in English. Keep it under 2
 }
 
 function generateFallbackAnalysis(data, soilType, score, nLevel, pLevel, kLevel) {
-  msg += `Aapki mitti **${soilType}** category mein hai (pH: ${data.ph}).\n\n`;
+  let msg = '';
+  msg += `Your soil is classified as **${soilType}** (pH: ${data.ph}).\n\n`;
 
-  if (nLevel === 'Low') msg += `⚠️ **Nitrogen kam hai** — fasal ki growth slow ho sakti hai. Urea ya organic compost use karein.\n`;
-  if (pLevel === 'Low') msg += `⚠️ **Phosphorus kam hai** — root development weak rahega. DAP fertilizer daalein.\n`;
-  if (kLevel === 'Low') msg += `⚠️ **Potassium kam hai** — fasal ki strength kam hogi. Potash use karein.\n`;
-  if (nLevel !== 'Low' && pLevel !== 'Low' && kLevel !== 'Low') msg += `✅ Sab nutrients balanced hain — acha hai!\n`;
+  if (nLevel === 'Low') msg += `⚠️ **Nitrogen is low** — crop growth may be slow. Use Urea or organic compost.\n`;
+  if (pLevel === 'Low') msg += `⚠️ **Phosphorus is low** — root development will be weak. Apply DAP fertilizer.\n`;
+  if (kLevel === 'Low') msg += `⚠️ **Potassium is low** — crop strength may be reduced. Apply Potash.\n`;
+  if (nLevel !== 'Low' && pLevel !== 'Low' && kLevel !== 'Low') msg += `✅ All nutrients are balanced — excellent condition!\n`;
 
-  msg += `\n**Suggestion:** Har 6 mahine mitti ki testing karwate rahein.`;
+  msg += `\n**Suggestion:** Get soil tested every 6 months for optimal results.`;
   return msg;
 }

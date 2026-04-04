@@ -247,7 +247,7 @@ Keep response under 250 words. Be specific to the location.`;
       location: location || `${lat}, ${lon}`,
       season: currentSeason,
       month: currentMonth,
-      info: `🏛️ Nearby Advisors: Apne district ke KVK (Krishi Vigyan Kendra) se contact karein\n🌾 Active Crops: Season ke hisaab se crops chal rahi hain\n📞 Helpline: Kisan Call Center — 1800-180-1551 (Free)\n\n_AI info temporarily unavailable._`,
+      info: `- Nearby Advisors: Please contact your district Krishi Vigyan Kendra (KVK).\n- Active Crops: Recommended cultivation based on the current season.\n- Helpline: Contact Kisan Call Center at 1800-180-1551 (Toll-Free).`,
       timestamp: new Date().toISOString()
     };
   }

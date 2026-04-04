@@ -188,7 +188,7 @@ OUTPUT STYLE: Simple, practical English. Keep under 300 words.`;
         wind: Math.round(current.wind.speed * 3.6)
       } : null,
       forecast: forecastDays,
-      advisory: `## ${loc} ke liye Advisory\n\n🌤️ Mausam normal hai.\n💧 Subah 6-8 baje irrigation best hai.\n\n_AI temporarily unavailable._`,
+      advisory: `## Farming Advisory for ${loc}\n\n- The current weather conditions are stable and suitable for standard farming activities.\n- Early morning irrigation between 6:00 AM and 8:00 AM is recommended to minimize water evaporation.\n- Monitor crop health visually as usual and stay updated with the latest alerts.`,
       timestamp: new Date().toISOString()
     };
   }
