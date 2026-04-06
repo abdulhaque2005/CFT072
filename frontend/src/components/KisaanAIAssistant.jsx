@@ -75,7 +75,8 @@ export default function KisaanAIAssistant() {
       const controller = new AbortController();
       abortRef.current = controller;
 
-      const streamUrl = `http://localhost:5000/api/tts/speak?text=${encodeURIComponent(text)}`;
+      const apiBase = import.meta.env.VITE_API_URL || '/api';
+      const streamUrl = `${apiBase}/tts/speak?text=${encodeURIComponent(text)}`;
       const audio = new Audio(streamUrl);
       audioRef.current = audio;
 
