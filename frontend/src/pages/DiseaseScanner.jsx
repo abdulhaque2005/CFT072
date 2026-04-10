@@ -2,46 +2,37 @@ import { useState, useRef } from 'react';
 import { Camera, UploadCloud, ScanLine, Leaf, AlertTriangle, ShieldCheck, ArrowRight, CheckCircle2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import SpeakButton from '../components/SpeakButton';
+import { detectDisease } from '../services/aiApi.js';
 
 export default function DiseaseScanner() {
   const [image, setImage] = useState(null);
   const [status, setStatus] = useState('idle'); // idle | scanning | result
+  const [result, setResult] = useState(null);
   const fileInputRef = useRef(null);
 
-  const MOCK_RESULT = {
-    disease: "Late Blight (Phytophthora infestans)",
-    confidence: "94%",
-    severity: "High",
-    action: "Immediate Action Required",
-    description: "Fungus-like pathogen affecting leaves and stems. Rapidly destroys crops in wet conditions.",
-    treatments: [
-      "Remove and destroy affected leaves immediately",
-      "Apply Copper fungicide (Mancozeb 75% WP) @ 2g/litre",
-      "Ensure proper plant spacing for air circulation"
-    ],
-    organic: [
-      "Spray Neem oil solution (5ml/litre water) every 7 days",
-      "Use Trichoderma viride enriched compost"
-    ]
-  };
-
-  const handleImageSelect = (e) => {
+  const handleImageSelect = async (e) => {
     const file = e.target.files?.[0];
     if (file) {
       const url = URL.createObjectURL(file);
       setImage(url);
       setStatus('scanning');
       
-      // Simulate scanning delay
-      setTimeout(() => {
+      try {
+        const data = await detectDisease(file);
+        setResult(data);
         setStatus('result');
         toast.success("AI Analysis Complete!");
-      }, 4000); // 4 seconds of cool scanning animation
+      } catch (error) {
+        console.error(error);
+        toast.error("Failed to analyze image. Please try again.");
+        setStatus('idle');
+      }
     }
   };
 
   const reset = () => {
     setImage(null);
+    setResult(null);
     setStatus('idle');
   };
 
@@ -52,7 +43,7 @@ export default function DiseaseScanner() {
           <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-green-100 mb-5 shadow-inner border-4 border-white">
             <ScanLine className="w-10 h-10 text-green-600 animate-pulse" />
           </div>
-          <h1 className="text-4xl md:text-5xl font-black text-gray-900 mb-4 tracking-tight">Kisaan Lens <span className="text-sm align-top bg-green-500 text-white px-2 py-1 rounded shadow">BETA</span></h1>
+          <h1 className="text-4xl md:text-5xl font-black text-gray-900 mb-4 tracking-tight">Kisaan Lens <span className="text-sm align-top bg-green-500 text-white px-2 py-1 rounded shadow">PRO</span></h1>
           <p className="text-gray-600 font-medium text-lg">Take a photo of your sick crop. AI will instantly identify the disease and suggest treatment.</p>
         </div>
 
@@ -80,7 +71,6 @@ export default function DiseaseScanner() {
             <input 
               type="file" 
               accept="image/*" 
-              capture="environment" 
               className="hidden" 
               ref={fileInputRef} 
               onChange={handleImageSelect}
@@ -94,7 +84,7 @@ export default function DiseaseScanner() {
               <ScanLine className="w-6 h-6 animate-pulse text-green-500" /> AI Vision Scanning Plant Details...
             </h2>
             <div className="relative w-full max-w-sm mx-auto h-80 rounded-2xl overflow-hidden shadow-2xl border-4 border-gray-800">
-              <img src={image} alt="Uploading..." className="w-full h-full object-cover" />
+              <img src={image} alt="Scanning..." className="w-full h-full object-cover" />
               <div className="absolute inset-0 bg-green-500/20" />
               
               {/* Laser Animation */}
@@ -111,10 +101,10 @@ export default function DiseaseScanner() {
           </div>
         )}
 
-        {status === 'result' && (
+        {status === 'result' && result && (
           <div className="bg-white rounded-[2rem] shadow-xl border border-gray-100 overflow-hidden animate-fade-in">
             {/* Header Result */}
-            <div className="bg-gradient-to-r from-red-600 to-rose-700 p-8 text-white relative">
+            <div className={`bg-gradient-to-r ${result.severity === 'High' ? 'from-red-600 to-rose-700' : 'from-orange-500 to-amber-600'} p-8 text-white relative`}>
               <div className="absolute top-0 right-0 opacity-10 transform translate-x-4 -translate-y-4">
                 <AlertTriangle className="w-48 h-48" />
               </div>
@@ -124,15 +114,15 @@ export default function DiseaseScanner() {
                 </div>
                 <div>
                   <div className="inline-flex bg-white/20 px-3 py-1 rounded-full text-xs font-bold mb-3 border border-white/30 backdrop-blur-sm">
-                    AI Confidence: {MOCK_RESULT.confidence}
+                    AI Confidence: {result.confidence}
                   </div>
-                  <h2 className="text-3xl md:text-4xl font-black mb-2">{MOCK_RESULT.disease}</h2>
+                  <h2 className="text-3xl md:text-4xl font-black mb-2">{result.disease}</h2>
                   <p className="text-red-100 font-medium text-lg flex items-center justify-center md:justify-start gap-2">
-                    <ShieldCheck className="w-5 h-5" /> Severity: {MOCK_RESULT.severity} — {MOCK_RESULT.action}
+                    <ShieldCheck className="w-5 h-5" /> Severity: {result.severity} — {result.action}
                   </p>
                   
                   <div className="mt-4">
-                    <SpeakButton text={`Ye bimari ${MOCK_RESULT.disease} hai. Isey theek karne ke liye: ${MOCK_RESULT.treatments[0]}`} label="Sunne ke liye click karein" />
+                    <SpeakButton text={`Ye bimari ${result.disease} hai. Isey theek karne ke liye: ${result.description} Suggestion: ${result.treatments[0]}`} label="Sunne ke liye click karein" />
                   </div>
                 </div>
               </div>
@@ -141,7 +131,7 @@ export default function DiseaseScanner() {
             {/* Analysis Data */}
             <div className="p-8">
               <p className="text-gray-600 font-medium text-lg leading-relaxed mb-8">
-                {MOCK_RESULT.description}
+                {result.description}
               </p>
 
               <div className="grid md:grid-cols-2 gap-8">
@@ -150,7 +140,7 @@ export default function DiseaseScanner() {
                     <ShieldCheck className="w-5 h-5" /> Chemical Treatment
                   </h3>
                   <ul className="space-y-4">
-                    {MOCK_RESULT.treatments.map((t, i) => (
+                    {result.treatments.map((t, i) => (
                       <li key={i} className="flex gap-3">
                         <CheckCircle2 className="w-5 h-5 text-blue-500 flex-shrink-0 mt-0.5" />
                         <span className="text-gray-700 font-medium">{t}</span>
@@ -167,7 +157,7 @@ export default function DiseaseScanner() {
                     <Leaf className="w-5 h-5" /> Organic Treatment
                   </h3>
                   <ul className="space-y-4">
-                    {MOCK_RESULT.organic.map((t, i) => (
+                    {result.organic.map((t, i) => (
                       <li key={i} className="flex gap-3">
                         <CheckCircle2 className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
                         <span className="text-gray-700 font-medium">{t}</span>
@@ -175,7 +165,7 @@ export default function DiseaseScanner() {
                     ))}
                   </ul>
                   <button className="mt-6 w-full text-center bg-green-600 text-white font-bold py-3 rounded-xl shadow-sm hover:bg-green-700 hover:shadow-lg transition-all">
-                    Order Neem Oil
+                    Order Organic Formula
                   </button>
                 </div>
               </div>

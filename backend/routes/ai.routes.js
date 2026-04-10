@@ -1,12 +1,15 @@
 import { Router } from 'express';
-import { getMasterAdvice, getRecoveryAdvice, getCalendar, getAgroforestry, getBioInput } from '../controllers/ai.controller.js';
+import multer from 'multer';
+import { getMasterAdvice, getRecoveryAdvice, getCalendar, getAgroforestry, getBioInput, getDiseaseDetection } from '../controllers/ai.controller.js';
 import { processVoiceQuery } from '../services/ai.service.js';
 import { getNearbyFarmingInfo } from '../services/ai.service.js';
 import { successResponse, errorResponse } from '../utils/responseFormatter.js';
 import { logger } from '../utils/logger.js';
 
 const router = Router();
+const upload = multer({ storage: multer.memoryStorage() });
 
+router.post('/detect-disease', upload.single('image'), getDiseaseDetection);
 router.post('/master', getMasterAdvice);
 router.post('/recovery', getRecoveryAdvice);
 router.post('/calendar', getCalendar);

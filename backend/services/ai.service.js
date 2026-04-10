@@ -325,6 +325,72 @@ Keep response under 200 words. Be practical and low-cost.`;
   }
 }
 
+
+export async function detectDisease(imageBuffer, mimeType) {
+  const prompt = `You are a professional plant pathologist and agriculture expert. Analyze this image of a plant/crop leaf.
+
+TASK:
+1. Identify the exact disease (if any).
+2. Rate the confidence of your analysis.
+3. Provide a brief description of the disease.
+4. Give a "Chemical Treatment" (specific pesticides/fungicides available in India).
+5. Give an "Organic Treatment" (low-cost, natural methods).
+6. Rate the severity (Low, Medium, High).
+
+IMPORTANT: You MUST respond ONLY with a valid JSON object in the exact format below, with NO markdown formatting, NO backticks, NO "json" label.
+{
+  "disease": "Disease Name",
+  "confidence": "XX%",
+  "severity": "High/Medium/Low",
+  "action": "Immediate Action text",
+  "description": "Short description of the disease",
+  "treatments": ["Chemical step 1", "Chemical step 2"],
+  "organic": ["Organic step 1", "Organic step 2"]
+}`;
+
+  try {
+    logger.ai('Calling Gemini Vision for disease detection...');
+    const model = getAI().getGenerativeModel({ 
+      model: 'gemini-1.5-flash',
+      generationConfig: { responseMimeType: "application/json" }
+    });
+
+    const result = await model.generateContent([
+      prompt,
+      {
+        inlineData: {
+          data: imageBuffer.toString('base64'),
+          mimeType
+        }
+      }
+    ]);
+
+    const response = await result.response;
+    let rawText = response.text().trim();
+    
+    // Fallback cleanup
+    if (rawText.startsWith('\`\`\`json')) {
+      rawText = rawText.substring(7, rawText.length - 3).trim();
+    } else if (rawText.startsWith('\`\`\`')) {
+      rawText = rawText.substring(3, rawText.length - 3).trim();
+    }
+
+    return JSON.parse(rawText);
+  } catch (error) {
+    logger.error(`Gemini disease detection error: ${error.message}`);
+    // Return a structured error response that the frontend can handle
+    return {
+      disease: "Identification Failed",
+      confidence: "0%",
+      severity: "N/A",
+      action: "Please retry with a clearer photo",
+      description: "AI was unable to clearly identify a disease from this photo. It could be due to lighting, focus, or an unknown condition.",
+      treatments: ["Check for pests manually", "Ensure proper watering"],
+      organic: ["Spray neem oil if pests are visible"]
+    };
+  }
+}
+
 function getSeasonName() {
   const month = new Date().getMonth() + 1;
   if (month >= 6 && month <= 10) return 'Kharif (Monsoon)';
